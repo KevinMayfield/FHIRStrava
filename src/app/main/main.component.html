@@ -1,0 +1,27 @@
+<td-layout class="layout-nav-demo" sidenavWidth="280px">
+  <td-navigation-drawer
+    flex
+    sidenavTitle="Menu" >
+    <mat-list>
+      <mat-list-item (click)="logout()">Logout Strava</mat-list-item>
+    </mat-list>
+
+  </td-navigation-drawer>
+  <td-layout-nav-list navigationRoute="/" opened="false" mode="side">
+
+    <div td-sidenav-content>
+
+
+    </div>
+    <div td-toolbar-content flex-auto>
+            <span flex>
+            <button mat-icon-button td-menu-button tdLayoutToggle>
+                <mat-icon>menu</mat-icon>
+            </button>
+            FHIR Strava
+            </span>
+      <!--   <span *ngIf="drugName"> - {{drugName}}</span> -->
+    </div>
+    <router-outlet></router-outlet>
+  </td-layout-nav-list>
+</td-layout>

@@ -1,0 +1,86 @@
+<mat-card>
+
+
+  <span *ngIf="connect">
+  <img class="img-responsive" (click)="connectStrava()" src="assets/images/btn_strava_connectwith_orange.png">
+</span>
+
+  <span *ngIf="!connect">
+  <table [dataSource]="activityDataSource" width="100%" mat-table class="mat-elevation-z8">
+
+
+     <ng-container matColumnDef="link">
+      <th *matHeaderCellDef mat-header-cell>Strava</th>
+      <td  *matCellDef="let activity">
+        <mat-icon (click)="openStrava(activity.id)" color="primary" class="hover">open_in_new</mat-icon> </td>
+    </ng-container>
+
+      <ng-container matColumnDef="type">
+      <th *matHeaderCellDef mat-header-cell>Type</th>
+      <td  *matCellDef="let activity">
+        <mat-icon *ngIf="activity.type==='Walk'" >directions_walk</mat-icon>
+        <mat-icon *ngIf="activity.type=='Ride'" >pedal_bike</mat-icon>
+        <mat-icon *ngIf="activity.type=='VirtualRide'" >directions_bike</mat-icon>
+      </td>
+    </ng-container>
+
+       <ng-container matColumnDef="powerlink">
+      <th *matHeaderCellDef mat-header-cell>Power.CC</th>
+      <td  *matCellDef="let activity">
+        <span *ngIf="activity.device_watts">
+        <mat-icon (click)="openPowerCC(activity.id)" color="primary" class="hover">query_stats</mat-icon>
+      </span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="date">
+      <th *matHeaderCellDef mat-header-cell>Date</th>
+      <td  *matCellDef="let activity">
+        {{datepipe.transform(activity.start_date, 'dd MMM HH:mm  ') }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="name">
+      <th *matHeaderCellDef mat-header-cell>Name</th>
+      <td  *matCellDef="let activity">
+      {{activity.name}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="energy">
+      <th *matHeaderCellDef mat-header-cell>Energy (kJ)</th>
+      <td  *matCellDef="let activity">
+        {{activity.kilojoules}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="distance">
+      <th *matHeaderCellDef mat-header-cell>Distance (km)</th>
+      <td  *matCellDef="let activity" matTooltip="English units only, no US units">
+        {{round(activity.distance / 1000)}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="duration">
+      <th *matHeaderCellDef mat-header-cell> Duration (min) </th>
+      <td  *matCellDef="let activity">
+        {{round(activity.moving_time / 60)}} </td>
+    </ng-container>
+
+     <ng-container matColumnDef="suffer">
+      <th *matHeaderCellDef mat-header-cell>Suffer Score</th>
+    <td  *matCellDef="let activity">
+        {{activity.suffer_score}}
+      <mat-slider min="1"
+                  max="300" [value]="activity.suffer_score" disabled="true"></mat-slider></td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="activityDisplayedColumns"></tr>
+    <tr *matRowDef="let row; columns: activityDisplayedColumns" mat-row></tr>
+  </table>
+    <!-- debug
+  <td-json-formatter *ngIf="athlete" [data]="athlete" key="root" [levelsOpen]="1">
+  </td-json-formatter> -->
+    <span *ngIf="activities.length> 0">
+    <h2>Debug Information</h2>
+  <td-json-formatter [data]="activities" key="root" [levelsOpen]="1">
+  </td-json-formatter>
+      </span>
+  </span>
+</mat-card>
