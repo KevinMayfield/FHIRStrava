@@ -60,15 +60,29 @@
     <ng-container matColumnDef="duration">
       <th *matHeaderCellDef mat-header-cell> Duration (min) </th>
       <td  *matCellDef="let activity">
-        {{round(activity.moving_time / 60)}} </td>
+
+        {{hhmm(activity.moving_time)}} </td>
     </ng-container>
 
      <ng-container matColumnDef="suffer">
       <th *matHeaderCellDef mat-header-cell>Suffer Score</th>
     <td  *matCellDef="let activity">
-        {{activity.suffer_score}}
-      <mat-slider min="1"
-                  max="300" [value]="activity.suffer_score" disabled="true"></mat-slider></td>
+      <span *ngIf="(activity.suffer_score < 50)">
+           <button mat-mini-fab color="none">{{activity.suffer_score}}</button>
+      </span>
+           <span *ngIf="(activity.suffer_score > 50 && activity.suffer_score < 100)">
+           <button mat-mini-fab color="primary">{{activity.suffer_score}}</button>
+      </span>
+      <span *ngIf="(activity.suffer_score >= 100 && activity.suffer_score < 200)">
+           <button mat-mini-fab color="accent">{{activity.suffer_score}}</button>
+      </span>
+       <span *ngIf="(activity.suffer_score >= 200)">
+           <button mat-mini-fab color="warn">{{activity.suffer_score}}</button>
+      </span>
+
+  <!--    <mat-slider min="1"
+                  max="300" [value]="activity.suffer_score" disabled="true"></mat-slider> -->
+                  </td>
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="activityDisplayedColumns"></tr>
