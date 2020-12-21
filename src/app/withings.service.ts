@@ -8,7 +8,7 @@ export class WithingsService {
 
   accesToken = undefined;
 
-  appRoute = undefined;
+
 
   constructor(private http: HttpClient) { }
 
@@ -20,10 +20,9 @@ export class WithingsService {
     if (routeUrl.substring(routeUrl.length - 1,1) === '/') {
       routeUrl = routeUrl.substring(0, routeUrl.length - 1);
     }
-    console.log(routeUrl);
-    console.log(routeUrl.substring(routeUrl.length - 1,1));
 
-    this.appRoute = routeUrl;
+
+    localStorage.setItem('appRoute', routeUrl);
     window.location.href = 'https://account.withings.com/oauth2_user/authorize2?response_type=code&client_id='+this.clientId+ '&redirect_uri='+routeUrl+'\withings&state=12345&scope=user.metrics';
   }
 
@@ -35,19 +34,39 @@ export class WithingsService {
     headers.append('Access-Control-Allow-Origin', '*');
 
 
-   var url = 'https://account.withings.com/oauth2/token';
+  // var url = 'https://account.withings.com/oauth2/token';
+    var url = 'http://localhost:8187/services/token';
  //  var url = 'https://wbsapi.withings.net/v2/oauth2'
 
-
+/*
     const body = new HttpParams();
     //body.set('action', 'requesttoken');
     body.set('grant_type', 'authorization_code');
     body.set('client_id', this.clientId);
     body.set('client_secret', this.clientSecret);
-    body.set('redirect_uri',this.appRoute+'\withings');
+    body.set('redirect_uri',localStorage.getItem('appRoute')+'\withings');
     body.set('code',authorisationCode);
+    console.log(body.toString());
 
-    return this.http.post<any>(url, body.toString(), { 'headers' : headers} );
+
+    const form = new FormData();
+    //body.set('action', 'requesttoken');
+    form.append('grant_type', 'authorization_code');
+    form.append('client_id', this.clientId);
+    form.append('client_secret', this.clientSecret);
+    form.append('redirect_uri',localStorage.getItem('appRoute')+'\withings');
+    form.append('code',authorisationCode);
+    console.log(form.toString());
+*/
+    var bodge= 'grant_type=authorization_code'
+    + '&client_id=' + this.clientId
+    + '&client_secret=' + this.clientSecret
+    + '&redirect_uri=' + localStorage.getItem('appRoute')+'\withings'
+    + '&code=' + authorisationCode;
+
+    console.log(bodge);
+
+    return this.http.post<any>(url, bodge, { 'headers' : headers} );
   }
 
 }
