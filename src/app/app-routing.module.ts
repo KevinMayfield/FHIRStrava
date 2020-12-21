@@ -3,6 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import {MainComponent} from "./main/main.component";
 import {BodyComponent} from "./body/body.component";
 import {ExchangeTokenComponent} from "./exchange-token/exchange-token.component";
+import {WithingsComponent} from "./withings/withings.component";
 
 const routes: Routes = [
   {
@@ -15,6 +16,9 @@ const routes: Routes = [
   },
   {
     path: 'exchange_token', component: ExchangeTokenComponent
+  },
+  {
+    path: 'withings', component: WithingsComponent
   }
 ];
 

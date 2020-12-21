@@ -4,7 +4,7 @@ import {Athlete} from "../models/athlete";
 import {SummaryActivity} from "../models/summary-activity";
 import {ActivityDataSource} from "../activity-data-source";
 import {DatePipe} from "@angular/common";
-import {Router} from "@angular/router";
+import {WithingsService} from "../withings.service";
 
 
 @Component({
@@ -14,7 +14,8 @@ import {Router} from "@angular/router";
 })
 export class BodyComponent implements OnInit {
 
-  constructor(private strava: StravaService) {
+  constructor(private strava: StravaService,
+              private withings: WithingsService) {
 
   }
 
@@ -23,20 +24,24 @@ export class BodyComponent implements OnInit {
 
   connect = true;
 
+  withingsConnect = true;
+
   activityDataSource: ActivityDataSource;
 
   datepipe: DatePipe = new DatePipe('en-GB')
 
-  activityDisplayedColumns = ['link', 'date', 'type', 'name',  'powerlink', 'energy', 'distance', 'duration', 'suffer'];
+  activityDisplayedColumns = ['link', 'date', 'type', 'name',  'powerlink',  'distance', 'duration','energy', 'suffer'];
 
   activities : SummaryActivity[] = [];
 
   ngOnInit(): void {
 
-
-
     if (localStorage.getItem('accessToken') != undefined) {
-       this.strava.accesToken = localStorage.getItem('accessToken');
+      var token: any = JSON.parse(localStorage.getItem('accessToken'));
+       if (token != undefined) {
+         this.strava.accesToken = token.access_token;
+
+       }
     }
 
     if (this.strava.accesToken != undefined) {
@@ -47,12 +52,26 @@ export class BodyComponent implements OnInit {
     }
   }
 
+  pad(num:number, size:number): string {
+    let s = num+"";
+    while (s.length < size) s = "0" + s;
+    return s;
+  }
+  hhmm(num) {
+    var min = Math.round(num/60);
+    var mins = this.pad(Math.round((min%60) ),2)
+    return Math.trunc(min/60) + ':' + mins.substring(0,2);
+  }
   connectStrava() {
 
     this.athlete = undefined;
     this.activities = undefined;
 
     this.strava.authorise(window.location.href);
+  }
+
+  connectWithings() {
+    this.withings.authorise(window.location.href);
   }
 
   openStrava(id) {
@@ -80,6 +99,9 @@ export class BodyComponent implements OnInit {
       },
       (err) => {
         console.log(err);
+        if (err.status == 401) {
+          this.connect = true;
+        }
       }
     );
 
@@ -93,6 +115,9 @@ export class BodyComponent implements OnInit {
       },
       (err) => {
         console.log(err);
+        if (err.status == 401) {
+          this.connect = true;
+        }
       }
     );
   }
@@ -100,4 +125,5 @@ export class BodyComponent implements OnInit {
   round(num) {
     return Math.round(num);
   }
+
 }

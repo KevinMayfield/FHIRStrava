@@ -29,7 +29,7 @@ export class ExchangeTokenComponent implements OnInit {
     this.strava.getAccessToken(authorisationCode).subscribe(
       token => {
         console.log(token);
-        localStorage.setItem('accessToken', token.access_token);
+        localStorage.setItem('accessToken', JSON.stringify(token));
         this.strava.accesToken = token.access_token;
         this.router.navigateByUrl('/');
       }

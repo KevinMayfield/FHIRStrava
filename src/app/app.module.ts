@@ -28,13 +28,15 @@ import { BodyComponent } from './body/body.component';
 import {CovalentJsonFormatterModule} from "@covalent/core/json-formatter";
 import { ExchangeTokenComponent } from './exchange-token/exchange-token.component';
 import {MatSliderModule} from "@angular/material/slider";
+import { WithingsComponent } from './withings/withings.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     MainComponent,
     BodyComponent,
-    ExchangeTokenComponent
+    ExchangeTokenComponent,
+    WithingsComponent
   ],
   imports: [
     BrowserModule,

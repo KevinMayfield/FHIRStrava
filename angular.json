@@ -127,5 +127,8 @@
       }
     }
   },
-  "defaultProject": "FHIRStrava"
+  "defaultProject": "FHIRStrava",
+  "cli": {
+    "analytics": "bb0c3d81-f2f4-495a-a85c-015d040df47b"
+  }
 }

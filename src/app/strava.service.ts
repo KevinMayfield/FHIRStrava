@@ -23,6 +23,10 @@ export class StravaService {
 
       let headers = new HttpHeaders(
       );
+      if (localStorage.getItem('accessToken') != undefined) {
+          var token: any = JSON.parse(localStorage.getItem('accessToken'));
+          console.log('token ' + token.expires_at + ' in ' + token.expires_in);
+      }
       headers = headers.append('Authorization', 'Bearer '+this.accesToken);
       return headers;
     }
@@ -39,23 +43,10 @@ export class StravaService {
   }
 
   public getAccessToken(authorisationCode) {
-    /*
-   curl -X POST https://www.strava.com/oauth/token \
- -F client_id=YOURCLIENTID \
- -F client_secret=YOURCLIENTSECRET \
- -F code=AUTHORIZATIONCODE \
- -F grant_type=authorization_code
 
-    */
     let headers = new HttpHeaders(
     );
 
-    /*
-   headers = headers.append('client_id', this.clientId);
-    headers = headers.append('client_secret', this.clientSecret);
-    headers = headers.append('code', authorisationCode);
-    headers = headers.append('grant_type', 'authorization_code');
-*/
     var url = 'https://www.strava.com/oauth/token' +
       '?client_id='+this.clientId +
       '&client_secret='+this.clientSecret +
