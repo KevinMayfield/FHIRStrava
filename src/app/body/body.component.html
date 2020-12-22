@@ -11,13 +11,19 @@
 </span>
 
   <td-tab-select [(ngModel)]="tabValue"  stretchTabs>
+    <td-tab-option value="charts">Chart</td-tab-option>
     <td-tab-option value="comb">Combined</td-tab-option>
     <td-tab-option value="strava">Strava</td-tab-option>
-    <td-tab-option value="debug">Withings Debug</td-tab-option>
-    <td-tab-option value="hamsters" disabled>Strava Debug</td-tab-option>
+   <!-- <td-tab-option value="debug">Withings Debug</td-tab-option> -->
+
   </td-tab-select>
 
-  <span  *ngIf="!withingsConnect && tabValue=='comb'">
+  <span *ngIf="tabValue=='charts'">
+    <span *ngIf="(!withingsConnect && !connect) && measures.length> 0">
+    <app-charts [observations]="obs"></app-charts>
+      </span>
+  </span>
+  <span  *ngIf="(!withingsConnect || !connect) && tabValue=='comb'">
     <table [dataSource]="obsDataSource" width="100%" mat-table matSort
            matSortActive="obsDate" matSortDirection="desc"
            class="mat-elevation-z8" (sort)="sorter($event)">

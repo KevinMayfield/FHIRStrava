@@ -47,7 +47,7 @@ export class BodyComponent implements OnInit {
 
   obsDataSource: MatTableDataSource<Obs>;
 
-  tabValue: string = '';
+  tabValue: string = 'charts';
 
   @ViewChild(MatSort) sort: MatSort;
 
@@ -87,11 +87,12 @@ export class BodyComponent implements OnInit {
 
   sortIt() {
 
-    this.sort.sortChange.subscribe((event) => {
-      console.log(event);
-    });
-    this.obsDataSource.sort = this.sort;
-
+    if (this.sort != undefined) {
+      this.sort.sortChange.subscribe((event) => {
+        console.log(event);
+      });
+      this.obsDataSource.sort = this.sort;
+    }
   }
 
 
@@ -149,13 +150,17 @@ export class BodyComponent implements OnInit {
     );
 
   }
-  getActivities() {
-    this.strava.getActivities().subscribe(
+  getActivities(page?) {
+    this.strava.getActivities(page).subscribe(
       result => {
-
+        if (page== undefined) page = 0;
+        console.log(page);
+        page++;
         this.activities = result;
         this.activityDataSource = new ActivityDataSource(this.activities);
+        if (result.length > 0) this.getActivities(page);
         this.processStravaObs();
+
       },
       (err) => {
         console.log(err);

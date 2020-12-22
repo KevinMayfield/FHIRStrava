@@ -31,6 +31,10 @@ import {MatSliderModule} from "@angular/material/slider";
 import { WithingsComponent } from './withings/withings.component';
 import {MatSortModule} from "@angular/material/sort";
 import {CovalentTabSelectModule} from "@covalent/core/tab-select";
+import { ChartsComponent } from './charts/charts.component';
+import {NgxChartsModule} from "@swimlane/ngx-charts";
+import { StravaChartComponent } from './strava-chart/strava-chart.component';
+import { PWVChartComponent } from './pwvchart/pwvchart.component';
 
 @NgModule({
   declarations: [
@@ -38,7 +42,10 @@ import {CovalentTabSelectModule} from "@covalent/core/tab-select";
     MainComponent,
     BodyComponent,
     ExchangeTokenComponent,
-    WithingsComponent
+    WithingsComponent,
+    ChartsComponent,
+    StravaChartComponent,
+    PWVChartComponent
   ],
   imports: [
     BrowserModule,
@@ -71,7 +78,9 @@ import {CovalentTabSelectModule} from "@covalent/core/tab-select";
     MatToolbarModule,
     MatCheckboxModule,
     MatSliderModule,
-    MatSortModule
+    MatSortModule,
+
+    NgxChartsModule
 
   ],
   providers: [],

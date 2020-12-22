@@ -75,7 +75,7 @@ export class WithingsService {
 
     let headers = this.getHeaders();
 
-    var lastUpdate = new Date('2020-12-01');
+    var lastUpdate = new Date('2020-07-14');
 
     var bodge= 'action=getmeas'
       + '&meastypes=1,5,77,76,88,91'

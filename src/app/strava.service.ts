@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {Athlete} from "./models/athlete";
+import {last} from "rxjs/operators";
 
 
 @Injectable({
@@ -34,8 +35,16 @@ export class StravaService {
   public getAthlete(): Observable<Athlete> {
     return this.http.get<Athlete>(this.url+'athlete',{'headers': this.getHeaders()});
   }
-  public getActivities(): Observable<any> {
-    return this.http.get<any>(this.url+'athlete/activities',{'headers': this.getHeaders()});
+  public getActivities(page?): Observable<any> {
+    var uri = this.url+'athlete/activities';
+
+    var lastUpdate = new Date('2020-07-14');
+    uri = uri + '?after='+Math.floor(lastUpdate.getTime()/ 1000)+'per_page=30';
+
+    if (page !== undefined) {
+      uri = uri +'&page='+page;
+    }
+    return this.http.get<any>(uri,{'headers': this.getHeaders()});
   }
 
   public authorise(routeUrl) {

@@ -26,6 +26,7 @@
     "@covalent/highlight": "^3.1.0",
     "@covalent/http": "^3.1.0",
     "@covalent/markdown": "^3.1.0",
+    "@swimlane/ngx-charts": "^16.0.0",
     "moment": "^2.29.1",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",
