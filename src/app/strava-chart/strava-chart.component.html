@@ -1,4 +1,4 @@
-<div style="width: 100%; height: 200px; box-sizing: border-box;">
+<div style="width: 100%; height: 200px; box-sizing: border-box; border-style: solid;">
 
 
   <ngx-charts-line-chart
@@ -12,7 +12,8 @@
     [xAxisLabel]="xAxisLabel"
     [yAxisLabel]="yAxisLabel"
     [timeline]="timeline"
-    [results]="multi"
+    [yScaleMin] = "yScaleMin"
+    [results]="results"
     (select)="onSelect($event)"
     (activate)="onActivate($event)"
     (deactivate)="onDeactivate($event)"

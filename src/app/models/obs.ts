@@ -9,6 +9,8 @@ export interface Obs {
   pwv? : number;
   suffer? : number;
   energy? : number;
+  average_heartrate?: number;
+  weighted_average_watts? : number;
   /*
   1	Weight (kg)
   4	Height (meter)

@@ -31,11 +31,11 @@ export class BodyComponent implements OnInit {
 
   withingsConnect = true;
 
-  activityDataSource: ActivityDataSource;
+
 
   datepipe: DatePipe = new DatePipe('en-GB')
 
-  activityDisplayedColumns = ['link', 'date', 'type', 'name',  'powerlink',  'distance', 'duration','energy', 'suffer'];
+  activityDisplayedColumns = ['link', 'date', 'type', 'name',  'powerlink',  'distance','duration', 'average_heartrate','weighted_average_watts','energy', 'suffer'];
 
   observationDisplayedColumns = ['obsDate', 'weight', 'muscle','fat', 'hydration', 'pwv', 'energy', 'suffer' ];
 
@@ -47,7 +47,9 @@ export class BodyComponent implements OnInit {
 
   obsDataSource: MatTableDataSource<Obs>;
 
-  tabValue: string = 'charts';
+  activityDataSource: MatTableDataSource<SummaryActivity>;
+
+  tabValue: string = 'strava';
 
   @ViewChild(MatSort) sort: MatSort;
 
@@ -71,6 +73,8 @@ export class BodyComponent implements OnInit {
     this.obs = [];
     this.obsDataSource = new MatTableDataSource<Obs>(this.obs);
 
+    this.activities = [];
+    this.activityDataSource = new MatTableDataSource<SummaryActivity>(this.activities);
 
     if (this.withings.accesToken != undefined) {
       this.withingsConnect = false;
@@ -156,11 +160,8 @@ export class BodyComponent implements OnInit {
         if (page== undefined) page = 0;
         console.log(page);
         page++;
-        this.activities = result;
-        this.activityDataSource = new ActivityDataSource(this.activities);
+        this.processStravaObs(result);
         if (result.length > 0) this.getActivities(page);
-        this.processStravaObs();
-
       },
       (err) => {
         console.log(err);
@@ -169,6 +170,25 @@ export class BodyComponent implements OnInit {
         }
       }
     );
+  }
+
+  processStravaObs(result) {
+    for (const activity of result) {
+      var date = new Date(activity.start_date).toISOString();
+      this.activities.push(activity);
+
+      var obs : Obs = {
+        'obsDate' : new Date(date),
+        'suffer' : activity.suffer_score,
+        'energy' : activity.kilojoules,
+        'average_heartrate' : activity.average_heartrate,
+        'weighted_average_watts': activity.weighted_average_watts
+      }
+      this.obs.push(obs);
+    }
+    this.activityDataSource.data = this.activities;
+    this.obsDataSource.data = this.obs;
+    this.sortIt();
   }
 
   round(num) {
@@ -195,21 +215,7 @@ export class BodyComponent implements OnInit {
     );
   }
 
-  processStravaObs() {
-    for (const activity of this.activities) {
-      var date = new Date(activity.start_date).toISOString();
 
-      var obs : Obs = {
-        'obsDate' : new Date(date),
-        'suffer' : activity.suffer_score,
-        'energy' : activity.kilojoules
-      }
-      this.obs.push(obs);
-    }
-    this.obsDataSource.data = this.obs;
-    this.sortIt();
-
-  }
   sorter(ev) {
     console.log(ev);
   }

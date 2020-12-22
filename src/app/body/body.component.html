@@ -11,74 +11,16 @@
 </span>
 
   <td-tab-select [(ngModel)]="tabValue"  stretchTabs>
-    <td-tab-option value="charts">Chart</td-tab-option>
-    <td-tab-option value="comb">Combined</td-tab-option>
     <td-tab-option value="strava">Strava</td-tab-option>
-   <!-- <td-tab-option value="debug">Withings Debug</td-tab-option> -->
+    <td-tab-option value="charts">Chart</td-tab-option>
+   <!-- <td-tab-option value="comb">Combined</td-tab-option>
+
+    <td-tab-option value="debug">Debug</td-tab-option> -->
 
   </td-tab-select>
 
-  <span *ngIf="tabValue=='charts'">
-    <span *ngIf="(!withingsConnect && !connect) && measures.length> 0">
-    <app-charts [observations]="obs"></app-charts>
-      </span>
-  </span>
-  <span  *ngIf="(!withingsConnect || !connect) && tabValue=='comb'">
-    <table [dataSource]="obsDataSource" width="100%" mat-table matSort
-           matSortActive="obsDate" matSortDirection="desc"
-           class="mat-elevation-z8" (sort)="sorter($event)">
+  <span *ngIf="!connect && tabValue=='strava'">
 
-          <ng-container matColumnDef="obsDate">
-      <th *matHeaderCellDef mat-header-cell mat-sort-header (sort)="sorter($event)">Date</th>
-      <td  *matCellDef="let observation">
-        {{datepipe.transform(observation.obsDate, 'dd MMM HH:mm  ') }} </td>
-    </ng-container>
-
-       <ng-container matColumnDef="weight">
-      <th *matHeaderCellDef mat-header-cell>Weight (Kg)</th>
-      <td  *matCellDef="let observation">
-        {{observation.weight }} </td>
-    </ng-container>
-
-          <ng-container matColumnDef="muscle">
-      <th *matHeaderCellDef mat-header-cell>Muscle Mass (Kg)</th>
-      <td  *matCellDef="let observation">
-        {{observation.muscle_mass }} </td>
-    </ng-container>
-
-          <ng-container matColumnDef="hydration">
-      <th *matHeaderCellDef mat-header-cell>Hydration (Kg)</th>
-      <td  *matCellDef="let observation">
-        {{observation.hydration }} </td>
-    </ng-container>
-
-        <ng-container matColumnDef="pwv">
-      <th *matHeaderCellDef mat-header-cell>Pulse Wave Velocity (m/s)</th>
-      <td  *matCellDef="let observation">
-        {{observation.pwv }} </td>
-    </ng-container>
-
-          <ng-container matColumnDef="fat">
-      <th *matHeaderCellDef mat-header-cell>Fat Mass (Kg)</th>
-      <td  *matCellDef="let observation">
-        {{observation.fat_mass }} </td>
-    </ng-container>
-    <ng-container matColumnDef="energy">
-      <th *matHeaderCellDef mat-header-cell>Energy (kJ)</th>
-      <td  *matCellDef="let observation">
-        {{observation.energy}} </td>
-    </ng-container>
-         <ng-container matColumnDef="suffer">
-      <th *matHeaderCellDef mat-header-cell>Suffer Score</th>
-      <td  *matCellDef="let observation">
-        {{observation.suffer }} </td>
-    </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="observationDisplayedColumns"></tr>
-    <tr *matRowDef="let row; columns: observationDisplayedColumns" mat-row></tr>
-    </table>
-  </span>
-  <span *ngIf="!connect&& tabValue=='strava'">
   <table [dataSource]="activityDataSource" width="100%" mat-table class="mat-elevation-z8">
 
 
@@ -137,6 +79,21 @@
         {{hhmm(activity.moving_time)}} </td>
     </ng-container>
 
+     <ng-container matColumnDef="average_heartrate">
+      <th *matHeaderCellDef mat-header-cell> Avg. HeartRate </th>
+      <td  *matCellDef="let activity">
+
+        {{activity.average_heartrate}} </td>
+    </ng-container>
+
+     <ng-container matColumnDef="weighted_average_watts">
+      <th *matHeaderCellDef mat-header-cell> Avg.(Norm.Norm.) Power </th>
+      <td  *matCellDef="let activity">
+
+        {{activity.weighted_average_watts}} </td>
+     </ng-container>
+
+
      <ng-container matColumnDef="suffer">
       <th *matHeaderCellDef mat-header-cell>Suffer Score</th>
     <td  *matCellDef="let activity">
@@ -153,8 +110,8 @@
            <button mat-mini-fab color="warn">{{activity.suffer_score}}</button>
       </span>
 
-  <!--    <mat-slider min="1"
-                  max="300" [value]="activity.suffer_score" disabled="true"></mat-slider> -->
+      <!--    <mat-slider min="1"
+                      max="300" [value]="activity.suffer_score" disabled="true"></mat-slider> -->
                   </td>
     </ng-container>
 
@@ -162,17 +119,80 @@
     <tr *matRowDef="let row; columns: activityDisplayedColumns" mat-row></tr>
   </table>
   </span>
-    <span *ngIf="measures.length> 0 && tabValue=='debug'" >
+  <span *ngIf="tabValue=='charts'">
+    <span *ngIf="(!withingsConnect && !connect) && activities.length> 0">
+    <app-charts [observations]="obs"></app-charts>
+      </span>
+  </span>
+  <span  *ngIf="(!withingsConnect || !connect) && tabValue=='comb'">
+    <table [dataSource]="obsDataSource" width="100%" mat-table matSort
+           matSortActive="obsDate" matSortDirection="desc"
+           class="mat-elevation-z8" (sort)="sorter($event)">
+
+          <ng-container matColumnDef="obsDate">
+      <th *matHeaderCellDef mat-header-cell mat-sort-header (sort)="sorter($event)">Date</th>
+      <td  *matCellDef="let observation">
+        {{datepipe.transform(observation.obsDate, 'dd MMM HH:mm  ') }} </td>
+    </ng-container>
+
+       <ng-container matColumnDef="weight">
+      <th *matHeaderCellDef mat-header-cell>Weight (Kg)</th>
+      <td  *matCellDef="let observation">
+        {{observation.weight }} </td>
+    </ng-container>
+
+          <ng-container matColumnDef="muscle">
+      <th *matHeaderCellDef mat-header-cell>Muscle Mass (Kg)</th>
+      <td  *matCellDef="let observation">
+        {{observation.muscle_mass }} </td>
+    </ng-container>
+
+          <ng-container matColumnDef="hydration">
+      <th *matHeaderCellDef mat-header-cell>Hydration (Kg)</th>
+      <td  *matCellDef="let observation">
+        {{observation.hydration }} </td>
+    </ng-container>
+
+        <ng-container matColumnDef="pwv">
+      <th *matHeaderCellDef mat-header-cell>Pulse Wave Velocity (m/s)</th>
+      <td  *matCellDef="let observation">
+        {{observation.pwv }} </td>
+    </ng-container>
+
+          <ng-container matColumnDef="fat">
+      <th *matHeaderCellDef mat-header-cell>Fat Mass (Kg)</th>
+      <td  *matCellDef="let observation">
+        {{observation.fat_mass }} </td>
+    </ng-container>
+    <ng-container matColumnDef="energy">
+      <th *matHeaderCellDef mat-header-cell>Energy (kJ)</th>
+      <td  *matCellDef="let observation">
+        {{observation.energy}} </td>
+    </ng-container>
+         <ng-container matColumnDef="suffer">
+      <th *matHeaderCellDef mat-header-cell>Suffer Score</th>
+      <td  *matCellDef="let observation">
+        {{observation.suffer }} </td>
+    </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="observationDisplayedColumns"></tr>
+    <tr *matRowDef="let row; columns: observationDisplayedColumns" mat-row></tr>
+    </table>
+  </span>
+
+    <span *ngIf="tabValue=='debug'" >
     <!-- debug
   <td-json-formatter *ngIf="athlete" [data]="athlete" key="root" [levelsOpen]="1">
   </td-json-formatter> -->
+      <
 
- <!-- <td-json-formatter [data]="activities" key="root" [levelsOpen]="1">
-  </td-json-formatter>-->
-
-      <td-json-formatter [data]="measures" key="root" [levelsOpen]="1">
+ <td-json-formatter [data]="activities" key="root" [levelsOpen]="1">
   </td-json-formatter>
 
+      <!--
+      <td-json-formatter [data]="measures" key="root" [levelsOpen]="1">
+  </td-json-formatter>
+-->
   </span>
 
 </mat-card>

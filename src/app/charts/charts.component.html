@@ -1,7 +1,11 @@
 
 
-  <app-pwvchart [multi]="multi" yAxisLabel="Weight"> </app-pwvchart>
-  <app-strava-chart [multi]="strava" yAxisLabel="Strava"> </app-strava-chart>
-  <app-strava-chart [multi]="pwv" yAxisLabel="Pulse Wave" ></app-strava-chart>
+  <span *ngFor="let chart of charts">
+     <span *ngIf="chart.chart.length>0 && chart.chart[0].series.length>0">
+
+      <app-strava-chart [results]="chart.chart" [yAxisLabel]="chart.name" [xAxisLabel]="chart.chart[0].name"> </app-strava-chart>
+       </span>
+  </span>
+
 
 
