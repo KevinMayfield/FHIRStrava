@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
+import {Observable} from "rxjs";
+import {Athlete} from "./models/athlete";
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +10,7 @@ export class WithingsService {
 
   accesToken = undefined;
 
-
+  url = 'https://wbsapi.withings.net/measure';
 
   constructor(private http: HttpClient) { }
 
@@ -26,6 +28,20 @@ export class WithingsService {
     window.location.href = 'https://account.withings.com/oauth2_user/authorize2?response_type=code&client_id='+this.clientId+ '&redirect_uri='+routeUrl+'\withings&state=12345&scope=user.metrics';
   }
 
+
+  getHeaders() : HttpHeaders {
+
+    let headers = new HttpHeaders(
+    );
+    if (localStorage.getItem('withingsToken') != undefined) {
+      var token: any = JSON.parse(localStorage.getItem('withingsToken'));
+      console.log('withings token ' + token.expires_at + ' in ' + token.expires_in);
+    }
+    headers = headers.append('Authorization', 'Bearer '+this.accesToken);
+    headers.append('Content-Type', 'application/x-www-form-urlencoded');
+    return headers;
+  }
+
   public getAccessToken(authorisationCode) {
 
     let headers = new HttpHeaders(
@@ -38,35 +54,40 @@ export class WithingsService {
     var url = 'http://localhost:8187/services/token';
  //  var url = 'https://wbsapi.withings.net/v2/oauth2'
 
-/*
-    const body = new HttpParams();
-    //body.set('action', 'requesttoken');
-    body.set('grant_type', 'authorization_code');
-    body.set('client_id', this.clientId);
-    body.set('client_secret', this.clientSecret);
-    body.set('redirect_uri',localStorage.getItem('appRoute')+'\withings');
-    body.set('code',authorisationCode);
-    console.log(body.toString());
-
-
-    const form = new FormData();
-    //body.set('action', 'requesttoken');
-    form.append('grant_type', 'authorization_code');
-    form.append('client_id', this.clientId);
-    form.append('client_secret', this.clientSecret);
-    form.append('redirect_uri',localStorage.getItem('appRoute')+'\withings');
-    form.append('code',authorisationCode);
-    console.log(form.toString());
-*/
     var bodge= 'grant_type=authorization_code'
     + '&client_id=' + this.clientId
     + '&client_secret=' + this.clientSecret
     + '&redirect_uri=' + localStorage.getItem('appRoute')+'\withings'
     + '&code=' + authorisationCode;
 
-    console.log(bodge);
+
 
     return this.http.post<any>(url, bodge, { 'headers' : headers} );
+  }
+
+  public getWeight(): Observable<any> {
+
+    /*
+    curl --data "action=getmeas
+    &Authorization=Authorization
+    &meastype=meastype&meastypes=meastypes&category=category&startdate=startdate&enddate=enddate&offset=offset&lastupdate=integer" 'https://wbsapi.withings.net/measure'
+    */
+
+    let headers = this.getHeaders();
+
+    var lastUpdate = new Date('2020-12-01');
+
+    var bodge= 'action=getmeas'
+      + '&meastypes=1,5,77,76,88,91'
+      + '&category=1'
+     // + '&startdate=2020-12-12'
+     // + '&enddate=2020-12-22';
+      + '&lastupdate='+Math.floor(lastUpdate.getTime())/1000;
+
+
+
+    return this.http.post<any>(this.url, bodge, { 'headers' : headers} );
+
   }
 
 }

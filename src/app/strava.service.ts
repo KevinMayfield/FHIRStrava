@@ -25,7 +25,7 @@ export class StravaService {
       );
       if (localStorage.getItem('accessToken') != undefined) {
           var token: any = JSON.parse(localStorage.getItem('accessToken'));
-          console.log('token ' + token.expires_at + ' in ' + token.expires_in);
+          console.log('strava token ' + token.expires_at + ' in ' + token.expires_in);
       }
       headers = headers.append('Authorization', 'Bearer '+this.accesToken);
       return headers;

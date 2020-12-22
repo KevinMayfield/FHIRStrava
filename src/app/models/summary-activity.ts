@@ -4,6 +4,7 @@ import {PolylineMap} from "./polyline-map";
 
 
 export interface SummaryActivity {
+  suffer_score?: number;
   id: number;
   external_id: string;
   upload_id: number;
@@ -37,4 +38,5 @@ export interface SummaryActivity {
   average_speed: number;
   max_speed: number;
   has_kudoed: boolean;
+  kilojoules : number;
 }

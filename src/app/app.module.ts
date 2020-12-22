@@ -29,6 +29,8 @@ import {CovalentJsonFormatterModule} from "@covalent/core/json-formatter";
 import { ExchangeTokenComponent } from './exchange-token/exchange-token.component';
 import {MatSliderModule} from "@angular/material/slider";
 import { WithingsComponent } from './withings/withings.component';
+import {MatSortModule} from "@angular/material/sort";
+import {CovalentTabSelectModule} from "@covalent/core/tab-select";
 
 @NgModule({
   declarations: [
@@ -53,6 +55,7 @@ import { WithingsComponent } from './withings/withings.component';
     CovalentMarkdownModule,
     CovalentCommonModule,
     CovalentJsonFormatterModule,
+    CovalentTabSelectModule,
 
     MatButtonModule,
     MatIconModule,
@@ -67,7 +70,9 @@ import { WithingsComponent } from './withings/withings.component';
     MatSelectModule,
     MatToolbarModule,
     MatCheckboxModule,
-    MatSliderModule
+    MatSliderModule,
+    MatSortModule
+
   ],
   providers: [],
   bootstrap: [AppComponent]

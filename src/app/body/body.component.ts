@@ -1,10 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {StravaService} from "../strava.service";
 import {Athlete} from "../models/athlete";
 import {SummaryActivity} from "../models/summary-activity";
 import {ActivityDataSource} from "../activity-data-source";
 import {DatePipe} from "@angular/common";
 import {WithingsService} from "../withings.service";
+import {MeasureGroups} from "../models/measure-groups";
+import {Obs} from "../models/obs";
+
+import {MatSort, MatSortable} from "@angular/material/sort";
+import {MatTableDataSource} from "@angular/material/table";
 
 
 @Component({
@@ -32,7 +37,19 @@ export class BodyComponent implements OnInit {
 
   activityDisplayedColumns = ['link', 'date', 'type', 'name',  'powerlink',  'distance', 'duration','energy', 'suffer'];
 
+  observationDisplayedColumns = ['obsDate', 'weight', 'muscle','fat', 'hydration', 'pwv', 'energy', 'suffer' ];
+
   activities : SummaryActivity[] = [];
+
+  measures : MeasureGroups[] = [];
+
+  obs: Obs[] = [];
+
+  obsDataSource: MatTableDataSource<Obs>;
+
+  tabValue: string = '';
+
+  @ViewChild(MatSort) sort: MatSort;
 
   ngOnInit(): void {
 
@@ -44,6 +61,22 @@ export class BodyComponent implements OnInit {
        }
     }
 
+    if (localStorage.getItem('withingsToken') != undefined) {
+      var token: any = JSON.parse(localStorage.getItem('withingsToken'));
+      if (token != undefined) {
+        this.withings.accesToken = token.access_token;
+      }
+    }
+
+    this.obs = [];
+    this.obsDataSource = new MatTableDataSource<Obs>(this.obs);
+
+
+    if (this.withings.accesToken != undefined) {
+      this.withingsConnect = false;
+        this.getObservations();
+    }
+
     if (this.strava.accesToken != undefined) {
       this.connect = false;
 
@@ -51,6 +84,16 @@ export class BodyComponent implements OnInit {
       this.getActivities()
     }
   }
+
+  sortIt() {
+
+    this.sort.sortChange.subscribe((event) => {
+      console.log(event);
+    });
+    this.obsDataSource.sort = this.sort;
+
+  }
+
 
   pad(num:number, size:number): string {
     let s = num+"";
@@ -112,6 +155,7 @@ export class BodyComponent implements OnInit {
 
         this.activities = result;
         this.activityDataSource = new ActivityDataSource(this.activities);
+        this.processStravaObs();
       },
       (err) => {
         console.log(err);
@@ -124,6 +168,78 @@ export class BodyComponent implements OnInit {
 
   round(num) {
     return Math.round(num);
+  }
+
+  getObservations() {
+    this.withings.getWeight().subscribe(
+      result => {
+        if (result.status == 401) {
+          console.log('Withings 401');
+          localStorage.removeItem('withingsToken');
+        }
+       this.measures = result.body.measuregrps;
+
+        this.processObs();
+      },
+      (err) => {
+        console.log(err);
+        if (err.status == 401) {
+          this.withingsConnect = true;
+        }
+      }
+    );
+  }
+
+  processStravaObs() {
+    for (const activity of this.activities) {
+      var date = new Date(activity.start_date).toISOString();
+
+      var obs : Obs = {
+        'obsDate' : new Date(date),
+        'suffer' : activity.suffer_score,
+        'energy' : activity.kilojoules
+      }
+      this.obs.push(obs);
+    }
+    this.obsDataSource.data = this.obs;
+    this.sortIt();
+
+  }
+  sorter(ev) {
+    console.log(ev);
+  }
+  processObs() {
+
+    for (const grp of this.measures) {
+      var date = new Date(+grp.date * 1000).toISOString();
+
+       var obs : Obs = {
+          'obsDate' : new Date(date)
+       }
+       for (const measure of grp.measures) {
+         switch (measure.type) {
+           case 1:
+             obs.weight = +measure.value / 1000;
+             break;
+           case 76:
+             obs.muscle_mass =+measure.value / 1000;
+             break;
+           case 5:
+             obs.fat_mass =+measure.value / 1000;
+             break;
+           case 77:
+             obs.hydration =+measure.value / 1000;
+             break;
+           case 91:
+             obs.pwv =+measure.value / 1000;
+             break;
+         }
+       }
+
+       this.obs.push(obs);
+    }
+    this.obsDataSource.data = this.obs;
+    this.sortIt();
   }
 
 }
