@@ -9,13 +9,27 @@
 </span>
 
   <span *ngIf="stravaComplete">
-  <td-expansion-panel label="Charts" >
-    <div class="md-padding">
-      charts should appear here
-      <app-charts [observations]="obs"></app-charts>
-    </div>
-  </td-expansion-panel>
+    <td-expansion-panel-group multi="true" #covPanelGroup>
+      <span *ngFor="let chart of charts">
+
+        <td-expansion-panel *ngIf="chart.chart[0].series.length>0"  [label]="chart.chart[0].name" >
+          <div class="md-padding">
+              <app-line-chart [results]="chart.chart" [yAxisLabel]="chart.name" [xAxisLabel]="chart.chart[0].name"> </app-line-chart>
+          </div>
+
+        </td-expansion-panel>
+      </span>
+     <span *ngFor="let barChart of bars">
+        <td-expansion-panel [label]="barChart.chart[0].name" >
+          <div class="md-padding">
+                <app-bar-chart [results]="barChart.chart"></app-bar-chart>
+          </div>
+
+        </td-expansion-panel>
+      </span>
+       </td-expansion-panel-group>
     </span>
+
 
   <table [dataSource]="activityDataSource" width="100%"
          matSort
@@ -119,9 +133,9 @@
 
 
   <span *ngIf="tabValue=='debug'" >
-      <
- <td-json-formatter [data]="activities" key="root" [levelsOpen]="1">
-  </td-json-formatter>
+
+       <td-json-formatter [data]="activities" key="root" [levelsOpen]="1">
+        </td-json-formatter>
   </span>
 
 </mat-card>

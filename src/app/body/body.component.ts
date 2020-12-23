@@ -34,6 +34,8 @@ export class BodyComponent implements OnInit {
 
   datepipe: DatePipe = new DatePipe('en-GB')
 
+  charts: any[];
+  bars: any[];
 
   activityDisplayedColumns = ['link', 'start_date', 'type', 'name',  'powerlink',  'distance','moving_time', 'average_heartrate','weighted_average_watts','kilojoules', 'suffer_score'];
 
@@ -44,6 +46,7 @@ export class BodyComponent implements OnInit {
   obs: Obs[] = [];
 
   activityDataSource: MatTableDataSource<SummaryActivity>;
+  activityMap = new Map();
 
   tabValue: string = 'strava';
 
@@ -153,7 +156,7 @@ export class BodyComponent implements OnInit {
         else {
           this.stravaComplete = true;
           this.activityDataSource.data = this.activities;
-      //    this.obsDataSource.data = this.obs;
+          this.processGraph();
 
         };
       },
@@ -169,17 +172,24 @@ export class BodyComponent implements OnInit {
   processStravaObs(result) {
     for (const activity of result) {
       var date = new Date(activity.start_date).toISOString();
-      this.activities.push(activity);
 
-      var obs : Obs = {
-        'obsDate' : new Date(date),
-        'suffer' : activity.suffer_score,
-        'energy' : activity.kilojoules,
-        'average_heartrate' : activity.average_heartrate,
-        'weighted_average_watts': activity.weighted_average_watts,
+      if (this.activityMap.get(activity.id) == undefined) {
+        this.activityMap.set(activity.id,activity);
+        this.activities.push(activity);
 
+        var obs: Obs = {
+          'obsDate': new Date(date),
+          'name': activity.name,
+          'suffer': activity.suffer_score,
+          'energy': activity.kilojoules,
+          'average_heartrate': activity.average_heartrate,
+          'weighted_average_watts': activity.weighted_average_watts,
+
+        }
+        this.obs.push(obs);
+      } else {
+        console.log('Duplicate Id = '+this.activityMap.get(activity.id))
       }
-      this.obs.push(obs);
     }
   }
 
@@ -257,6 +267,187 @@ export class BodyComponent implements OnInit {
       'https://power-meter.cc/activities/'+id+'/power-analysis',
       '_blank' // <- This is what makes it open in a new window.
     )
+  }
+
+  processGraph(){
+
+    var charts = [
+      {
+        "name": "Kg",
+        "chart": [
+
+          {
+            "name": "Weight",
+            "series": []
+          }]
+      },
+      {
+        "name": "kJ",
+        "chart": [{
+          name: "Energy",
+          series: []
+        }]
+      },
+      {
+        "name": "m/s",
+        "chart": [{
+          "name": "Pulse Wave Velocity",
+          "series": [
+          ]
+        }]},
+      {
+        "name": "Score",
+        "chart": [{
+          "name": "Suffer Score",
+          "series": [
+          ]
+        }]},
+      {
+        "name": "Kg",
+        "chart": [
+
+          {
+            "name": "Muscle Mass",
+            "series": []
+          }]
+      },
+      {
+        "name": "Kg",
+        "chart": [
+
+          {
+            "name": "Fat Mass",
+            "series": []
+          }]
+      },
+      {
+        "name": "beats/min",
+        "chart": [
+
+          {
+            "name": "Avg. Heart Rate",
+            "series": []
+          }]
+      },
+      {
+        "name": "W",
+        "chart": [
+
+          {
+            "name": "Avg(Norm) Power",
+            "series": []
+          }]
+      },
+    ];
+
+    var bars = [
+      {
+        "name": "kJ",
+        "chart": [{
+          name: "Energy and Avg. Heart Rate",
+          series: [
+          ]
+        }]
+      }
+      ];
+
+
+    for (const obs of this.obs) {
+      if (obs.weight != undefined ) {
+        charts[0].chart[0].series.push({
+          name : obs.obsDate,
+          value : obs.weight
+        })
+      }
+
+      if (obs.energy != undefined ) {
+        charts[1].chart[0].series.push({
+          name : obs.obsDate,
+          value : obs.energy
+        })
+      }
+      if (obs.pwv != undefined ) {
+        charts[2].chart[0].series.push({
+          name : obs.obsDate,
+          value : obs.pwv
+        })
+      }
+      if (obs.suffer != undefined ) {
+        charts[3].chart[0].series.push({
+          name : obs.obsDate,
+          value : obs.suffer
+        })
+      }
+      if (obs.muscle_mass != undefined ) {
+        charts[4].chart[0].series.push({
+          name : obs.obsDate,
+          value : obs.muscle_mass
+        })
+      }
+      if (obs.fat_mass != undefined ) {
+        charts[5].chart[0].series.push({
+          name : obs.obsDate,
+          value : obs.fat_mass
+        })
+      }
+      if (obs.average_heartrate != undefined ) {
+        charts[6].chart[0].series.push({
+          name : obs.obsDate,
+          value : obs.average_heartrate
+        })
+      }
+      if (obs.weighted_average_watts != undefined ) {
+        charts[7].chart[0].series.push({
+          name : obs.obsDate,
+          value : obs.weighted_average_watts
+        })
+      }
+
+      if (obs.energy != undefined  && obs.average_heartrate != undefined ) {
+        bars[0].chart[0].series.push({
+          name : obs.name,
+          x: obs.obsDate,
+          y: obs.energy,
+          r: obs.average_heartrate
+        })
+      }
+    }
+
+    this.charts=[];
+    for (const chart of charts) {
+      if (chart.chart.length>0) {
+        this.charts.push(chart);
+      }
+    }
+    this.bars =[];
+    for (const bar of bars) {
+      if (bar.chart.length>0) {
+        this.bars.push(bar);
+      }
+    }
+  //  console.log(bars);
+  //  console.log(this.charts);
+  }
+
+  convertToBubble(event) : any {
+
+    var newseries : any = [];
+
+    for(const chart of event.chart) {
+      for(const item of chart.series) {
+        var newent = {
+          name: item.name,
+          x: item.name,
+          y: item.value,
+          r: item.value
+        };
+        newseries.push(newent);
+      }
+    }
+    console.log(newseries);
+    return newseries;
+
+
   }
 
 }

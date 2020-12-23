@@ -30,11 +30,10 @@ import { ExchangeTokenComponent } from './exchange-token/exchange-token.componen
 import {MatSliderModule} from "@angular/material/slider";
 import { WithingsComponent } from './withings/withings.component';
 import {MatSortModule} from "@angular/material/sort";
-import {CovalentTabSelectModule} from "@covalent/core/tab-select";
-import { ChartsComponent } from './charts/charts.component';
 import {NgxChartsModule} from "@swimlane/ngx-charts";
-import { StravaChartComponent } from './strava-chart/strava-chart.component';
+import { LineChartComponent } from './line-chart/line-chart.component';
 import {CovalentExpansionPanelModule} from "@covalent/core/expansion-panel";
+import { BarChartComponent } from './bar-chart/bar-chart.component';
 
 @NgModule({
   declarations: [
@@ -43,8 +42,9 @@ import {CovalentExpansionPanelModule} from "@covalent/core/expansion-panel";
     BodyComponent,
     ExchangeTokenComponent,
     WithingsComponent,
-    ChartsComponent,
-    StravaChartComponent,
+
+    LineChartComponent,
+    BarChartComponent,
   ],
   imports: [
     BrowserModule,

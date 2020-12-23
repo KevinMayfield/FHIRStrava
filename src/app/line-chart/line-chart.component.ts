@@ -2,11 +2,11 @@ import {Component, Input, OnInit} from '@angular/core';
 import {Obs} from "../models/obs";
 
 @Component({
-  selector: 'app-strava-chart',
-  templateUrl: './strava-chart.component.html',
-  styleUrls: ['./strava-chart.component.scss']
+  selector: 'app-line-chart',
+  templateUrl: './line-chart.component.html',
+  styleUrls: ['./line-chart.component.scss']
 })
-export class StravaChartComponent implements OnInit {
+export class LineChartComponent implements OnInit {
 
   constructor() { }
 
