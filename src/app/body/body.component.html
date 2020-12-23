@@ -58,26 +58,21 @@
         {{activity.name}} </td>
     </ng-container>
 
-    <ng-container matColumnDef="energy">
-      <th *matHeaderCellDef mat-header-cell>Energy (kJ)</th>
+    <ng-container matColumnDef="kilojoules">
+      <th *matHeaderCellDef mat-header-cell mat-sort-header>Energy (kJ)</th>
       <td  *matCellDef="let activity">
         {{activity.kilojoules}} </td>
     </ng-container>
 
-    <ng-container matColumnDef="calories">
-      <th *matHeaderCellDef mat-header-cell>Calories (kcal)</th>
-      <td  *matCellDef="let activity">
-        {{activity.calories}} </td>
-    </ng-container>
 
     <ng-container matColumnDef="distance">
-      <th *matHeaderCellDef mat-header-cell>Distance (km)</th>
+      <th *matHeaderCellDef mat-header-cell mat-sort-header>Distance (km)</th>
       <td  *matCellDef="let activity" matTooltip="English units only, no US units">
         {{round(activity.distance / 1000)}} </td>
     </ng-container>
 
-    <ng-container matColumnDef="duration">
-      <th *matHeaderCellDef mat-header-cell> Duration (min) </th>
+    <ng-container matColumnDef="moving_time">
+      <th *matHeaderCellDef mat-header-cell mat-sort-header> Duration (min) </th>
       <td  *matCellDef="let activity">
 
         {{hhmm(activity.moving_time)}} </td>
@@ -91,15 +86,15 @@
     </ng-container>
 
     <ng-container matColumnDef="weighted_average_watts">
-      <th *matHeaderCellDef mat-header-cell> Avg.(Norm.Norm.) Power </th>
+      <th *matHeaderCellDef mat-header-cell mat-sort-header> Avg.(Norm.Norm.) Power </th>
       <td  *matCellDef="let activity">
 
         {{activity.weighted_average_watts}} </td>
     </ng-container>
 
 
-    <ng-container matColumnDef="suffer">
-      <th *matHeaderCellDef mat-header-cell>Suffer Score</th>
+    <ng-container matColumnDef="suffer_score">
+      <th *matHeaderCellDef mat-header-cell mat-sort-header>Suffer Score</th>
       <td  *matCellDef="let activity">
       <span *ngIf="(activity.suffer_score < 50)">
            <button mat-mini-fab color="none">{{activity.suffer_score}}</button>

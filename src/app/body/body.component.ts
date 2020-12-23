@@ -35,7 +35,7 @@ export class BodyComponent implements OnInit {
   datepipe: DatePipe = new DatePipe('en-GB')
 
 
-  activityDisplayedColumns = ['link', 'start_date', 'type', 'name',  'powerlink',  'distance','duration', 'average_heartrate','weighted_average_watts','energy', 'suffer'];
+  activityDisplayedColumns = ['link', 'start_date', 'type', 'name',  'powerlink',  'distance','moving_time', 'average_heartrate','weighted_average_watts','kilojoules', 'suffer_score'];
 
   activities : SummaryActivity[] = [];
 
