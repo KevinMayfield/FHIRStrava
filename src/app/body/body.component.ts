@@ -184,8 +184,10 @@ export class BodyComponent implements OnInit {
           'energy': activity.kilojoules,
           'average_heartrate': activity.average_heartrate,
           'weighted_average_watts': activity.weighted_average_watts,
-
+          'distance' :activity.distance / 1000,
+          'duration': Math.round(activity.moving_time / 600)
         }
+        console.log(activity.duration);
         this.obs.push(obs);
       } else {
         console.log('Duplicate Id = '+this.activityMap.get(activity.id))
@@ -334,7 +336,7 @@ export class BodyComponent implements OnInit {
         "chart": [
 
           {
-            "name": "Avg(Norm) Power",
+            "name": "Average (Normalised) Power",
             "series": []
           }]
       },
@@ -348,6 +350,42 @@ export class BodyComponent implements OnInit {
           series: [
           ]
         }]
+      },
+      {
+        "name": "W",
+        "chart": [
+
+          {
+            "name": "Duration and Avg. Heart Rate",
+            "series": []
+          }]
+      },
+      {
+        "name": "Score",
+        "chart": [
+
+          {
+            "name": "Suffer score and Heart Rate",
+            "series": []
+          }]
+      },
+      {
+        "name": "Score",
+        "chart": [
+
+          {
+            "name": "Suffer score and Average Power",
+            "series": []
+          }]
+      },
+      {
+        "name": "Score",
+        "chart": [
+
+          {
+            "name": "Suffer score and Duration",
+            "series": []
+          }]
       }
       ];
 
@@ -359,25 +397,26 @@ export class BodyComponent implements OnInit {
           value : obs.weight
         })
       }
-
+/*
       if (obs.energy != undefined ) {
         charts[1].chart[0].series.push({
           name : obs.obsDate,
           value : obs.energy
         })
-      }
+      }*/
       if (obs.pwv != undefined ) {
         charts[2].chart[0].series.push({
           name : obs.obsDate,
           value : obs.pwv
         })
       }
+      /*
       if (obs.suffer != undefined ) {
         charts[3].chart[0].series.push({
           name : obs.obsDate,
           value : obs.suffer
         })
-      }
+      }*/
       if (obs.muscle_mass != undefined ) {
         charts[4].chart[0].series.push({
           name : obs.obsDate,
@@ -390,25 +429,45 @@ export class BodyComponent implements OnInit {
           value : obs.fat_mass
         })
       }
-      if (obs.average_heartrate != undefined ) {
-        charts[6].chart[0].series.push({
-          name : obs.obsDate,
-          value : obs.average_heartrate
-        })
-      }
-      if (obs.weighted_average_watts != undefined ) {
-        charts[7].chart[0].series.push({
-          name : obs.obsDate,
-          value : obs.weighted_average_watts
-        })
-      }
 
-      if (obs.energy != undefined  && obs.average_heartrate != undefined ) {
+      if (obs.energy != undefined && obs.average_heartrate != undefined ) {
         bars[0].chart[0].series.push({
           name : obs.name,
           x: obs.obsDate,
           y: obs.energy,
           r: obs.average_heartrate
+        })
+      }
+      if (obs.average_heartrate != undefined  && obs.duration != undefined ) {
+        bars[1].chart[0].series.push({
+          name : obs.name,
+          x: obs.obsDate,
+          y: obs.duration,
+          r: obs.average_heartrate
+        })
+      }
+      if (obs.suffer != undefined && obs.average_heartrate) {
+        bars[2].chart[0].series.push({
+          name : obs.name,
+          x: obs.obsDate,
+          y: obs.suffer,
+          r: obs.average_heartrate
+        })
+      }
+      if (obs.suffer != undefined && obs.weighted_average_watts) {
+        bars[3].chart[0].series.push({
+          name : obs.name,
+          x: obs.obsDate,
+          y: obs.suffer,
+          r: obs.weighted_average_watts
+        })
+      }
+      if (obs.suffer != undefined && obs.duration) {
+        bars[4].chart[0].series.push({
+          name : obs.name,
+          x: obs.obsDate,
+          y: obs.suffer,
+          r: obs.duration
         })
       }
     }
@@ -446,8 +505,6 @@ export class BodyComponent implements OnInit {
     }
     console.log(newseries);
     return newseries;
-
-
   }
 
 }

@@ -12,6 +12,8 @@ export interface Obs {
   energy? : number;
   average_heartrate?: number;
   weighted_average_watts? : number;
+  distance? : number;
+  duration? : number;
  // not suported in strava calories? : number;
   /*
   1	Weight (kg)
