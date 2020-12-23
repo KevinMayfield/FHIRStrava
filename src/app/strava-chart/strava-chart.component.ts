@@ -50,12 +50,13 @@ export class StravaChartComponent implements OnInit {
   }
 
 
+
   ngOnInit(): void {
     var min=9999;
 
 
       for (const chart of this.results) {
-        console.log(chart);
+     //   console.log(chart);
         for (const val of chart.series) {
           if (val.value < min) min = val.value;
         }

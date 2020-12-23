@@ -34,7 +34,7 @@ import {CovalentTabSelectModule} from "@covalent/core/tab-select";
 import { ChartsComponent } from './charts/charts.component';
 import {NgxChartsModule} from "@swimlane/ngx-charts";
 import { StravaChartComponent } from './strava-chart/strava-chart.component';
-import { PWVChartComponent } from './pwvchart/pwvchart.component';
+import {CovalentExpansionPanelModule} from "@covalent/core/expansion-panel";
 
 @NgModule({
   declarations: [
@@ -45,7 +45,6 @@ import { PWVChartComponent } from './pwvchart/pwvchart.component';
     WithingsComponent,
     ChartsComponent,
     StravaChartComponent,
-    PWVChartComponent
   ],
   imports: [
     BrowserModule,
@@ -62,7 +61,7 @@ import { PWVChartComponent } from './pwvchart/pwvchart.component';
     CovalentMarkdownModule,
     CovalentCommonModule,
     CovalentJsonFormatterModule,
-    CovalentTabSelectModule,
+    CovalentExpansionPanelModule,
 
     MatButtonModule,
     MatIconModule,

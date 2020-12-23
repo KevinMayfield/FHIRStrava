@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, ViewChild, ViewChildren} from '@angular/core';
 import {StravaService} from "../strava.service";
 import {Athlete} from "../models/athlete";
 import {SummaryActivity} from "../models/summary-activity";
@@ -7,9 +7,8 @@ import {DatePipe} from "@angular/common";
 import {WithingsService} from "../withings.service";
 import {MeasureGroups} from "../models/measure-groups";
 import {Obs} from "../models/obs";
-
-import {MatSort, MatSortable} from "@angular/material/sort";
 import {MatTableDataSource} from "@angular/material/table";
+import {MatSort} from "@angular/material/sort";
 
 
 @Component({
@@ -31,13 +30,12 @@ export class BodyComponent implements OnInit {
 
   withingsConnect = true;
 
-
+  stravaComplete = false;
 
   datepipe: DatePipe = new DatePipe('en-GB')
 
-  activityDisplayedColumns = ['link', 'date', 'type', 'name',  'powerlink',  'distance','duration', 'average_heartrate','weighted_average_watts','energy', 'suffer'];
 
-  observationDisplayedColumns = ['obsDate', 'weight', 'muscle','fat', 'hydration', 'pwv', 'energy', 'suffer' ];
+  activityDisplayedColumns = ['link', 'start_date', 'type', 'name',  'powerlink',  'distance','duration', 'average_heartrate','weighted_average_watts','energy', 'suffer'];
 
   activities : SummaryActivity[] = [];
 
@@ -45,13 +43,23 @@ export class BodyComponent implements OnInit {
 
   obs: Obs[] = [];
 
-  obsDataSource: MatTableDataSource<Obs>;
-
   activityDataSource: MatTableDataSource<SummaryActivity>;
 
   tabValue: string = 'strava';
 
   @ViewChild(MatSort) sort: MatSort;
+
+
+  ngAfterViewInit() {
+    if (this.sort != undefined) {
+      this.sort.sortChange.subscribe((event) => {
+        console.log(event);
+      });
+      this.activityDataSource.sort = this.sort;
+    } else {
+      console.log('SORT UNDEFINED');
+    }
+  }
 
   ngOnInit(): void {
 
@@ -71,10 +79,11 @@ export class BodyComponent implements OnInit {
     }
 
     this.obs = [];
-    this.obsDataSource = new MatTableDataSource<Obs>(this.obs);
+   // this.obsDataSource = new MatTableDataSource<Obs>(this.obs);
 
     this.activities = [];
     this.activityDataSource = new MatTableDataSource<SummaryActivity>(this.activities);
+
 
     if (this.withings.accesToken != undefined) {
       this.withingsConnect = false;
@@ -85,19 +94,12 @@ export class BodyComponent implements OnInit {
       this.connect = false;
 
       this.getAthlete();
+      this.stravaComplete=false;
       this.getActivities()
     }
   }
 
-  sortIt() {
 
-    if (this.sort != undefined) {
-      this.sort.sortChange.subscribe((event) => {
-        console.log(event);
-      });
-      this.obsDataSource.sort = this.sort;
-    }
-  }
 
 
   pad(num:number, size:number): string {
@@ -122,21 +124,7 @@ export class BodyComponent implements OnInit {
     this.withings.authorise(window.location.href);
   }
 
-  openStrava(id) {
 
-    window.open(
-      'https://www.strava.com/activities/'+id,
-      '_blank' // <- This is what makes it open in a new window.
-    );
-  }
-
-  openPowerCC(id) {
-
-    window.open(
-      'https://power-meter.cc/activities/'+id+'/power-analysis',
-      '_blank' // <- This is what makes it open in a new window.
-    )
-  }
 
   getAthlete() {
 
@@ -161,7 +149,13 @@ export class BodyComponent implements OnInit {
         console.log(page);
         page++;
         this.processStravaObs(result);
-        if (result.length > 0) this.getActivities(page);
+        if (result.length > 0) { this.getActivities(page) }
+        else {
+          this.stravaComplete = true;
+          this.activityDataSource.data = this.activities;
+      //    this.obsDataSource.data = this.obs;
+
+        };
       },
       (err) => {
         console.log(err);
@@ -182,13 +176,11 @@ export class BodyComponent implements OnInit {
         'suffer' : activity.suffer_score,
         'energy' : activity.kilojoules,
         'average_heartrate' : activity.average_heartrate,
-        'weighted_average_watts': activity.weighted_average_watts
+        'weighted_average_watts': activity.weighted_average_watts,
+
       }
       this.obs.push(obs);
     }
-    this.activityDataSource.data = this.activities;
-    this.obsDataSource.data = this.obs;
-    this.sortIt();
   }
 
   round(num) {
@@ -215,10 +207,6 @@ export class BodyComponent implements OnInit {
     );
   }
 
-
-  sorter(ev) {
-    console.log(ev);
-  }
   processObs() {
 
     for (const grp of this.measures) {
@@ -249,8 +237,26 @@ export class BodyComponent implements OnInit {
 
        this.obs.push(obs);
     }
-    this.obsDataSource.data = this.obs;
-    this.sortIt();
+
+
+  }
+
+
+
+  openStrava(id) {
+
+    window.open(
+      'https://www.strava.com/activities/'+id,
+      '_blank' // <- This is what makes it open in a new window.
+    );
+  }
+
+  openPowerCC(id) {
+
+    window.open(
+      'https://power-meter.cc/activities/'+id+'/power-analysis',
+      '_blank' // <- This is what makes it open in a new window.
+    )
   }
 
 }
