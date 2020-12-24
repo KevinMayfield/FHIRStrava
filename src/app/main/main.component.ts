@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {StravaService} from "../services/strava.service";
 import {Router} from "@angular/router";
+import {WithingsService} from "../services/withings.service";
 
 @Component({
   selector: 'app-main',
@@ -9,14 +10,16 @@ import {Router} from "@angular/router";
 })
 export class MainComponent implements OnInit {
 
-  constructor(private strava: StravaService
-    , private route : Router) { }
+  constructor(private strava: StravaService,
+    private withings: WithingsService,
+    private route : Router) { }
 
   ngOnInit(): void {
   }
 
   logout() {
     this.strava.logout();
+    this.withings.logout()
     // TODO tidy
     this.route.navigateByUrl('/');
   }

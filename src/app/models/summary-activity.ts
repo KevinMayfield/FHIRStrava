@@ -39,4 +39,5 @@ export interface SummaryActivity {
   max_speed: number;
   has_kudoed: boolean;
   kilojoules : number;
+  intensity: number;
 }

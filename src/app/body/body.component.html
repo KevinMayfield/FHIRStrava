@@ -93,6 +93,7 @@
     <ng-container matColumnDef="suffer_score">
       <th *matHeaderCellDef mat-header-cell mat-sort-header>Suffer Score</th>
       <td  *matCellDef="let activity">
+        <span *ngIf="isNum(activity.suffer_score)">
       <span *ngIf="(activity.suffer_score < sufferRange.low)">
            <button mat-mini-fab color="none">{{activity.suffer_score}}</button>
       </span>
@@ -105,7 +106,7 @@
         <span *ngIf="(activity.suffer_score >= sufferRange.tough)">
            <button mat-mini-fab color="warn">{{activity.suffer_score}}</button>
       </span>
-
+</span>
       </td>
     </ng-container>
 
@@ -115,6 +116,25 @@
         {{ratio(activity.average_heartrate, activity.weighted_average_watts) }} </td>
     </ng-container>
 
+    <ng-container matColumnDef="intensity">
+      <th *matHeaderCellDef mat-header-cell mat-sort-header>Intensity</th>
+      <td  *matCellDef="let activity">
+ <span *ngIf="isNum(activity.intensity)">
+        <span *ngIf="(activity.intensity < intensityRange.low)">
+             <button mat-mini-fab color="none">{{activity.intensity}}</button>
+      </span>
+        <span *ngIf="(activity.intensity > intensityRange.low && activity.intensity < intensityRange.medium)">
+           <button mat-mini-fab color="accent">{{activity.intensity}}</button>
+      </span>
+        <span *ngIf="(activity.intensity >= intensityRange.medium && activity.intensity < intensityRange.tough)">
+           <button mat-mini-fab color="primary">{{activity.intensity}}</button>
+      </span>
+        <span *ngIf="(activity.intensity >= intensityRange.tough)">
+           <button mat-mini-fab color="warn">{{activity.intensity}}</button>
+      </span>
+ </span>
+      </td>
+    </ng-container>
     <ng-container matColumnDef="average_cadence">
       <th *matHeaderCellDef mat-header-cell mat-sort-header>Average Cadence</th>
       <td  *matCellDef="let activity">

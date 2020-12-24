@@ -18,4 +18,5 @@ export interface Athlete {
   premium: boolean;
   created_at: Date;
   updated_at: Date;
+  ftp?: number;
 }

@@ -38,7 +38,7 @@ export class BodyComponent implements OnInit {
   charts: any[];
   bars: any[];
 
-  activityDisplayedColumns = ['link', 'start_date', 'type', 'name',  'powerlink',  'distance','moving_time','average_cadence', 'average_heartrate','weighted_average_watts','kilojoules', 'suffer_score', 'ratio'];
+  activityDisplayedColumns = ['link', 'start_date', 'type', 'name',  'powerlink',  'distance','moving_time','average_cadence', 'average_heartrate','weighted_average_watts','kilojoules', 'suffer_score', 'intensity'];
 
   activities : SummaryActivity[] = [];
 
@@ -51,6 +51,12 @@ export class BodyComponent implements OnInit {
 
   tabValue: string = 'strava';
 
+
+  intensityRange = {
+    "tough" : 95,
+    "medium": 80,
+    "low": 65
+  };
   sufferRange = {
     "tough" : 400,
     "medium": 200,
@@ -138,6 +144,18 @@ export class BodyComponent implements OnInit {
      return ratio;
   }
 
+  isNum(val) {
+    return (val === +val);
+  }
+
+
+  intensity(pwr) {
+    if (pwr != +pwr) return '';
+    if (this.athlete.ftp == undefined) return '';
+
+    return Math.round((pwr/ this.athlete.ftp)*100);
+  }
+
   connectStrava() {
 
     this.athlete = undefined;
@@ -157,7 +175,7 @@ export class BodyComponent implements OnInit {
     this.strava.getAthlete().subscribe(
       result => {
         this.athlete = result;
-
+        console.log(result);
       },
       (err) => {
         console.log(err);
@@ -195,7 +213,7 @@ export class BodyComponent implements OnInit {
   processStravaObs(result) {
     for (const activity of result) {
       var date = new Date(activity.start_date).toISOString();
-
+      activity.intensity = this.intensity(activity.weighted_average_watts);
       if (this.activityMap.get(activity.id) == undefined) {
         this.activityMap.set(activity.id,activity);
         this.activities.push(activity);
@@ -208,7 +226,8 @@ export class BodyComponent implements OnInit {
           'average_heartrate': activity.average_heartrate,
           'weighted_average_watts': activity.weighted_average_watts,
           'distance' :activity.distance / 1000,
-          'duration': Math.round(activity.moving_time / 600)
+          'duration': Math.round(activity.moving_time / 600),
+          'intensity': activity.intensity
         }
 
         this.obs.push(obs);
@@ -227,7 +246,7 @@ export class BodyComponent implements OnInit {
       result => {
         if (result.status == 401) {
           console.log('Withings 401');
-          localStorage.removeItem('withingsToken');
+
         }
        this.measures = result.body.measuregrps;
 
@@ -376,7 +395,19 @@ export class BodyComponent implements OnInit {
           name: "Energy and Duration",
           series: [
           ]
-        }]
+        },
+          {
+            "name": "Tempo",
+            "series": []
+          },
+          {
+            "name": "Sweet",
+            "series": []
+          },
+          {
+            "name": "Race",
+            "series": []
+          }]
       },
       {
         "name": "Score",
@@ -384,6 +415,39 @@ export class BodyComponent implements OnInit {
 
           {
             "name": "Suffer and Duration",
+            "series": []
+          },
+          {
+            "name": "Tempo",
+            "series": []
+          },
+          {
+            "name": "Sweet",
+            "series": []
+          },
+          {
+            "name": "Race",
+            "series": []
+          }]
+      },
+      {
+        "name": "time",
+        "chart": [
+
+          {
+            "name": "Duration and Intensity",
+            "series": []
+          },
+          {
+            "name": "Tempo",
+            "series": []
+          },
+          {
+            "name": "Sweet",
+            "series": []
+          },
+          {
+            "name": "Race",
             "series": []
           }]
       }
@@ -429,22 +493,60 @@ export class BodyComponent implements OnInit {
           value : obs.fat_mass
         })
       }
-
+      var chartNum =0;
       if (obs.energy != undefined && obs.duration != undefined ) {
-        bars[0].chart[0].series.push({
+        var energy = obs.energy / obs.duration;
+        if (energy < 80) {
+          chartNum = 0;
+        } else if (energy < 110) {
+          chartNum = 1;
+        } else if (energy < 130) {
+          chartNum = 2;
+        } else  {
+          chartNum = 3;
+        }
+        bars[0].chart[chartNum].series.push({
           name : obs.name,
           x: obs.obsDate,
           y: obs.energy,
-          r: obs.energy /obs.duration
+          r: energy
         })
       }
       if (obs.suffer != undefined && obs.duration != undefined ) {
-        bars[1].chart[0].series.push({
+        var suffer = obs.suffer / obs.duration;
+        if (suffer < 10) {
+          chartNum = 0;
+        } else if (suffer < 20) {
+          chartNum = 1;
+        } else if (suffer < 30) {
+          chartNum = 2;
+        } else  {
+          chartNum = 3;
+        }
+        bars[1].chart[chartNum].series.push({
           name : obs.name,
           x: obs.obsDate,
           y: obs.suffer,
-          r: obs.suffer /obs.duration
+          r: suffer
         })
+      }
+      if (obs.intensity != undefined && this.isNum(obs.intensity) && obs.duration != undefined ) {
+
+        if (obs.intensity < this.intensityRange.low) {
+          chartNum = 0;
+        } else if (obs.intensity < this.intensityRange.medium) {
+          chartNum = 1;
+        } else if (obs.intensity < this.intensityRange.tough) {
+          chartNum = 2;
+        } else  {
+          chartNum = 3;
+        }
+        bars[2].chart[chartNum].series.push({
+          name: obs.name,
+          x: obs.obsDate,
+          y: obs.duration * 10,
+          r: obs.intensity
+        });
       }
     }
 

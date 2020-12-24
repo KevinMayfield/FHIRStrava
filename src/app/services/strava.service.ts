@@ -14,6 +14,8 @@ export class StravaService {
 
   private accessToken = undefined;
 
+  private athlete = undefined;
+
   clientId = '8536';
 
   clientSecret = '6c34eb8997791f315f2f4d9c932a01a903f6beaa';
@@ -34,6 +36,7 @@ export class StravaService {
   public getAthlete(): Observable<Athlete> {
     return this.http.get<Athlete>(this.url+'athlete',{'headers': this.getHeaders()});
   }
+
   public getActivities(page?): Observable<any> {
     var uri = this.url+'athlete/activities';
 
@@ -122,12 +125,12 @@ export class StravaService {
     decoded: any
   ): Date | null {
 
-    if (!decoded || !decoded.hasOwnProperty("exp")) {
+    if (!decoded || !decoded.hasOwnProperty("expires_at")) {
       return null;
     }
 
     const date = new Date(0);
-    date.setUTCSeconds(decoded.exp);
+    date.setUTCSeconds(decoded.expires_at);
 
     return date;
   }
@@ -141,7 +144,7 @@ export class StravaService {
     }
     const date = this.getTokenExpirationDate(token);
     offsetSeconds = offsetSeconds || 0;
-
+  console.log(date);
     if (date === null) {
       return false;
     }

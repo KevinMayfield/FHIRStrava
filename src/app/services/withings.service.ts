@@ -64,6 +64,10 @@ export class WithingsService {
      return this.accessToken;
   }
 
+  public logout() {
+    localStorage.removeItem('withingsToken');
+  }
+
   public getRefreshToken() {
 
     let headers = new HttpHeaders(

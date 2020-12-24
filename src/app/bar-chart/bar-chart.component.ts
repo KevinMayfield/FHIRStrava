@@ -31,7 +31,7 @@ export class BarChartComponent implements OnInit {
   results : [];
 
   colorScheme = {
-    domain: ['#5AA454', '#A10A28', '#C7B42C', '#AAAAAA']
+    domain: ['#1976d2', '#00695c',  '#ef6c00', '#c62828']
   };
   constructor() {
 
