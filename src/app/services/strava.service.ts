@@ -1,9 +1,8 @@
-import { Injectable } from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {Athlete} from "../models/athlete";
-import {last} from "rxjs/operators";
-import {JwtHelperService} from "@auth0/angular-jwt";
+
 
 
 @Injectable({
@@ -13,11 +12,13 @@ export class StravaService {
 
   url = 'https://www.strava.com/api/v3/';
 
-  accesToken = undefined;
+  private accessToken = undefined;
 
   clientId = '8536';
 
   clientSecret = '6c34eb8997791f315f2f4d9c932a01a903f6beaa';
+
+  tokenChange: EventEmitter<any> = new EventEmitter();
 
   constructor(private http: HttpClient) { }
 
@@ -25,13 +26,8 @@ export class StravaService {
 
       let headers = new HttpHeaders(
       );
-      if (localStorage.getItem('stravaToken') != undefined) {
-          var token: any = JSON.parse(localStorage.getItem('stravaToken'));
-         // const helper = new JwtHelperService();
 
-        console.log('strava token expiry ' + this.isTokenExpired(token));
-      }
-      headers = headers.append('Authorization', 'Bearer '+this.accesToken);
+      headers = headers.append('Authorization', 'Bearer '+this.getAccessToken());
       return headers;
     }
 
@@ -54,7 +50,50 @@ export class StravaService {
     window.location.href = 'http://www.strava.com/oauth/authorize?client_id='+this.clientId+'&response_type=code&redirect_uri='+routeUrl+'/exchange_token&approval_prompt=force&scope=read,activity:read_all,profile:read_all';
   }
 
-  public getAccessToken(authorisationCode) {
+  setAccessToken(token) {
+    localStorage.setItem('stravaToken', JSON.stringify(token));
+    this.accessToken = token.access_token;
+    this.tokenChange.emit(token);
+  }
+
+  getAccessToken() {
+
+    if (localStorage.getItem('stravaToken') != undefined) {
+      var token: any = JSON.parse(localStorage.getItem('stravaToken'));
+
+      if (this.isTokenExpired(token)) {
+        this.getRefreshToken();
+      }
+      if (token != undefined) {
+        this.accessToken = token.access_token;
+      }
+    }
+    return this.accessToken;
+  }
+
+  public getRefreshToken() {
+    console.log('Strava token expired');
+    var token: any = JSON.parse(localStorage.getItem('stravaToken'));
+    let headers = new HttpHeaders(
+    );
+
+    var url = 'https://www.strava.com/oauth/token' +
+      '?client_id='+this.clientId +
+      '&client_secret='+this.clientSecret +
+      '&refresh_token='+token.refresh_token +
+      '&grant_type=refresh_token';
+
+    return this.http.post<any>(url,{'headers': headers}).subscribe(
+      token => {
+        this.setAccessToken(token);
+      },
+      (err) => {
+          console.log('Strava Refresh Error: '+err);
+      }
+    );
+  }
+
+  public getOAuth2AccessToken(authorisationCode) {
 
     let headers = new HttpHeaders(
     );
@@ -65,7 +104,14 @@ export class StravaService {
       '&code='+authorisationCode +
       '&grant_type=authorization_code';
 
-    return this.http.post<any>(url,{'headers': headers});
+    this.http.post<any>(url,{'headers': headers}).subscribe(
+      token => {
+        this.setAccessToken(token);
+      },
+      (err) => {
+        console.log('Strava Access Error: '+err);
+      }
+    );
   }
 
   logout(){

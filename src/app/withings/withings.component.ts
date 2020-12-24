@@ -30,14 +30,12 @@ export class WithingsComponent implements OnInit {
   doSetup(authorisationCode, state) {
 
     console.log(authorisationCode);
-    this.withings.getAccessToken(authorisationCode).subscribe(
+    this.withings.tokenChange.subscribe(
       token => {
-        console.log(token);
-        localStorage.setItem('withingsToken', JSON.stringify(token));
-        this.withings.accesToken = token.access_token;
         this.router.navigateByUrl('/');
       }
     );
+    this.withings.getOAuth2AccessToken(authorisationCode);
   }
 
 }

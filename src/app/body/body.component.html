@@ -19,16 +19,16 @@
 
         </td-expansion-panel>
       </span>
+      </td-expansion-panel-group>
     <span *ngFor="let barChart of bars">
-        <td-expansion-panel *ngIf="barChart.chart[0].series.length>0" [label]="barChart.chart[0].name" >
+        <span *ngIf="barChart.chart[0].series.length>0" >
           <div class="md-padding">
-                <app-bar-chart [results]="barChart.chart" [yAxisLabel]="barChart.name" ></app-bar-chart>
+                <app-bar-chart [results]="barChart.chart" [yAxisLabel]="barChart.name" [xAxisLabel]="barChart.chart[0].name"></app-bar-chart>
           </div>
-
-        </td-expansion-panel>
+        </span>
       </span>
-       </td-expansion-panel-group>
-    </span>
+  </span>
+
 
   <div *tdLoading="'overlayStarSyntax'; mode: 'indeterminate'; type: 'circle'; strategy: 'overlay'; color: 'accent'">
   <table [dataSource]="activityDataSource" width="100%"

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {Athlete} from "../models/athlete";
@@ -9,7 +9,7 @@ import {JwtHelperService} from "@auth0/angular-jwt";
 })
 export class WithingsService {
 
-  accesToken = undefined;
+  private accessToken = undefined;
 
   url = 'https://wbsapi.withings.net/measure';
 
@@ -18,6 +18,8 @@ export class WithingsService {
   clientId = 'e532209382d449afbb1ef360919f2fdac284fac62ec23feeea0589f043bdc41f';
 
   clientSecret = 'd026b695a4cacdd486ac15b2498d08d6432854679876e2c48ae6da043c00e04d';
+
+  tokenChange: EventEmitter<any> = new EventEmitter();
 
   public authorise(routeUrl : string) {
     if (routeUrl.substring(routeUrl.length - 1,1) === '/') {
@@ -34,19 +36,59 @@ export class WithingsService {
 
     let headers = new HttpHeaders(
     );
-    if (localStorage.getItem('withingsToken') != undefined) {
-      var token: any = JSON.parse(localStorage.getItem('withingsToken'));
 
-      const helper = new JwtHelperService();
-     // console.log('Token ' + token);
-      console.log('withings token expiry ' + this.isTokenExpired(token));
-    }
-    headers = headers.append('Authorization', 'Bearer '+this.accesToken);
+    headers = headers.append('Authorization', 'Bearer '+this.getAccessToken());
     headers.append('Content-Type', 'application/x-www-form-urlencoded');
     return headers;
   }
 
-  public getAccessToken(authorisationCode) {
+  setAccessToken(token) {
+    localStorage.setItem('withingsToken', JSON.stringify(token));
+    this.accessToken = token.access_token;
+    this.tokenChange.emit(token);
+  }
+
+  getAccessToken() {
+    if (localStorage.getItem('withingsToken') != undefined) {
+      var token: any = JSON.parse(localStorage.getItem('withingsToken'));
+
+      const helper = new JwtHelperService();
+      if (this.isTokenExpired(token)) {
+        this.getRefreshToken();
+      }
+      if (token != undefined) {
+        this.accessToken = token.access_token;
+      }
+    }
+
+     return this.accessToken;
+  }
+
+  public getRefreshToken() {
+
+    let headers = new HttpHeaders(
+    );
+    headers.append('Content-Type', 'application/x-www-form-urlencoded');
+    headers.append('Access-Control-Allow-Origin', '*');
+    var token: any = JSON.parse(localStorage.getItem('withingsToken'));
+
+    // var url = 'https://account.withings.com/oauth2/token';
+    var url = 'http://localhost:8187/services/token';
+    //  var url = 'https://wbsapi.withings.net/v2/oauth2'
+
+    var bodge= 'grant_type=refresh_token'
+      + '&client_id=' + this.clientId
+      + '&client_secret=' + this.clientSecret
+      + '&refresh_token=' + token.refresh_token;
+
+    this.http.post<any>(url, bodge, { 'headers' : headers} ).subscribe(
+      token => {
+        this.setAccessToken(token);
+      }
+    );
+  }
+
+  public getOAuth2AccessToken(authorisationCode) {
 
     let headers = new HttpHeaders(
     );
@@ -66,7 +108,11 @@ export class WithingsService {
 
 
 
-    return this.http.post<any>(url, bodge, { 'headers' : headers} );
+    this.http.post<any>(url, bodge, { 'headers' : headers} ).subscribe(
+      token => {
+        this.setAccessToken(token);
+      }
+    );
   }
 
   public getWeight(): Observable<any> {

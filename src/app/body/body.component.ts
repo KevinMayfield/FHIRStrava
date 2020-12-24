@@ -78,20 +78,6 @@ export class BodyComponent implements OnInit {
 
   ngOnInit(): void {
 
-    if (localStorage.getItem('stravaToken') != undefined) {
-      var token: any = JSON.parse(localStorage.getItem('stravaToken'));
-       if (token != undefined) {
-         this.strava.accesToken = token.access_token;
-
-       }
-    }
-
-    if (localStorage.getItem('withingsToken') != undefined) {
-      var token: any = JSON.parse(localStorage.getItem('withingsToken'));
-      if (token != undefined) {
-        this.withings.accesToken = token.access_token;
-      }
-    }
 
     this.obs = [];
    // this.obsDataSource = new MatTableDataSource<Obs>(this.obs);
@@ -100,21 +86,36 @@ export class BodyComponent implements OnInit {
     this.activityDataSource = new MatTableDataSource<SummaryActivity>(this.activities);
 
 
-    if (this.withings.accesToken != undefined) {
+    if (this.withings.getAccessToken() != undefined) {
       this.withingsConnect = false;
         this.getWithingsObservations();
+    } else {
+
     }
-
-    if (this.strava.accesToken != undefined) {
-      this.connect = false;
-
-      this.getAthlete();
-      this.stravaComplete=false;
-      this._loadingService.register('overlayStarSyntax');
-      this.getActivities()
+    this.withings.tokenChange.subscribe(
+      token => {
+        this.withingsConnect = false;
+        this.getWithingsObservations();
+      }
+    )
+    this.strava.tokenChange.subscribe(
+      token => {
+        this.stravaLoad();
+      }
+    );
+    if (this.strava.getAccessToken() != undefined) {
+      this.stravaLoad();
     }
   }
 
+  stravaLoad(){
+    this.connect = false;
+
+    this.getAthlete();
+    this.stravaComplete=false;
+    this._loadingService.register('overlayStarSyntax');
+    this.getActivities()
+  }
 
 
 

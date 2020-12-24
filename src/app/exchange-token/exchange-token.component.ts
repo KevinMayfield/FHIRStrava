@@ -26,14 +26,15 @@ export class ExchangeTokenComponent implements OnInit {
   doSetup(authorisationCode)  {
 
     console.log(authorisationCode);
-    this.strava.getAccessToken(authorisationCode).subscribe(
-      token => {
 
-        localStorage.setItem('stravaToken', JSON.stringify(token));
-        this.strava.accesToken = token.access_token;
+    // Subscribe to the token change
+    this.strava.tokenChange.subscribe(
+      token => {
         this.router.navigateByUrl('/');
       }
-    );
+    )
+    // this will emit a change when the token is retrieved
+    this.strava.getOAuth2AccessToken(authorisationCode);
   }
 
 }

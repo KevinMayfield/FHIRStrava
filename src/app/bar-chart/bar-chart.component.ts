@@ -20,6 +20,7 @@ export class BarChartComponent implements OnInit {
   @Input()
   yAxisLabel: string = 'KJ';
   showYAxisLabel: boolean = true;
+  @Input()
   xAxisLabel: string = 'Date';
   maxRadius: number = 10;
   minRadius: number = 0;
