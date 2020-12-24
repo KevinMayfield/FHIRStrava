@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {Observable} from "rxjs";
-import {Athlete} from "./models/athlete";
+import {Athlete} from "../models/athlete";
+import {JwtHelperService} from "@auth0/angular-jwt";
 
 @Injectable({
   providedIn: 'root'
@@ -35,7 +36,10 @@ export class WithingsService {
     );
     if (localStorage.getItem('withingsToken') != undefined) {
       var token: any = JSON.parse(localStorage.getItem('withingsToken'));
-      console.log('withings token ' + token.expires_at + ' in ' + token.expires_in);
+
+      const helper = new JwtHelperService();
+     // console.log('Token ' + token);
+      console.log('withings token expiry ' + this.isTokenExpired(token));
     }
     headers = headers.append('Authorization', 'Bearer '+this.accesToken);
     headers.append('Content-Type', 'application/x-www-form-urlencoded');
@@ -78,7 +82,7 @@ export class WithingsService {
     var lastUpdate = new Date('2020-07-14');
 
     var bodge= 'action=getmeas'
-      + '&meastypes=1,5,77,76,88,91'
+      + '&meastypes=1,5,8,77,76,88,91'
       + '&category=1'
      // + '&startdate=2020-12-12'
      // + '&enddate=2020-12-22';
@@ -89,5 +93,37 @@ export class WithingsService {
     return this.http.post<any>(this.url, bodge, { 'headers' : headers} );
 
   }
+
+  public getTokenExpirationDate(
+    decoded: any
+  ): Date | null {
+
+    if (!decoded || !decoded.hasOwnProperty("exp")) {
+      return null;
+    }
+
+    const date = new Date(0);
+    date.setUTCSeconds(decoded.exp);
+
+    return date;
+  }
+
+  public isTokenExpired(
+    token: any,
+    offsetSeconds?: number
+  ): boolean {
+    if (!token || token === "") {
+      return true;
+    }
+    const date = this.getTokenExpirationDate(token);
+    offsetSeconds = offsetSeconds || 0;
+
+    if (date === null) {
+      return false;
+    }
+
+    return !(date.valueOf() > new Date().valueOf() + offsetSeconds * 1000);
+  }
+
 
 }

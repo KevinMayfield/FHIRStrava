@@ -19,10 +19,10 @@
 
         </td-expansion-panel>
       </span>
-     <span *ngFor="let barChart of bars">
-        <td-expansion-panel [label]="barChart.chart[0].name" >
+    <span *ngFor="let barChart of bars">
+        <td-expansion-panel *ngIf="barChart.chart[0].series.length>0" [label]="barChart.chart[0].name" >
           <div class="md-padding">
-                <app-bar-chart [results]="barChart.chart"></app-bar-chart>
+                <app-bar-chart [results]="barChart.chart" [yAxisLabel]="barChart.name" ></app-bar-chart>
           </div>
 
         </td-expansion-panel>
@@ -30,7 +30,7 @@
        </td-expansion-panel-group>
     </span>
 
-
+  <div *tdLoading="'overlayStarSyntax'; mode: 'indeterminate'; type: 'circle'; strategy: 'overlay'; color: 'accent'">
   <table [dataSource]="activityDataSource" width="100%"
          matSort
          matSortActive="start_date" matSortDirection="desc"
@@ -43,7 +43,7 @@
     </ng-container>
 
     <ng-container matColumnDef="type">
-      <th *matHeaderCellDef mat-header-cell>Type</th>
+      <th *matHeaderCellDef mat-header-cell mat-sort-header>Type</th>
       <td  *matCellDef="let activity">
         <mat-icon *ngIf="activity.type==='Walk'" >directions_walk</mat-icon>
         <mat-icon *ngIf="activity.type=='Ride'" >pedal_bike</mat-icon>
@@ -67,7 +67,7 @@
     </ng-container>
 
     <ng-container matColumnDef="name">
-      <th *matHeaderCellDef mat-header-cell>Name</th>
+      <th *matHeaderCellDef mat-header-cell mat-sort-header>Name</th>
       <td  *matCellDef="let activity">
         {{activity.name}} </td>
     </ng-container>
@@ -75,9 +75,51 @@
     <ng-container matColumnDef="kilojoules">
       <th *matHeaderCellDef mat-header-cell mat-sort-header>Energy (kJ)</th>
       <td  *matCellDef="let activity">
-        {{activity.kilojoules}} </td>
+         <span *ngIf="(activity.kilojoules < enerygRange.low)">
+           <button mat-mini-fab color="none">{{round(activity.kilojoules)}}</button>
+      </span>
+        <span *ngIf="(activity.kilojoules>= enerygRange.low && activity.kilojoules < enerygRange.medium)">
+           <button mat-mini-fab color="accent">{{round(activity.kilojoules)}}</button>
+      </span>
+        <span *ngIf="(activity.kilojoules>= enerygRange.medium && activity.kilojoules < enerygRange.tough)">
+           <button mat-mini-fab color="primary">{{round(activity.kilojoules)}}</button>
+      </span>
+        <span *ngIf="(activity.kilojoules >= enerygRange.tough)">
+           <button mat-mini-fab color="warn">{{round(activity.kilojoules)}}</button>
+      </span>
+        </td>
     </ng-container>
 
+    <ng-container matColumnDef="suffer_score">
+      <th *matHeaderCellDef mat-header-cell mat-sort-header>Suffer Score</th>
+      <td  *matCellDef="let activity">
+      <span *ngIf="(activity.suffer_score < sufferRange.low)">
+           <button mat-mini-fab color="none">{{activity.suffer_score}}</button>
+      </span>
+        <span *ngIf="(activity.suffer_score > sufferRange.low && activity.suffer_score < sufferRange.medium)">
+           <button mat-mini-fab color="accent">{{activity.suffer_score}}</button>
+      </span>
+        <span *ngIf="(activity.suffer_score >= sufferRange.medium && activity.suffer_score < sufferRange.tough)">
+           <button mat-mini-fab color="primary">{{activity.suffer_score}}</button>
+      </span>
+        <span *ngIf="(activity.suffer_score >= sufferRange.tough)">
+           <button mat-mini-fab color="warn">{{activity.suffer_score}}</button>
+      </span>
+
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="ratio">
+      <th *matHeaderCellDef mat-header-cell mat-sort-header>HR/Pwr Ratio</th>
+      <td  *matCellDef="let activity">
+        {{ratio(activity.average_heartrate, activity.weighted_average_watts) }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="average_cadence">
+      <th *matHeaderCellDef mat-header-cell mat-sort-header>Average Cadence</th>
+      <td  *matCellDef="let activity">
+        {{activity.average_cadence}} </td>
+    </ng-container>
 
     <ng-container matColumnDef="distance">
       <th *matHeaderCellDef mat-header-cell mat-sort-header>Distance (km)</th>
@@ -93,7 +135,7 @@
     </ng-container>
 
     <ng-container matColumnDef="average_heartrate">
-      <th *matHeaderCellDef mat-header-cell> Avg. HeartRate </th>
+      <th *matHeaderCellDef mat-header-cell mat-sort-header> Avg. HeartRate </th>
       <td  *matCellDef="let activity">
 
         {{activity.average_heartrate}} </td>
@@ -102,34 +144,18 @@
     <ng-container matColumnDef="weighted_average_watts">
       <th *matHeaderCellDef mat-header-cell mat-sort-header> Avg.(Norm.Norm.) Power </th>
       <td  *matCellDef="let activity">
+        {{activity.weighted_average_watts}}
 
-        {{activity.weighted_average_watts}} </td>
+         </td>
     </ng-container>
 
 
-    <ng-container matColumnDef="suffer_score">
-      <th *matHeaderCellDef mat-header-cell mat-sort-header>Suffer Score</th>
-      <td  *matCellDef="let activity">
-      <span *ngIf="(activity.suffer_score < 50)">
-           <button mat-mini-fab color="none">{{activity.suffer_score}}</button>
-      </span>
-        <span *ngIf="(activity.suffer_score > 50 && activity.suffer_score < 100)">
-           <button mat-mini-fab color="primary">{{activity.suffer_score}}</button>
-      </span>
-        <span *ngIf="(activity.suffer_score >= 100 && activity.suffer_score < 200)">
-           <button mat-mini-fab color="accent">{{activity.suffer_score}}</button>
-      </span>
-        <span *ngIf="(activity.suffer_score >= 200)">
-           <button mat-mini-fab color="warn">{{activity.suffer_score}}</button>
-      </span>
 
-      </td>
-    </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="activityDisplayedColumns"></tr>
     <tr *matRowDef="let row; columns: activityDisplayedColumns" mat-row></tr>
   </table>
-
+  </div>
 
 
   <span *ngIf="tabValue=='debug'" >

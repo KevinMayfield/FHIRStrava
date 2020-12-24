@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {StravaService} from "../strava.service";
+import {StravaService} from "../services/strava.service";
 import {Router} from "@angular/router";
 
 @Component({

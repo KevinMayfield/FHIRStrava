@@ -16,6 +16,8 @@ export class BarChartComponent implements OnInit {
   gradient: boolean = false;
   showLegend: boolean = false;
   showXAxisLabel: boolean = true;
+
+  @Input()
   yAxisLabel: string = 'KJ';
   showYAxisLabel: boolean = true;
   xAxisLabel: string = 'Date';
@@ -40,7 +42,7 @@ export class BarChartComponent implements OnInit {
 
 
   ngOnInit(): void {
-      console.log(this.results);
+
   }
 
 

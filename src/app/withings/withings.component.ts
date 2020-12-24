@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
-import {StravaService} from "../strava.service";
-import {WithingsService} from "../withings.service";
+import {StravaService} from "../services/strava.service";
+import {WithingsService} from "../services/withings.service";
 
 @Component({
   selector: 'app-withings',

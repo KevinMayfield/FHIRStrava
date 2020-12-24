@@ -34,6 +34,7 @@ import {NgxChartsModule} from "@swimlane/ngx-charts";
 import { LineChartComponent } from './line-chart/line-chart.component';
 import {CovalentExpansionPanelModule} from "@covalent/core/expansion-panel";
 import { BarChartComponent } from './bar-chart/bar-chart.component';
+import {CovalentLoadingModule} from "@covalent/core/loading";
 
 @NgModule({
   declarations: [
@@ -62,6 +63,7 @@ import { BarChartComponent } from './bar-chart/bar-chart.component';
     CovalentCommonModule,
     CovalentJsonFormatterModule,
     CovalentExpansionPanelModule,
+    CovalentLoadingModule,
 
     MatButtonModule,
     MatIconModule,

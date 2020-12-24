@@ -1,14 +1,14 @@
 import {Component, OnInit, ViewChild, ViewChildren} from '@angular/core';
-import {StravaService} from "../strava.service";
+import {StravaService} from "../services/strava.service";
 import {Athlete} from "../models/athlete";
 import {SummaryActivity} from "../models/summary-activity";
-import {ActivityDataSource} from "../activity-data-source";
 import {DatePipe} from "@angular/common";
-import {WithingsService} from "../withings.service";
+import {WithingsService} from "../services/withings.service";
 import {MeasureGroups} from "../models/measure-groups";
 import {Obs} from "../models/obs";
 import {MatTableDataSource} from "@angular/material/table";
 import {MatSort} from "@angular/material/sort";
+import {TdLoadingService} from "@covalent/core/loading";
 
 
 @Component({
@@ -19,10 +19,11 @@ import {MatSort} from "@angular/material/sort";
 export class BodyComponent implements OnInit {
 
   constructor(private strava: StravaService,
-              private withings: WithingsService) {
+              private withings: WithingsService,
+              private _loadingService: TdLoadingService) {
 
   }
-
+  overlayStarSyntax: boolean = false;
 
   athlete : Athlete;
 
@@ -37,7 +38,7 @@ export class BodyComponent implements OnInit {
   charts: any[];
   bars: any[];
 
-  activityDisplayedColumns = ['link', 'start_date', 'type', 'name',  'powerlink',  'distance','moving_time', 'average_heartrate','weighted_average_watts','kilojoules', 'suffer_score'];
+  activityDisplayedColumns = ['link', 'start_date', 'type', 'name',  'powerlink',  'distance','moving_time','average_cadence', 'average_heartrate','weighted_average_watts','kilojoules', 'suffer_score', 'ratio'];
 
   activities : SummaryActivity[] = [];
 
@@ -49,6 +50,17 @@ export class BodyComponent implements OnInit {
   activityMap = new Map();
 
   tabValue: string = 'strava';
+
+  sufferRange = {
+    "tough" : 400,
+    "medium": 200,
+    "low": 50
+  };
+  enerygRange = {
+    "tough" : 1500,
+    "medium": 1000,
+    "low": 600
+  }
 
   @ViewChild(MatSort) sort: MatSort;
 
@@ -66,8 +78,8 @@ export class BodyComponent implements OnInit {
 
   ngOnInit(): void {
 
-    if (localStorage.getItem('accessToken') != undefined) {
-      var token: any = JSON.parse(localStorage.getItem('accessToken'));
+    if (localStorage.getItem('stravaToken') != undefined) {
+      var token: any = JSON.parse(localStorage.getItem('stravaToken'));
        if (token != undefined) {
          this.strava.accesToken = token.access_token;
 
@@ -90,7 +102,7 @@ export class BodyComponent implements OnInit {
 
     if (this.withings.accesToken != undefined) {
       this.withingsConnect = false;
-        this.getObservations();
+        this.getWithingsObservations();
     }
 
     if (this.strava.accesToken != undefined) {
@@ -98,6 +110,7 @@ export class BodyComponent implements OnInit {
 
       this.getAthlete();
       this.stravaComplete=false;
+      this._loadingService.register('overlayStarSyntax');
       this.getActivities()
     }
   }
@@ -115,6 +128,15 @@ export class BodyComponent implements OnInit {
     var mins = this.pad(Math.round((min%60) ),2)
     return Math.trunc(min/60) + ':' + mins.substring(0,2);
   }
+
+  ratio(kj, suffer) {
+     if (kj != + kj) return '';
+    if (suffer != + suffer) return '';
+     var ratio = +(kj/ suffer);
+     ratio = Math.round(ratio*10) / 10;
+     return ratio;
+  }
+
   connectStrava() {
 
     this.athlete = undefined;
@@ -149,12 +171,12 @@ export class BodyComponent implements OnInit {
     this.strava.getActivities(page).subscribe(
       result => {
         if (page== undefined) page = 0;
-        console.log(page);
         page++;
         this.processStravaObs(result);
         if (result.length > 0) { this.getActivities(page) }
         else {
           this.stravaComplete = true;
+          this._loadingService.resolve('overlayStarSyntax');
           this.activityDataSource.data = this.activities;
           this.processGraph();
 
@@ -187,7 +209,7 @@ export class BodyComponent implements OnInit {
           'distance' :activity.distance / 1000,
           'duration': Math.round(activity.moving_time / 600)
         }
-        console.log(activity.duration);
+
         this.obs.push(obs);
       } else {
         console.log('Duplicate Id = '+this.activityMap.get(activity.id))
@@ -199,7 +221,7 @@ export class BodyComponent implements OnInit {
     return Math.round(num);
   }
 
-  getObservations() {
+  getWithingsObservations() {
     this.withings.getWeight().subscribe(
       result => {
         if (result.status == 401) {
@@ -208,7 +230,7 @@ export class BodyComponent implements OnInit {
         }
        this.measures = result.body.measuregrps;
 
-        this.processObs();
+        this.processWithingsObs();
       },
       (err) => {
         console.log(err);
@@ -219,7 +241,7 @@ export class BodyComponent implements OnInit {
     );
   }
 
-  processObs() {
+  processWithingsObs() {
 
     for (const grp of this.measures) {
       var date = new Date(+grp.date * 1000).toISOString();
@@ -227,19 +249,23 @@ export class BodyComponent implements OnInit {
        var obs : Obs = {
           'obsDate' : new Date(date)
        }
+       // console.log(obs);
        for (const measure of grp.measures) {
          switch (measure.type) {
            case 1:
              obs.weight = +measure.value / 1000;
              break;
            case 76:
-             obs.muscle_mass =+measure.value / 1000;
+             obs.muscle_mass =+measure.value / 100;
              break;
-           case 5:
-             obs.fat_mass =+measure.value / 1000;
+           case 5 :
+             // free fat mass
+             break;
+           case 8:
+             obs.fat_mass =+measure.value / 100;
              break;
            case 77:
-             obs.hydration =+measure.value / 1000;
+             obs.hydration =+measure.value / 100;
              break;
            case 91:
              obs.pwv =+measure.value / 1000;
@@ -298,9 +324,9 @@ export class BodyComponent implements OnInit {
           ]
         }]},
       {
-        "name": "Score",
+        "name": "Kg",
         "chart": [{
-          "name": "Suffer Score",
+          "name": "Hydration",
           "series": [
           ]
         }]},
@@ -346,44 +372,17 @@ export class BodyComponent implements OnInit {
       {
         "name": "kJ",
         "chart": [{
-          name: "Energy and Avg. Heart Rate",
+          name: "Energy and Duration",
           series: [
           ]
         }]
       },
       {
-        "name": "W",
-        "chart": [
-
-          {
-            "name": "Duration and Avg. Heart Rate",
-            "series": []
-          }]
-      },
-      {
         "name": "Score",
         "chart": [
 
           {
-            "name": "Suffer score and Heart Rate",
-            "series": []
-          }]
-      },
-      {
-        "name": "Score",
-        "chart": [
-
-          {
-            "name": "Suffer score and Average Power",
-            "series": []
-          }]
-      },
-      {
-        "name": "Score",
-        "chart": [
-
-          {
-            "name": "Suffer score and Duration",
+            "name": "Suffer and Duration",
             "series": []
           }]
       }
@@ -410,13 +409,13 @@ export class BodyComponent implements OnInit {
           value : obs.pwv
         })
       }
-      /*
-      if (obs.suffer != undefined ) {
+
+      if (obs.hydration != undefined ) {
         charts[3].chart[0].series.push({
           name : obs.obsDate,
-          value : obs.suffer
+          value : obs.hydration
         })
-      }*/
+      }
       if (obs.muscle_mass != undefined ) {
         charts[4].chart[0].series.push({
           name : obs.obsDate,
@@ -430,44 +429,20 @@ export class BodyComponent implements OnInit {
         })
       }
 
-      if (obs.energy != undefined && obs.average_heartrate != undefined ) {
+      if (obs.energy != undefined && obs.duration != undefined ) {
         bars[0].chart[0].series.push({
           name : obs.name,
           x: obs.obsDate,
           y: obs.energy,
-          r: obs.average_heartrate
+          r: obs.energy /obs.duration
         })
       }
-      if (obs.average_heartrate != undefined  && obs.duration != undefined ) {
+      if (obs.suffer != undefined && obs.duration != undefined ) {
         bars[1].chart[0].series.push({
           name : obs.name,
           x: obs.obsDate,
-          y: obs.duration,
-          r: obs.average_heartrate
-        })
-      }
-      if (obs.suffer != undefined && obs.average_heartrate) {
-        bars[2].chart[0].series.push({
-          name : obs.name,
-          x: obs.obsDate,
           y: obs.suffer,
-          r: obs.average_heartrate
-        })
-      }
-      if (obs.suffer != undefined && obs.weighted_average_watts) {
-        bars[3].chart[0].series.push({
-          name : obs.name,
-          x: obs.obsDate,
-          y: obs.suffer,
-          r: obs.weighted_average_watts
-        })
-      }
-      if (obs.suffer != undefined && obs.duration) {
-        bars[4].chart[0].series.push({
-          name : obs.name,
-          x: obs.obsDate,
-          y: obs.suffer,
-          r: obs.duration
+          r: obs.suffer /obs.duration
         })
       }
     }
@@ -484,27 +459,6 @@ export class BodyComponent implements OnInit {
         this.bars.push(bar);
       }
     }
-  //  console.log(bars);
-  //  console.log(this.charts);
-  }
-
-  convertToBubble(event) : any {
-
-    var newseries : any = [];
-
-    for(const chart of event.chart) {
-      for(const item of chart.series) {
-        var newent = {
-          name: item.name,
-          x: item.name,
-          y: item.value,
-          r: item.value
-        };
-        newseries.push(newent);
-      }
-    }
-    console.log(newseries);
-    return newseries;
   }
 
 }

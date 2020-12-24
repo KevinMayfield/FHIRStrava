@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
-import {StravaService} from "../strava.service";
+import {StravaService} from "../services/strava.service";
 
 @Component({
   selector: 'app-exchange-token',
@@ -28,8 +28,8 @@ export class ExchangeTokenComponent implements OnInit {
     console.log(authorisationCode);
     this.strava.getAccessToken(authorisationCode).subscribe(
       token => {
-        console.log(token);
-        localStorage.setItem('accessToken', JSON.stringify(token));
+
+        localStorage.setItem('stravaToken', JSON.stringify(token));
         this.strava.accesToken = token.access_token;
         this.router.navigateByUrl('/');
       }

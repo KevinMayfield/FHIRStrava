@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Observable} from "rxjs";
-import {Athlete} from "./models/athlete";
+import {Athlete} from "../models/athlete";
 import {last} from "rxjs/operators";
+import {JwtHelperService} from "@auth0/angular-jwt";
 
 
 @Injectable({
@@ -24,9 +25,11 @@ export class StravaService {
 
       let headers = new HttpHeaders(
       );
-      if (localStorage.getItem('accessToken') != undefined) {
-          var token: any = JSON.parse(localStorage.getItem('accessToken'));
-          console.log('strava token ' + token.expires_at + ' in ' + token.expires_in);
+      if (localStorage.getItem('stravaToken') != undefined) {
+          var token: any = JSON.parse(localStorage.getItem('stravaToken'));
+         // const helper = new JwtHelperService();
+
+        console.log('strava token expiry ' + this.isTokenExpired(token));
       }
       headers = headers.append('Authorization', 'Bearer '+this.accesToken);
       return headers;
@@ -66,7 +69,38 @@ export class StravaService {
   }
 
   logout(){
-    localStorage.removeItem('accessToken')
+    localStorage.removeItem('stravaToken')
+  }
+
+  public getTokenExpirationDate(
+    decoded: any
+  ): Date | null {
+
+    if (!decoded || !decoded.hasOwnProperty("exp")) {
+      return null;
+    }
+
+    const date = new Date(0);
+    date.setUTCSeconds(decoded.exp);
+
+    return date;
+  }
+
+  public isTokenExpired(
+    token: any,
+    offsetSeconds?: number
+  ): boolean {
+    if (!token || token === "") {
+      return true;
+    }
+    const date = this.getTokenExpirationDate(token);
+    offsetSeconds = offsetSeconds || 0;
+
+    if (date === null) {
+      return false;
+    }
+
+    return !(date.valueOf() > new Date().valueOf() + offsetSeconds * 1000);
   }
 
 }
