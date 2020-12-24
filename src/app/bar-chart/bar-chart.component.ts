@@ -22,7 +22,7 @@ export class BarChartComponent implements OnInit {
   showYAxisLabel: boolean = true;
   @Input()
   xAxisLabel: string = 'Date';
-  maxRadius: number = 10;
+  maxRadius: number = 7;
   minRadius: number = 0;
  // yScaleMin: number = 70;
 //  yScaleMax: number = 5000;

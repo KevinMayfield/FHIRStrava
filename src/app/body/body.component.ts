@@ -23,6 +23,9 @@ export class BodyComponent implements OnInit {
               private _loadingService: TdLoadingService) {
 
   }
+
+  weight = true;
+  pwv = false;
   overlayStarSyntax: boolean = false;
 
   athlete : Athlete;
@@ -390,31 +393,59 @@ export class BodyComponent implements OnInit {
 
     var bars = [
       {
-        "name": "kJ",
-        "chart": [{
-          name: "Energy and Duration",
-          series: [
-          ]
-        },
+        "unit": "kJ",
+        "name": "Energy and Duration",
+        "chart": [
+          {
+            "name": "Endurance",
+            "series": []
+          },
+          {
+            "name": "Moderate",
+            "series": []
+          },
           {
             "name": "Tempo",
             "series": []
           },
           {
-            "name": "Sweet",
+            "name": "Threshold",
+            "series": []
+          }
+        ]
+      },
+      {
+        "unit": "Score",
+        "name":"Suffer and Duration",
+        "chart": [
+          {
+            "name": "Endurance",
             "series": []
           },
           {
-            "name": "Race",
+            "name": "Moderate",
+            "series": []
+          },
+          {
+            "name": "Tempo",
+            "series": []
+          },
+          {
+            "name": "Threshold",
             "series": []
           }]
       },
       {
-        "name": "Score",
+        "unit": "time",
+        "name" : "Duration and Intensity",
         "chart": [
 
           {
-            "name": "Suffer and Duration",
+            "name": "Endurance",
+            "series": []
+          },
+          {
+            "name": "Moderate",
             "series": []
           },
           {
@@ -422,32 +453,7 @@ export class BodyComponent implements OnInit {
             "series": []
           },
           {
-            "name": "Sweet",
-            "series": []
-          },
-          {
-            "name": "Race",
-            "series": []
-          }]
-      },
-      {
-        "name": "time",
-        "chart": [
-
-          {
-            "name": "Duration and Intensity",
-            "series": []
-          },
-          {
-            "name": "Tempo",
-            "series": []
-          },
-          {
-            "name": "Sweet",
-            "series": []
-          },
-          {
-            "name": "Race",
+            "name": "Threshold",
             "series": []
           }]
       }
@@ -564,4 +570,11 @@ export class BodyComponent implements OnInit {
     }
   }
 
+  togglePWV() {
+    this.pwv = !this.pwv;
+  }
+
+  toggleWeight() {
+    this.weight = !this.weight;
+  }
 }

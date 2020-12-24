@@ -9,21 +9,25 @@
 </span>
 
   <span *ngIf="stravaComplete">
-    <td-expansion-panel-group multi="true" #covPanelGroup>
-      <span *ngFor="let chart of charts">
-
-        <td-expansion-panel *ngIf="chart.chart[0].series.length>0"  [label]="chart.chart[0].name" >
-          <div class="md-padding">
-              <app-line-chart [results]="chart.chart" [yAxisLabel]="chart.name" [xAxisLabel]="chart.chart[0].name"> </app-line-chart>
-          </div>
-
-        </td-expansion-panel>
-      </span>
-      </td-expansion-panel-group>
+    <span *ngIf="charts.length>0">
+      <td-expansion-panel label="Body Measurements" >
+        <button mat-button [matMenuTriggerFor]="menu">Menu</button>
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item (click)="toggleWeight()"><mat-icon *ngIf="weight">done</mat-icon>Weight</button>
+          <button mat-menu-item (click)="togglePWV()"><mat-icon *ngIf="pwv">done</mat-icon>Pulse Wave Velocity</button>
+        </mat-menu>
+        <span *ngIf="pwv">
+           <app-line-chart [results]="charts[2].chart" [yAxisLabel]="charts[2].chart.name" [xAxisLabel]="charts[2].chart[0].name"> </app-line-chart>
+        </span>
+        <span *ngIf="weight">
+            <app-line-chart [results]="charts[0].chart" [yAxisLabel]="charts[0].chart.name" [xAxisLabel]="charts[0].chart[0].name"> </app-line-chart>
+        </span>
+      </td-expansion-panel>
+    </span>
     <span *ngFor="let barChart of bars">
         <span *ngIf="barChart.chart[0].series.length>0" >
           <div class="md-padding">
-                <app-bar-chart [results]="barChart.chart" [yAxisLabel]="barChart.name" [xAxisLabel]="barChart.chart[0].name"></app-bar-chart>
+                <app-bar-chart [results]="barChart.chart" [yAxisLabel]="barChart.unit" [xAxisLabel]="barChart.name"></app-bar-chart>
           </div>
         </span>
       </span>
@@ -67,7 +71,7 @@
     </ng-container>
 
     <ng-container matColumnDef="name">
-      <th *matHeaderCellDef mat-header-cell mat-sort-header>Name</th>
+      <th *matHeaderCellDef mat-header-cell mat-sort-header width="20%">Name</th>
       <td  *matCellDef="let activity">
         {{activity.name}} </td>
     </ng-container>
@@ -155,14 +159,14 @@
     </ng-container>
 
     <ng-container matColumnDef="average_heartrate">
-      <th *matHeaderCellDef mat-header-cell mat-sort-header> Avg. HeartRate </th>
+      <th *matHeaderCellDef mat-header-cell mat-sort-header matTooltip="Average Heart Rate"> Avg. Heart Rate </th>
       <td  *matCellDef="let activity">
 
         {{activity.average_heartrate}} </td>
     </ng-container>
 
     <ng-container matColumnDef="weighted_average_watts">
-      <th *matHeaderCellDef mat-header-cell mat-sort-header> Avg.(Norm.Norm.) Power </th>
+      <th *matHeaderCellDef mat-header-cell mat-sort-header matTooltip="Average Normalised Power"> Avg (N) Power </th>
       <td  *matCellDef="let activity">
         {{activity.weighted_average_watts}}
 
