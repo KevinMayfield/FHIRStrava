@@ -24,8 +24,10 @@ export class BarChartComponent implements OnInit {
   xAxisLabel: string = 'Date';
   maxRadius: number = 7;
   minRadius: number = 0;
- // yScaleMin: number = 70;
-//  yScaleMax: number = 5000;
+  @Input()
+  xScaleMin: any = new Date('2020-07-14');
+
+  xScaleMax= new Date();
 
   @Input()
   results : [];

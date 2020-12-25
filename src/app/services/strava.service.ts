@@ -14,6 +14,8 @@ export class StravaService {
 
   private accessToken = undefined;
 
+  private refreshingToken = false;
+
   private athlete = undefined;
 
   clientId = '8536';
@@ -82,7 +84,10 @@ export class StravaService {
   }
 
   public getRefreshToken() {
+    if (this.refreshingToken) return;
+    this.refreshingToken = true;
     console.log('Strava token expired');
+
     var token: any = JSON.parse(localStorage.getItem('stravaToken'));
     let headers = new HttpHeaders(
     );
@@ -95,7 +100,9 @@ export class StravaService {
 
     return this.http.post<any>(url,{'headers': headers}).subscribe(
       token => {
+        console.log('Strava token refreshed');
         this.setAccessToken(token);
+        this.refreshingToken = false;
       },
       (err) => {
           console.log('Strava Refresh Error: '+err);

@@ -11,6 +11,8 @@ export class WithingsService {
 
   private accessToken = undefined;
 
+  private refreshingToken = false;
+
   url = 'https://wbsapi.withings.net';
 
   constructor(private http: HttpClient) { }
@@ -63,6 +65,9 @@ export class WithingsService {
 
   public getRefreshToken() {
 
+    if (this.refreshingToken) return;
+    this.refreshingToken = true;
+    console.log('refreshing token');
     let headers = new HttpHeaders(
     );
     headers.append('Content-Type', 'application/x-www-form-urlencoded');
@@ -80,7 +85,12 @@ export class WithingsService {
 
     this.http.post<any>(url, bodge, { 'headers' : headers} ).subscribe(
       token => {
+        console.log('refreshed token');
         this.setAccessToken(token);
+        this.refreshingToken = false;
+      },
+      (err) => {
+        console.log(err);
       }
     );
   }
@@ -158,8 +168,10 @@ export class WithingsService {
 
       const helper = new JwtHelperService();
       if (this.isTokenExpired(token)) {
+
+        console.log('withings Token expired');
         this.accessToken = undefined;
-       // this.getRefreshToken();
+        this.getRefreshToken();
         return undefined;
       }
       if (token != undefined) {

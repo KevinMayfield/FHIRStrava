@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {Obs} from "../models/obs";
+import { curveBasis } from 'd3-shape';
 
 @Component({
   selector: 'app-line-chart',
@@ -12,6 +12,8 @@ export class LineChartComponent implements OnInit {
 
   @Input()
   results: any;
+
+  curve: any = curveBasis;
 
   chart : [];
 
@@ -30,6 +32,12 @@ export class LineChartComponent implements OnInit {
   xAxisLabel: string =undefined;
   @Input()
   yAxisLabel: string = 'Population';
+
+  @Input()
+  xScaleMin: any = new Date('2020-07-14');
+
+  xScaleMax= new Date();
+
   timeline: boolean = false;
   yScaleMin= 0;
 
