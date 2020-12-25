@@ -11,7 +11,7 @@ export class WithingsService {
 
   private accessToken = undefined;
 
-  url = 'https://wbsapi.withings.net/measure';
+  url = 'https://wbsapi.withings.net';
 
   constructor(private http: HttpClient) { }
 
@@ -28,7 +28,11 @@ export class WithingsService {
 
 
     localStorage.setItem('appRoute', routeUrl);
-    window.location.href = 'https://account.withings.com/oauth2_user/authorize2?response_type=code&client_id='+this.clientId+ '&redirect_uri='+routeUrl+'\withings&state=12345&scope=user.metrics';
+    window.location.href = 'https://account.withings.com/oauth2_user/authorize2?response_type=code&client_id='
+      +this.clientId
+      + '&redirect_uri=' +routeUrl+'\withings'
+      +'&state=12345'
+      +'&scope=user.metrics,user.activity';
   }
 
 
@@ -43,26 +47,15 @@ export class WithingsService {
   }
 
   setAccessToken(token) {
+    var date = new Date
+    // Create an expires at ..... don't know when we got the token
+    token.expires_at = Math.round((new Date().valueOf())/1000) + token.expires_in;
     localStorage.setItem('withingsToken', JSON.stringify(token));
     this.accessToken = token.access_token;
     this.tokenChange.emit(token);
   }
 
-  getAccessToken() {
-    if (localStorage.getItem('withingsToken') != undefined) {
-      var token: any = JSON.parse(localStorage.getItem('withingsToken'));
 
-      const helper = new JwtHelperService();
-      if (this.isTokenExpired(token)) {
-        this.getRefreshToken();
-      }
-      if (token != undefined) {
-        this.accessToken = token.access_token;
-      }
-    }
-
-     return this.accessToken;
-  }
 
   public logout() {
     localStorage.removeItem('withingsToken');
@@ -119,13 +112,9 @@ export class WithingsService {
     );
   }
 
-  public getWeight(): Observable<any> {
+  public getMeasures(): Observable<any> {
 
-    /*
-    curl --data "action=getmeas
-    &Authorization=Authorization
-    &meastype=meastype&meastypes=meastypes&category=category&startdate=startdate&enddate=enddate&offset=offset&lastupdate=integer" 'https://wbsapi.withings.net/measure'
-    */
+    // Use the postman collection for details
 
     let headers = this.getHeaders();
 
@@ -140,20 +129,59 @@ export class WithingsService {
 
 
 
-    return this.http.post<any>(this.url, bodge, { 'headers' : headers} );
+    return this.http.post<any>(this.url+'/measure', bodge, { 'headers' : headers} );
 
+  }
+
+  public getSleep(): Observable<any> {
+
+    let headers = this.getHeaders();
+
+    var lastUpdate = new Date('2020-07-14');
+
+    var bodge= 'action=getsummary'
+      + '&lastupdate='+Math.floor(lastUpdate.getTime())/1000
+    + '&data_fields=breathing_disturbances_intensity,deepsleepduration,lightsleepduration,wakeupcount,durationtosleep,sleep_score,remsleepduration';
+
+
+
+    return this.http.post<any>(this.url+'/v2/sleep', bodge, { 'headers' : headers} );
+
+  }
+  connect() {
+    var token = this.getAccessToken();
+    if (token != undefined) this.tokenChange.emit(token);
+  }
+  getAccessToken() {
+    if (localStorage.getItem('withingsToken') != undefined) {
+      var token: any = JSON.parse(localStorage.getItem('withingsToken'));
+
+      const helper = new JwtHelperService();
+      if (this.isTokenExpired(token)) {
+        this.accessToken = undefined;
+       // this.getRefreshToken();
+        return undefined;
+      }
+      if (token != undefined) {
+        this.accessToken = token.access_token;
+        return this.accessToken;
+      }
+    }
+    return undefined;
   }
 
   public getTokenExpirationDate(
     decoded: any
   ): Date | null {
 
-    if (!decoded || !decoded.hasOwnProperty("exp")) {
+    if (!decoded || !decoded.hasOwnProperty("expires_at")) {
+      // Invalid format
+      localStorage.removeItem('withingsToken');
       return null;
     }
 
     const date = new Date(0);
-    date.setUTCSeconds(decoded.exp);
+    date.setUTCSeconds(decoded.expires_at);
 
     return date;
   }
@@ -168,6 +196,7 @@ export class WithingsService {
     const date = this.getTokenExpirationDate(token);
     offsetSeconds = offsetSeconds || 0;
 
+    console.log('withings expiry date '+date);
     if (date === null) {
       return false;
     }

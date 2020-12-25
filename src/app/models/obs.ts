@@ -15,6 +15,13 @@ export interface Obs {
   distance? : number;
   duration? : number;
   intensity? : number;
+  deepsleepduration?: number;
+  durationtosleep?: number;
+  breathing_disturbances_intensity?: number;
+  lightsleepduration? : number;
+  wakeupcount? : number;
+  remsleepduration?: number;
+  sleep_score? : number;
  // not suported in strava calories? : number;
   /*
   1	Weight (kg)

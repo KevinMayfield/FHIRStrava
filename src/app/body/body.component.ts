@@ -30,7 +30,7 @@ export class BodyComponent implements OnInit {
 
   athlete : Athlete;
 
-  connect = true;
+  stravaConnect = true;
 
   withingsConnect = true;
 
@@ -73,6 +73,8 @@ export class BodyComponent implements OnInit {
 
   @ViewChild(MatSort) sort: MatSort;
 
+  sleepscore = false;
+
 
   ngAfterViewInit() {
     if (this.sort != undefined) {
@@ -94,31 +96,26 @@ export class BodyComponent implements OnInit {
     this.activities = [];
     this.activityDataSource = new MatTableDataSource<SummaryActivity>(this.activities);
 
-
-    if (this.withings.getAccessToken() != undefined) {
-      this.withingsConnect = false;
-        this.getWithingsObservations();
-    } else {
-
-    }
     this.withings.tokenChange.subscribe(
       token => {
-        this.withingsConnect = false;
+        if (token != undefined) this.withingsConnect = false;
         this.getWithingsObservations();
+        this.getWithingsSleep();
       }
     )
     this.strava.tokenChange.subscribe(
       token => {
-        this.stravaLoad();
+        if (token != undefined) this.stravaConnect = false;
+          this.stravaLoad();
       }
     );
-    if (this.strava.getAccessToken() != undefined) {
-      this.stravaLoad();
-    }
+
+    this.strava.connect();
+    this.withings.connect();
   }
 
   stravaLoad(){
-    this.connect = false;
+
 
     this.getAthlete();
     this.stravaComplete=false;
@@ -178,12 +175,12 @@ export class BodyComponent implements OnInit {
     this.strava.getAthlete().subscribe(
       result => {
         this.athlete = result;
-        console.log(result);
+
       },
       (err) => {
         console.log(err);
         if (err.status == 401) {
-          this.connect = true;
+          this.stravaConnect = true;
         }
       }
     );
@@ -207,7 +204,7 @@ export class BodyComponent implements OnInit {
       (err) => {
         console.log(err);
         if (err.status == 401) {
-          this.connect = true;
+          this.stravaConnect = true;
         }
       }
     );
@@ -244,8 +241,32 @@ export class BodyComponent implements OnInit {
     return Math.round(num);
   }
 
+  getWithingsSleep() {
+    this.withings.getSleep().subscribe(
+      result => {
+        if (result.status == 401) {
+          console.log('Withings 401');
+
+        }
+        if (result.status == 403) {
+          console.log('Withings 403 - Need to ask for permission');
+
+        }
+        this.processWithingsSleep(result);
+      },
+      (err) => {
+        console.log(err);
+        if (err.status == 401) {
+          this.withingsConnect = true;
+        }
+      }
+    );
+  }
+
+
+
   getWithingsObservations() {
-    this.withings.getWeight().subscribe(
+    this.withings.getMeasures().subscribe(
       result => {
         if (result.status == 401) {
           console.log('Withings 401');
@@ -262,6 +283,38 @@ export class BodyComponent implements OnInit {
         }
       }
     );
+  }
+
+
+  processWithingsSleep(sleepData) {
+    for (const sleep of sleepData.body.series) {
+      var obs : Obs = {
+        'obsDate' : new Date(sleep.date)
+      }
+      if (sleep.data.durationtosleep != undefined) {
+        obs.durationtosleep = sleep.data.durationtosleep;
+      }
+      if (sleep.data.deepsleepduration != undefined) {
+        obs.deepsleepduration = sleep.data.deepsleepduration;
+      }
+      if (sleep.data.breathing_disturbances_intensity != undefined) {
+        obs.breathing_disturbances_intensity = sleep.data.breathing_disturbances_intensity;
+      }
+      if (sleep.data.wakeupcount != undefined) {
+        obs.wakeupcount = sleep.data.wakeupcount;
+      }
+      if (sleep.data.sleep_score != undefined) {
+        obs.sleep_score = sleep.data.sleep_score;
+      }
+      if (sleep.data.remsleepduration != undefined) {
+        obs.remsleepduration = sleep.data.remsleepduration;
+      }
+      if (sleep.data.lightsleepduration != undefined) {
+        obs.lightsleepduration = sleep.data.lightsleepduration;
+      }
+      this.obs.push(obs);
+    }
+
   }
 
   processWithingsObs() {
@@ -372,23 +425,14 @@ export class BodyComponent implements OnInit {
           }]
       },
       {
-        "name": "beats/min",
+        "name": "score",
         "chart": [
 
           {
-            "name": "Avg. Heart Rate",
+            "name": "Sleep Score",
             "series": []
           }]
-      },
-      {
-        "name": "W",
-        "chart": [
-
-          {
-            "name": "Average (Normalised) Power",
-            "series": []
-          }]
-      },
+      }
     ];
 
     var bars = [
@@ -499,6 +543,12 @@ export class BodyComponent implements OnInit {
           value : obs.fat_mass
         })
       }
+      if (obs.sleep_score!= undefined ) {
+        charts[6].chart[0].series.push({
+          name : obs.obsDate,
+          value : obs.sleep_score
+        })
+      }
       var chartNum =0;
       if (obs.energy != undefined && obs.duration != undefined ) {
         var energy = obs.energy / obs.duration;
@@ -576,5 +626,9 @@ export class BodyComponent implements OnInit {
 
   toggleWeight() {
     this.weight = !this.weight;
+  }
+
+  toggleSleep() {
+    this.sleepscore = !this.sleepscore;
   }
 }

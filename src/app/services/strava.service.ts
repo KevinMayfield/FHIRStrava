@@ -59,19 +59,26 @@ export class StravaService {
     this.tokenChange.emit(token);
   }
 
+  connect() {
+    var token = this.getAccessToken();
+    if (token != undefined) this.tokenChange.emit(token);
+  }
   getAccessToken() {
 
     if (localStorage.getItem('stravaToken') != undefined) {
       var token: any = JSON.parse(localStorage.getItem('stravaToken'));
 
       if (this.isTokenExpired(token)) {
+        this.accessToken = undefined;
         this.getRefreshToken();
+        return undefined;
       }
       if (token != undefined) {
         this.accessToken = token.access_token;
+        return this.accessToken;
       }
     }
-    return this.accessToken;
+    return undefined;
   }
 
   public getRefreshToken() {
@@ -144,11 +151,9 @@ export class StravaService {
     }
     const date = this.getTokenExpirationDate(token);
     offsetSeconds = offsetSeconds || 0;
-  console.log(date);
     if (date === null) {
       return false;
     }
-
     return !(date.valueOf() > new Date().valueOf() + offsetSeconds * 1000);
   }
 
