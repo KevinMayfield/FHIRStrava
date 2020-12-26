@@ -48,6 +48,8 @@ export class BodyComponent implements OnInit {
 
   measures : MeasureGroups[] = [];
 
+  showMeasures= false;
+
   obs: Obs[] = [];
 
   activityDataSource: MatTableDataSource<SummaryActivity>;
@@ -98,9 +100,15 @@ export class BodyComponent implements OnInit {
     this.activities = [];
     this.activityDataSource = new MatTableDataSource<SummaryActivity>(this.activities);
 
+    this.ihealth.tokenChange.subscribe(
+      token => {
+        this.showMeasures = true;
+
+      }
+    )
     this.withings.tokenChange.subscribe(
       token => {
-
+        this.showMeasures = true;
         this.getWithingsObservations();
         this.getWithingsSleep();
       }

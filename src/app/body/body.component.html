@@ -14,17 +14,14 @@
           <button *ngIf="barChart.chart[0].series.length>0" mat-menu-item (click)="toggle(barChart)"><mat-icon *ngIf="barChart.ticked">done</mat-icon>{{barChart.name}}</button>
             </span>
   </mat-menu>
-  <div mat-row *ngIf="stravaComplete"  >
-     <button mat-raised-button [matMenuTriggerFor]="menuExercise"><mat-icon>av_timer</mat-icon>Exercise</button>
-
-    <span *ngIf="charts.length>0">
-
+  <div mat-row   >
+     <button mat-raised-button *ngIf="stravaComplete" [matMenuTriggerFor]="menuExercise"><mat-icon>av_timer</mat-icon>Exercise</button>
+    <span *ngIf="showMeasures">
       <button mat-raised-button [matMenuTriggerFor]="menu"><mat-icon>accessibility_new</mat-icon>Body Measurements</button>
-
-
     </span>
 
   </div>
+
   <span *ngFor="let chart of charts">
            <app-line-chart *ngIf="chart.ticked" [results]="chart.chart" [yAxisLabel]="chart.unit" [xAxisLabel]="chart.name"> </app-line-chart>
         </span>
