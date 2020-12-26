@@ -16,13 +16,16 @@ export class StravaService {
 
   private refreshingToken = false;
 
-  private athlete = undefined;
+  private athlete : Athlete = undefined;
 
   clientId = '8536';
 
   clientSecret = '6c34eb8997791f315f2f4d9c932a01a903f6beaa';
 
   tokenChange: EventEmitter<any> = new EventEmitter();
+
+
+  athleteChange: EventEmitter<any> = new EventEmitter();
 
   constructor(private http: HttpClient) { }
 
@@ -37,6 +40,11 @@ export class StravaService {
 
   public getAthlete(): Observable<Athlete> {
     return this.http.get<Athlete>(this.url+'athlete',{'headers': this.getHeaders()});
+  }
+
+  public setAthlete(athlete : Athlete) {
+     this.athlete = athlete;
+     this.athleteChange.emit(athlete);
   }
 
   public getActivities(page?): Observable<any> {

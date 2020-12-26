@@ -1,42 +1,40 @@
 <mat-card>
 
-
-    <span *ngIf="withingsConnect">
-  <img class="img-responsive"  width="100" height="100" (click)="connectWithings()" src="assets/images/withings.png">
-</span>
   <span *ngIf="stravaConnect">
   <img class="img-responsive" (click)="connectStrava()" src="assets/images/btn_strava_connectwith_orange.png">
 </span>
 
-  <span *ngIf="stravaComplete">
+  <mat-menu #menu="matMenu">
+          <span *ngFor="let chart of charts">
+          <button *ngIf="chart.chart[0].series.length>0" mat-menu-item (click)="toggle(chart)"><mat-icon *ngIf="chart.ticked">done</mat-icon>{{chart.name}}</button>
+            </span>
+  </mat-menu>
+  <mat-menu #menuExercise="matMenu">
+          <span *ngFor="let barChart of bars">
+          <button *ngIf="barChart.chart[0].series.length>0" mat-menu-item (click)="toggle(barChart)"><mat-icon *ngIf="barChart.ticked">done</mat-icon>{{barChart.name}}</button>
+            </span>
+  </mat-menu>
+  <div mat-row *ngIf="stravaComplete"  >
+     <button mat-raised-button [matMenuTriggerFor]="menuExercise"><mat-icon>av_timer</mat-icon>Exercise</button>
+
     <span *ngIf="charts.length>0">
-      <td-expansion-panel label="Body Measurements" >
-        <button mat-button [matMenuTriggerFor]="menu">Menu</button>
-        <mat-menu #menu="matMenu">
-          <button mat-menu-item (click)="toggleWeight()"><mat-icon *ngIf="weight">done</mat-icon>Weight</button>
-          <button mat-menu-item (click)="togglePWV()"><mat-icon *ngIf="pwv">done</mat-icon>Pulse Wave Velocity</button>
-           <button mat-menu-item (click)="toggleSleep()"><mat-icon *ngIf="sleepscore">done</mat-icon>Sleep Score</button>
-        </mat-menu>
-        <span *ngIf="pwv">
-           <app-line-chart [results]="charts[2].chart" [yAxisLabel]="charts[2].chart.name" [xAxisLabel]="charts[2].chart[0].name"> </app-line-chart>
-        </span>
-        <span *ngIf="weight">
-            <app-line-chart [results]="charts[0].chart" [yAxisLabel]="charts[0].chart.name" [xAxisLabel]="charts[0].chart[0].name"> </app-line-chart>
-        </span>
-         <span *ngIf="sleepscore">
-            <app-line-chart [results]="charts[6].chart" [yAxisLabel]="charts[6].chart.name" [xAxisLabel]="charts[6].chart[0].name"> </app-line-chart>
-        </span>
-      </td-expansion-panel>
+
+      <button mat-raised-button [matMenuTriggerFor]="menu"><mat-icon>accessibility_new</mat-icon>Body Measurements</button>
+
+
     </span>
-    <span *ngFor="let barChart of bars">
+
+  </div>
+  <span *ngFor="let chart of charts">
+           <app-line-chart *ngIf="chart.ticked" [results]="chart.chart" [yAxisLabel]="chart.unit" [xAxisLabel]="chart.name"> </app-line-chart>
+        </span>
+  <span *ngFor="let barChart of bars">
         <span *ngIf="barChart.chart[0].series.length>0" >
           <div class="md-padding">
-                <app-bar-chart [results]="barChart.chart" [yAxisLabel]="barChart.unit" [xAxisLabel]="barChart.name"></app-bar-chart>
+                <app-bar-chart *ngIf="barChart.ticked" [results]="barChart.chart" [yAxisLabel]="barChart.unit" [xAxisLabel]="barChart.name"></app-bar-chart>
           </div>
         </span>
       </span>
-  </span>
-
 
   <div *tdLoading="'overlayStarSyntax'; mode: 'indeterminate'; type: 'circle'; strategy: 'overlay'; color: 'accent'">
   <table [dataSource]="activityDataSource" width="100%"

@@ -22,6 +22,8 @@ export interface Obs {
   wakeupcount? : number;
   remsleepduration?: number;
   sleep_score? : number;
+  diastolic? : number;
+  systolic? : number;
  // not suported in strava calories? : number;
   /*
   1	Weight (kg)

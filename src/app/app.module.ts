@@ -35,6 +35,7 @@ import { LineChartComponent } from './line-chart/line-chart.component';
 import {CovalentExpansionPanelModule} from "@covalent/core/expansion-panel";
 import { BarChartComponent } from './bar-chart/bar-chart.component';
 import {CovalentLoadingModule} from "@covalent/core/loading";
+import { IhealthComponent } from './ihealth/ihealth.component';
 
 @NgModule({
   declarations: [
@@ -46,6 +47,7 @@ import {CovalentLoadingModule} from "@covalent/core/loading";
 
     LineChartComponent,
     BarChartComponent,
+    IhealthComponent,
   ],
   imports: [
     BrowserModule,

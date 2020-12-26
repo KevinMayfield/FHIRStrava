@@ -131,7 +131,7 @@ export class WithingsService {
     var lastUpdate = new Date('2020-07-14');
 
     var bodge= 'action=getmeas'
-      + '&meastypes=1,5,8,77,76,88,91'
+      + '&meastypes=1,5,8,77,76,88,91,9,10'
       + '&category=1'
      // + '&startdate=2020-12-12'
      // + '&enddate=2020-12-22';

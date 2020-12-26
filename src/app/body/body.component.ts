@@ -9,6 +9,8 @@ import {Obs} from "../models/obs";
 import {MatTableDataSource} from "@angular/material/table";
 import {MatSort} from "@angular/material/sort";
 import {TdLoadingService} from "@covalent/core/loading";
+import {IhealthComponent} from "../ihealth/ihealth.component";
+import {IhealthService} from "../services/ihealth.service";
 
 
 @Component({
@@ -20,6 +22,7 @@ export class BodyComponent implements OnInit {
 
   constructor(private strava: StravaService,
               private withings: WithingsService,
+              private ihealth: IhealthService,
               private _loadingService: TdLoadingService) {
 
   }
@@ -31,8 +34,6 @@ export class BodyComponent implements OnInit {
   athlete : Athlete;
 
   stravaConnect = true;
-
-  withingsConnect = true;
 
   stravaComplete = false;
 
@@ -74,6 +75,7 @@ export class BodyComponent implements OnInit {
   @ViewChild(MatSort) sort: MatSort;
 
   sleepscore = false;
+  bp = false;
 
 
   ngAfterViewInit() {
@@ -98,7 +100,7 @@ export class BodyComponent implements OnInit {
 
     this.withings.tokenChange.subscribe(
       token => {
-        if (token != undefined) this.withingsConnect = false;
+
         this.getWithingsObservations();
         this.getWithingsSleep();
       }
@@ -164,9 +166,7 @@ export class BodyComponent implements OnInit {
     this.strava.authorise(window.location.href);
   }
 
-  connectWithings() {
-    this.withings.authorise(window.location.href);
-  }
+
 
 
 
@@ -175,6 +175,7 @@ export class BodyComponent implements OnInit {
     this.strava.getAthlete().subscribe(
       result => {
         this.athlete = result;
+        this.strava.setAthlete(result);
 
       },
       (err) => {
@@ -257,7 +258,7 @@ export class BodyComponent implements OnInit {
       (err) => {
         console.log(err);
         if (err.status == 401) {
-          this.withingsConnect = true;
+
         }
       }
     );
@@ -279,7 +280,7 @@ export class BodyComponent implements OnInit {
       (err) => {
         console.log(err);
         if (err.status == 401) {
-          this.withingsConnect = true;
+
         }
       }
     );
@@ -346,6 +347,10 @@ export class BodyComponent implements OnInit {
            case 91:
              obs.pwv =+measure.value / 1000;
              break;
+           case 9 :obs.diastolic =+measure.value /1000;
+             break;
+           case 10 :obs.systolic =+measure.value / 1000;
+             break;
          }
        }
 
@@ -377,7 +382,8 @@ export class BodyComponent implements OnInit {
 
     var charts = [
       {
-        "name": "Kg",
+        "unit": "Kg",
+        "name": "Weight",
         "chart": [
 
           {
@@ -386,28 +392,32 @@ export class BodyComponent implements OnInit {
           }]
       },
       {
-        "name": "kJ",
+        "unit": "kJ",
+        name: "Energy",
         "chart": [{
           name: "Energy",
           series: []
         }]
       },
       {
-        "name": "m/s",
+        "unit": "m/s",
+        "name": "Pulse Wave Velocity",
         "chart": [{
           "name": "Pulse Wave Velocity",
           "series": [
           ]
         }]},
       {
-        "name": "Kg",
+        "unit": "Kg",
+        "name": "Hydration",
         "chart": [{
           "name": "Hydration",
           "series": [
           ]
         }]},
       {
-        "name": "Kg",
+        "unit": "Kg",
+        "name": "Muscle Mass",
         "chart": [
 
           {
@@ -416,7 +426,8 @@ export class BodyComponent implements OnInit {
           }]
       },
       {
-        "name": "Kg",
+        "unit": "Kg",
+        "name": "Fat Mass",
         "chart": [
 
           {
@@ -425,13 +436,28 @@ export class BodyComponent implements OnInit {
           }]
       },
       {
-        "name": "score",
+        "unit": "score",
+        "name": "Sleep Score",
         "chart": [
 
           {
             "name": "Sleep Score",
             "series": []
           }]
+      },
+      {
+        "unit": "mmHg",
+        "name": "Blood Pressure",
+        "chart": [
+          {
+            "name": "Systolic Blood Pressure",
+            "series": []
+          },
+          {
+            "name": "Diastolic Blood Pressure",
+            "series": []
+          }
+          ]
       }
     ];
 
@@ -549,6 +575,16 @@ export class BodyComponent implements OnInit {
           value : obs.sleep_score
         })
       }
+      if (obs.diastolic!= undefined && obs.systolic != undefined ) {
+        charts[7].chart[1].series.push({
+          name : obs.obsDate,
+          value : obs.diastolic
+        });
+        charts[7].chart[0].series.push({
+          name : obs.obsDate,
+          value : obs.systolic
+        });
+      }
       var chartNum =0;
       if (obs.energy != undefined && obs.duration != undefined ) {
         var energy = obs.energy / obs.duration;
@@ -630,5 +666,16 @@ export class BodyComponent implements OnInit {
 
   toggleSleep() {
     this.sleepscore = !this.sleepscore;
+  }
+
+  toggleBP() {
+    this.bp = !this.bp;
+  }
+
+
+  toggle(chart: any) {
+    if (chart.ticked == undefined) chart.ticked = false;
+    chart.ticked = !chart.ticked;
+
   }
 }
