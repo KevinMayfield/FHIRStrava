@@ -11,14 +11,14 @@ import {MatSort} from "@angular/material/sort";
 import {TdLoadingService} from "@covalent/core/loading";
 import {IhealthComponent} from "../ihealth/ihealth.component";
 import {IhealthService} from "../services/ihealth.service";
-import * as CsvReadableStream from 'csv-reader';
-import * as fs from 'fs';
+
 import {HrvService} from "../services/hrv.service";
 
 // @ts-ignore
 import Observation = fhir.Observation;
 // @ts-ignore
 import Bundle = fhir.Bundle;
+import {PhrService} from "../services/phr.service";
 
 
 @Component({
@@ -32,6 +32,7 @@ export class BodyComponent implements OnInit {
               private withings: WithingsService,
               private hrv : HrvService,
               private ihealth: IhealthService,
+              private phr: PhrService,
               private _loadingService: TdLoadingService) {
 
   }
@@ -40,7 +41,7 @@ export class BodyComponent implements OnInit {
   pwv = false;
   overlayStarSyntax: boolean = false;
 
-  files: File | FileList;
+
 
   athlete : Athlete;
 
@@ -131,6 +132,9 @@ export class BodyComponent implements OnInit {
           this.stravaLoad();
       }
     );
+    this.hrv.hrvChange.subscribe(result => {
+      this.processHRVObs(result);
+    })
 
     this.strava.connect();
     this.withings.connect();
@@ -699,46 +703,34 @@ export class BodyComponent implements OnInit {
 
   }
 
-  selectEvent(files: FileList | File): void {
-    if (files instanceof FileList) {
-       console.log('Files '+ files);
-    } else if (files instanceof File) {
 
-      var file : File = files;
-    //  console.log('file ' +  file);
-      this.hrv.postCSVFile(file).subscribe(result => {
-        this.processHRVObs(result);
-      })
-
-    }
-  };
 
   processHRVObs(bundle : Bundle) {
-    var lastUpdate = new Date('2020-07-14');
+    var lastUpdate = this.phr.getLowerDate();
     var process = false;
     for (const entry of bundle.entry) {
       process= true;
-        const fhirobs : Observation = entry.resource;
-        var datetime = new Date(fhirobs.effectiveDateTime);
-        if (datetime > lastUpdate) {
+      const fhirobs : Observation = entry.resource;
+      var datetime = new Date(fhirobs.effectiveDateTime);
+      if (datetime > lastUpdate) {
         //  console.log(fhirobs);
-          var obs : Obs =  {
-              obsDate : datetime
-          }
-
-          if (fhirobs.code.coding[0].code ==="8867-4") {
-            obs.sdnn = fhirobs.valueQuantity.value;
-          }
-          if (fhirobs.code.coding[0].code ==="60842-2") {
-            obs.vo2max = fhirobs.valueQuantity.value;
-          }
-          if (fhirobs.code.coding[0].code ==="Recovery_Points") {
-            obs.recoverypoints = fhirobs.valueQuantity.value;
-          }
-          this.obs.push(obs);
+        var obs : Obs =  {
+          obsDate : datetime
         }
+
+        if (fhirobs.code.coding[0].code ==="8867-4") {
+          obs.sdnn = fhirobs.valueQuantity.value;
+        }
+        if (fhirobs.code.coding[0].code ==="60842-2") {
+          obs.vo2max = fhirobs.valueQuantity.value;
+        }
+        if (fhirobs.code.coding[0].code ==="Recovery_Points") {
+          obs.recoverypoints = fhirobs.valueQuantity.value;
+        }
+        this.obs.push(obs);
+      }
     }
-    if (process) this.processHRVGraph();
+    this.processHRVGraph();
   }
 
   processHRVGraph(){

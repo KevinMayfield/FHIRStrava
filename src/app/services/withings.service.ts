@@ -3,6 +3,7 @@ import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {Athlete} from "../models/athlete";
 import {JwtHelperService} from "@auth0/angular-jwt";
+import {PhrService} from "./phr.service";
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,8 @@ export class WithingsService {
 
   url = 'https://wbsapi.withings.net';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient,
+              private phrService : PhrService) { }
 
   clientId = 'e532209382d449afbb1ef360919f2fdac284fac62ec23feeea0589f043bdc41f';
 
@@ -128,14 +130,14 @@ export class WithingsService {
 
     let headers = this.getHeaders();
 
-    var lastUpdate = new Date('2020-07-14');
+    var lastUpdate = this.phrService.getLowerDate();
 
     var bodge= 'action=getmeas'
       + '&meastypes=1,5,8,77,76,88,91,9,10'
       + '&category=1'
      // + '&startdate=2020-12-12'
      // + '&enddate=2020-12-22';
-      + '&lastupdate='+Math.floor(lastUpdate.getTime())/1000;
+      + '&lastupdate='+Math.floor(lastUpdate.getTime()/1000);
 
 
 
@@ -147,13 +149,11 @@ export class WithingsService {
 
     let headers = this.getHeaders();
 
-    var lastUpdate = new Date('2020-07-14');
+    var lastUpdate = this.phrService.getLowerDate();
 
     var bodge= 'action=getsummary'
-      + '&lastupdate='+Math.floor(lastUpdate.getTime())/1000
+      + '&lastupdate='+Math.floor(lastUpdate.getTime()/1000)
     + '&data_fields=breathing_disturbances_intensity,deepsleepduration,lightsleepduration,wakeupcount,durationtosleep,sleep_score,remsleepduration';
-
-
 
     return this.http.post<any>(this.url+'/v2/sleep', bodge, { 'headers' : headers} );
 

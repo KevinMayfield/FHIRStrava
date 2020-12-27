@@ -1,13 +1,23 @@
-import { Injectable } from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 import {Observable} from "rxjs";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
+import {PhrService} from "./phr.service";
+import {Obs} from "../models/obs";
+// @ts-ignore
+import Observation = fhir.Observation;
+// @ts-ignore
+import Bundle = fhir.Bundle;
 
 @Injectable({
   providedIn: 'root'
 })
 export class HrvService {
 
-  constructor(private http: HttpClient) { }
+
+  hrvChange: EventEmitter<any> = new EventEmitter();
+
+  constructor(private http: HttpClient,
+              private phr : PhrService) { }
 
   getHeaders() : HttpHeaders {
 
@@ -18,14 +28,17 @@ export class HrvService {
     return headers;
   }
 
-  public postCSVFile(body : any): Observable<any> {
+  public postCSVFile(body : any) {
 
     let headers = this.getHeaders();
 
-    var lastUpdate = new Date('2020-07-14');
+    var lastUpdate = this.phr.getLowerDate();
 
 
-    return this.http.post<any>('http://localhost:8187/services/hrv', body, { 'headers' : headers} );
+    return this.http.post<any>('http://localhost:8187/services/hrv', body, { 'headers' : headers} ).subscribe(result => {
+      this.hrvChange.emit(result);
+    });
 
   }
+
 }

@@ -1,5 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import { curveBasis } from 'd3-shape';
+import {PhrService} from "../services/phr.service";
 
 @Component({
   selector: 'app-line-chart',
@@ -8,7 +9,7 @@ import { curveBasis } from 'd3-shape';
 })
 export class LineChartComponent implements OnInit {
 
-  constructor() { }
+  constructor(private phrService : PhrService) { }
 
   @Input()
   results: any;
@@ -34,9 +35,9 @@ export class LineChartComponent implements OnInit {
   yAxisLabel: string = 'Population';
 
   @Input()
-  xScaleMin: any = new Date('2020-07-14');
+  xScaleMin: Date;
 
-  xScaleMax= new Date();
+  xScaleMax: Date = new Date();
 
   timeline: boolean = false;
   yScaleMin= 0;
@@ -62,7 +63,9 @@ export class LineChartComponent implements OnInit {
   ngOnInit(): void {
     var min=9999;
 
-
+    if (this.xScaleMin = undefined) {
+      this.xScaleMin = this.phrService.getLowerDate();
+    }
       for (const chart of this.results) {
      //   console.log(chart);
         for (const val of chart.series) {

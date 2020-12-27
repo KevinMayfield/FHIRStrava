@@ -22,12 +22,7 @@
     <span *ngIf="showMeasures">
       <button mat-raised-button [matMenuTriggerFor]="menu"><mat-icon>accessibility_new</mat-icon>Body Measurements</button>
     </span>
-    <span>
-    <td-file-input class="push-left-sm push-right-sm" #fileInput (select)="selectEvent($event)" accept=".csv" [(ngModel)]="files" multiple="false">
-      <mat-icon>folder</mat-icon>
-      <span class="text-upper">HRV Load...</span>
-    </td-file-input>
-    </span>
+
   </div>
 
   <span *ngFor="let chart of charts">

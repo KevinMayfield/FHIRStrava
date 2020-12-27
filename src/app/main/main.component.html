@@ -13,6 +13,12 @@
         <img class="img-responsive" width="25%" height="25" src="assets/images/ihealth.png">
     </mat-list-item >
     </mat-list>
+    <span>
+    <td-file-input class="push-left-sm push-right-sm" #fileInput (select)="selectEvent($event)" accept=".csv" [(ngModel)]="files" multiple="false">
+      <mat-icon>folder</mat-icon>
+      <span class="text-upper">HRV Load...</span>
+    </td-file-input>
+    </span>
   </td-navigation-drawer>
   <td-layout-nav-list navigationRoute="/" opened="false" mode="side">
 

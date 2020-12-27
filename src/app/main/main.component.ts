@@ -3,6 +3,7 @@ import {StravaService} from "../services/strava.service";
 import {Router} from "@angular/router";
 import {WithingsService} from "../services/withings.service";
 import {IhealthService} from "../services/ihealth.service";
+import {HrvService} from "../services/hrv.service";
 
 @Component({
   selector: 'app-main',
@@ -13,8 +14,11 @@ export class MainComponent implements OnInit {
 
   constructor(private strava: StravaService,
     private withings: WithingsService,
+              private hrv : HrvService,
               private ihealth: IhealthService,
     private route : Router) { }
+
+  files: File | FileList;
 
   withingsConnect = true;
 
@@ -61,4 +65,16 @@ export class MainComponent implements OnInit {
   connectIHealth() {
     this.ihealth.authorise(window.location.href);
   }
+
+
+  selectEvent(files: FileList | File): void {
+    if (files instanceof FileList) {
+      console.log('Files '+ files);
+    } else if (files instanceof File) {
+
+      var file : File = files;
+      //  console.log('file ' +  file);
+      this.hrv.postCSVFile(file);
+    }
+  };
 }

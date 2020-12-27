@@ -2,6 +2,7 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {Athlete} from "../models/athlete";
+import {PhrService} from "./phr.service";
 
 
 
@@ -27,7 +28,8 @@ export class StravaService {
 
   athleteChange: EventEmitter<any> = new EventEmitter();
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient,
+              private phrService : PhrService) { }
 
   getHeaders() : HttpHeaders {
 
@@ -50,7 +52,7 @@ export class StravaService {
   public getActivities(page?): Observable<any> {
     var uri = this.url+'athlete/activities';
 
-    var lastUpdate = new Date('2020-07-14');
+    var lastUpdate = this.phrService.getLowerDate();
     uri = uri + '?after='+Math.floor(lastUpdate.getTime()/ 1000)+'per_page=30';
 
     if (page !== undefined) {
