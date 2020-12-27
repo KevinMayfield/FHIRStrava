@@ -36,6 +36,7 @@ import {CovalentExpansionPanelModule} from "@covalent/core/expansion-panel";
 import { BarChartComponent } from './bar-chart/bar-chart.component';
 import {CovalentLoadingModule} from "@covalent/core/loading";
 import { IhealthComponent } from './ihealth/ihealth.component';
+import {CovalentFileModule} from "@covalent/core/file";
 
 @NgModule({
   declarations: [
@@ -66,6 +67,7 @@ import { IhealthComponent } from './ihealth/ihealth.component';
     CovalentJsonFormatterModule,
     CovalentExpansionPanelModule,
     CovalentLoadingModule,
+    CovalentFileModule,
 
     MatButtonModule,
     MatIconModule,

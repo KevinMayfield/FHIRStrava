@@ -29,4 +29,6 @@ export class IhealthService {
       + '&APIName=OpenApiSpO2';
 
   }
+
+
 }

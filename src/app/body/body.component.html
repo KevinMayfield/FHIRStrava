@@ -6,8 +6,11 @@
 
   <mat-menu #menu="matMenu">
           <span *ngFor="let chart of charts">
-          <button *ngIf="chart.chart[0].series.length>0" mat-menu-item (click)="toggle(chart)"><mat-icon *ngIf="chart.ticked">done</mat-icon>{{chart.name}}</button>
-            </span>
+            <button *ngIf="chart.chart[0].series.length>0" mat-menu-item (click)="toggle(chart)"><mat-icon *ngIf="chart.ticked">done</mat-icon>{{chart.name}}</button>
+          </span>
+          <span *ngFor="let chart of hrvcharts">
+            <button *ngIf="chart.chart[0].series.length>0" mat-menu-item (click)="toggle(chart)"><mat-icon *ngIf="chart.ticked">done</mat-icon>{{chart.name}}</button>
+          </span>
   </mat-menu>
   <mat-menu #menuExercise="matMenu">
           <span *ngFor="let barChart of bars">
@@ -19,10 +22,18 @@
     <span *ngIf="showMeasures">
       <button mat-raised-button [matMenuTriggerFor]="menu"><mat-icon>accessibility_new</mat-icon>Body Measurements</button>
     </span>
-
+    <span>
+    <td-file-input class="push-left-sm push-right-sm" #fileInput (select)="selectEvent($event)" accept=".csv" [(ngModel)]="files" multiple="false">
+      <mat-icon>folder</mat-icon>
+      <span class="text-upper">HRV Load...</span>
+    </td-file-input>
+    </span>
   </div>
 
   <span *ngFor="let chart of charts">
+           <app-line-chart *ngIf="chart.ticked" [results]="chart.chart" [yAxisLabel]="chart.unit" [xAxisLabel]="chart.name"> </app-line-chart>
+        </span>
+  <span *ngFor="let chart of hrvcharts">
            <app-line-chart *ngIf="chart.ticked" [results]="chart.chart" [yAxisLabel]="chart.unit" [xAxisLabel]="chart.name"> </app-line-chart>
         </span>
   <span *ngFor="let barChart of bars">
