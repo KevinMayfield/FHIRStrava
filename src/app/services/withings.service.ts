@@ -124,6 +124,25 @@ export class WithingsService {
     );
   }
 
+
+  public getWorkouts(offset? : number): Observable<any> {
+
+    // Use the postman collection for details
+
+    let headers = this.getHeaders();
+
+    var lastUpdate = this.phrService.getLowerDate();
+
+    var bodge= 'action=getworkouts'
+      + '&data_field=calories,duration,hr_average,effduration,steps'
+      + '&lastupdate='+Math.floor(lastUpdate.getTime()/1000);
+    if (offset != undefined) {
+      bodge= bodge + '&offset='+Math.floor(offset);
+    }
+
+    return this.http.post<any>(this.url+'/v2/measure', bodge, { 'headers' : headers} );
+  }
+
   public getMeasures(): Observable<any> {
 
     // Use the postman collection for details

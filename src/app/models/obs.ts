@@ -29,6 +29,8 @@ export interface Obs {
   vo2max?: number;
   spo2?: number;
   pi?:number;
+  steps? : number;
+  calories? : number;
  // not suported in strava calories? : number;
   /*
   1	Weight (kg)

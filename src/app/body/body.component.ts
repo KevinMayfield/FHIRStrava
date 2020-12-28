@@ -123,7 +123,9 @@ export class BodyComponent implements OnInit {
       token => {
         this.showMeasures = true;
         this.getWithingsObservations();
+        this.getWithingsWorkouts();
         this.getWithingsSleep();
+
       }
     )
     this.strava.tokenChange.subscribe(
@@ -255,10 +257,9 @@ export class BodyComponent implements OnInit {
           'average_heartrate': activity.average_heartrate,
           'weighted_average_watts': activity.weighted_average_watts,
           'distance': activity.distance / 1000,
-          'duration': Math.round(activity.moving_time / 600),
+          'duration': Math.round(activity.moving_time),
           'intensity': activity.intensity
         }
-
         this.obs.push(obs);
       } else {
         console.log('Duplicate Id = ' + this.activityMap.get(activity.id))
@@ -312,8 +313,54 @@ export class BodyComponent implements OnInit {
       }
     );
   }
+  getWithingsWorkouts() {
+    this.withings.getWorkouts().subscribe(
+      result => {
+        if (result.status == 401) {
+          console.log('Withings 401');
 
+        }
+        this.processWithingsWorkout(result);
+      },
+      (err) => {
+        console.log(err);
+        if (err.status == 401) {
 
+        }
+      }
+    );
+  }
+
+  processWithingsWorkout(activityData) {
+
+    for (const activity of activityData.body.series) {
+      var obs: Obs = {
+        'obsDate': new Date(activity.date)
+      }
+      if (activity.data.manual_calories != undefined && activity.data.manual_calories > 0) {
+        obs.calories =activity.data.manual_calories;
+      }
+      if (activity.data.duration != undefined) {
+        obs.duration =activity.data.duration;
+        console.log(obs.duration);
+      }
+      if (activity.data.effduration != undefined) {
+        obs.duration =activity.data.effduration;
+      }
+      if (activity.data.steps != undefined) {
+        obs.steps =activity.data.steps;
+        obs.name = activity.data.steps + ' steps';
+      }
+      if (activity.data.distance != undefined) {
+        obs.distance =activity.data.distance / 1000;
+      }
+      if (obs.name === undefined) {
+
+      }
+      // Should not be necessary as date range should prevent it
+      if (obs.obsDate > this.phr.getLowerDate()) this.obs.push(obs);
+    }
+  }
   processWithingsSleep(sleepData) {
     for (const sleep of sleepData.body.series) {
       var obs: Obs = {
@@ -342,7 +389,6 @@ export class BodyComponent implements OnInit {
       }
       this.obs.push(obs);
     }
-
   }
 
   processWithingsObs() {
@@ -615,7 +661,7 @@ export class BodyComponent implements OnInit {
       }
       var chartNum = 0;
       if (obs.energy != undefined && obs.duration != undefined) {
-        var energy = obs.energy / obs.duration;
+        var energy = obs.energy / (obs.duration/ 600);
         if (energy < 80) {
           chartNum = 0;
         } else if (energy < 110) {
@@ -633,7 +679,7 @@ export class BodyComponent implements OnInit {
         })
       }
       if (obs.suffer != undefined && obs.duration != undefined) {
-        var suffer = obs.suffer / obs.duration;
+        var suffer = obs.suffer / (obs.duration/600);
         if (suffer < 10) {
           chartNum = 0;
         } else if (suffer < 20) {
