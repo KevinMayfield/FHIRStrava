@@ -11,6 +11,9 @@
           <span *ngFor="let chart of hrvcharts">
             <button *ngIf="chart.chart[0].series.length>0" mat-menu-item (click)="toggle(chart)"><mat-icon *ngIf="chart.ticked">done</mat-icon>{{chart.name}}</button>
           </span>
+    <span *ngFor="let chart of ihealthcharts">
+            <button *ngIf="chart.chart[0].series.length>0" mat-menu-item (click)="toggle(chart)"><mat-icon *ngIf="chart.ticked">done</mat-icon>{{chart.name}}</button>
+          </span>
   </mat-menu>
   <mat-menu #menuExercise="matMenu">
           <span *ngFor="let barChart of bars">
@@ -29,6 +32,9 @@
            <app-line-chart *ngIf="chart.ticked" [results]="chart.chart" [yAxisLabel]="chart.unit" [xAxisLabel]="chart.name"> </app-line-chart>
         </span>
   <span *ngFor="let chart of hrvcharts">
+           <app-line-chart *ngIf="chart.ticked" [results]="chart.chart" [yAxisLabel]="chart.unit" [xAxisLabel]="chart.name"> </app-line-chart>
+        </span>
+  <span *ngFor="let chart of ihealthcharts">
            <app-line-chart *ngIf="chart.ticked" [results]="chart.chart" [yAxisLabel]="chart.unit" [xAxisLabel]="chart.name"> </app-line-chart>
         </span>
   <span *ngFor="let barChart of bars">

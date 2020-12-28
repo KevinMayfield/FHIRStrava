@@ -77,4 +77,15 @@ export class MainComponent implements OnInit {
       this.hrv.postCSVFile(file);
     }
   };
+
+  selectSPO2Event(files: File | FileList) {
+    if (files instanceof FileList) {
+      console.log('Files '+ files);
+    } else if (files instanceof File) {
+
+      var file : File = files;
+      //  console.log('file ' +  file);
+      this.ihealth.postCSVFile(file);
+    }
+  }
 }

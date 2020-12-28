@@ -30,7 +30,7 @@ export class BodyComponent implements OnInit {
 
   constructor(private strava: StravaService,
               private withings: WithingsService,
-              private hrv : HrvService,
+              private hrv: HrvService,
               private ihealth: IhealthService,
               private phr: PhrService,
               private _loadingService: TdLoadingService) {
@@ -42,8 +42,7 @@ export class BodyComponent implements OnInit {
   overlayStarSyntax: boolean = false;
 
 
-
-  athlete : Athlete;
+  athlete: Athlete;
 
   stravaConnect = true;
 
@@ -53,15 +52,16 @@ export class BodyComponent implements OnInit {
 
   charts: any[];
   hrvcharts: any[];
+  ihealthcharts: any[];
   bars: any[];
 
-  activityDisplayedColumns = ['link', 'start_date', 'type', 'name',  'powerlink',  'distance','moving_time','average_cadence', 'average_heartrate','weighted_average_watts','kilojoules', 'suffer_score', 'intensity'];
+  activityDisplayedColumns = ['link', 'start_date', 'type', 'name', 'powerlink', 'distance', 'moving_time', 'average_cadence', 'average_heartrate', 'weighted_average_watts', 'kilojoules', 'suffer_score', 'intensity'];
 
-  activities : SummaryActivity[] = [];
+  activities: SummaryActivity[] = [];
 
-  measures : MeasureGroups[] = [];
+  measures: MeasureGroups[] = [];
 
-  showMeasures= false;
+  showMeasures = false;
 
   obs: Obs[] = [];
 
@@ -72,17 +72,17 @@ export class BodyComponent implements OnInit {
 
 
   intensityRange = {
-    "tough" : 95,
+    "tough": 95,
     "medium": 80,
     "low": 65
   };
   sufferRange = {
-    "tough" : 400,
+    "tough": 400,
     "medium": 200,
     "low": 50
   };
   enerygRange = {
-    "tough" : 1500,
+    "tough": 1500,
     "medium": 1000,
     "low": 600
   }
@@ -108,7 +108,7 @@ export class BodyComponent implements OnInit {
 
 
     this.obs = [];
-   // this.obsDataSource = new MatTableDataSource<Obs>(this.obs);
+    // this.obsDataSource = new MatTableDataSource<Obs>(this.obs);
 
     this.activities = [];
     this.activityDataSource = new MatTableDataSource<SummaryActivity>(this.activities);
@@ -129,45 +129,49 @@ export class BodyComponent implements OnInit {
     this.strava.tokenChange.subscribe(
       token => {
         if (token != undefined) this.stravaConnect = false;
-          this.stravaLoad();
+        this.stravaLoad();
       }
     );
     this.hrv.hrvChange.subscribe(result => {
       this.processHRVObs(result);
     })
 
+    this.ihealth.iHealthChange.subscribe(result => {
+      this.processIHealthObs(result);
+    })
+
     this.strava.connect();
     this.withings.connect();
   }
 
-  stravaLoad(){
+  stravaLoad() {
 
 
     this.getAthlete();
-    this.stravaComplete=false;
+    this.stravaComplete = false;
     this._loadingService.register('overlayStarSyntax');
     this.getActivities()
   }
 
 
-
-  pad(num:number, size:number): string {
-    let s = num+"";
+  pad(num: number, size: number): string {
+    let s = num + "";
     while (s.length < size) s = "0" + s;
     return s;
   }
+
   hhmm(num) {
-    var min = Math.round(num/60);
-    var mins = this.pad(Math.round((min%60) ),2)
-    return Math.trunc(min/60) + ':' + mins.substring(0,2);
+    var min = Math.round(num / 60);
+    var mins = this.pad(Math.round((min % 60)), 2)
+    return Math.trunc(min / 60) + ':' + mins.substring(0, 2);
   }
 
   ratio(kj, suffer) {
-     if (kj != + kj) return '';
-    if (suffer != + suffer) return '';
-     var ratio = +(kj/ suffer);
-     ratio = Math.round(ratio*10) / 10;
-     return ratio;
+    if (kj != +kj) return '';
+    if (suffer != +suffer) return '';
+    var ratio = +(kj / suffer);
+    ratio = Math.round(ratio * 10) / 10;
+    return ratio;
   }
 
   isNum(val) {
@@ -179,7 +183,7 @@ export class BodyComponent implements OnInit {
     if (pwr != +pwr) return '';
     if (this.athlete.ftp == undefined) return '';
 
-    return Math.round((pwr/ this.athlete.ftp)*100);
+    return Math.round((pwr / this.athlete.ftp) * 100);
   }
 
   connectStrava() {
@@ -189,9 +193,6 @@ export class BodyComponent implements OnInit {
 
     this.strava.authorise(window.location.href);
   }
-
-
-
 
 
   getAthlete() {
@@ -211,20 +212,23 @@ export class BodyComponent implements OnInit {
     );
 
   }
+
   getActivities(page?) {
     this.strava.getActivities(page).subscribe(
       result => {
-        if (page== undefined) page = 0;
+        if (page == undefined) page = 0;
         page++;
         this.processStravaObs(result);
-        if (result.length > 0) { this.getActivities(page) }
-        else {
+        if (result.length > 0) {
+          this.getActivities(page)
+        } else {
           this.stravaComplete = true;
           this._loadingService.resolve('overlayStarSyntax');
           this.activityDataSource.data = this.activities;
           this.processGraph();
 
-        };
+        }
+        ;
       },
       (err) => {
         console.log(err);
@@ -240,7 +244,7 @@ export class BodyComponent implements OnInit {
       var date = new Date(activity.start_date).toISOString();
       activity.intensity = this.intensity(activity.weighted_average_watts);
       if (this.activityMap.get(activity.id) == undefined) {
-        this.activityMap.set(activity.id,activity);
+        this.activityMap.set(activity.id, activity);
         this.activities.push(activity);
 
         var obs: Obs = {
@@ -250,14 +254,14 @@ export class BodyComponent implements OnInit {
           'energy': activity.kilojoules,
           'average_heartrate': activity.average_heartrate,
           'weighted_average_watts': activity.weighted_average_watts,
-          'distance' :activity.distance / 1000,
+          'distance': activity.distance / 1000,
           'duration': Math.round(activity.moving_time / 600),
           'intensity': activity.intensity
         }
 
         this.obs.push(obs);
       } else {
-        console.log('Duplicate Id = '+this.activityMap.get(activity.id))
+        console.log('Duplicate Id = ' + this.activityMap.get(activity.id))
       }
     }
   }
@@ -289,7 +293,6 @@ export class BodyComponent implements OnInit {
   }
 
 
-
   getWithingsObservations() {
     this.withings.getMeasures().subscribe(
       result => {
@@ -297,7 +300,7 @@ export class BodyComponent implements OnInit {
           console.log('Withings 401');
 
         }
-       this.measures = result.body.measuregrps;
+        this.measures = result.body.measuregrps;
 
         this.processWithingsObs();
       },
@@ -313,8 +316,8 @@ export class BodyComponent implements OnInit {
 
   processWithingsSleep(sleepData) {
     for (const sleep of sleepData.body.series) {
-      var obs : Obs = {
-        'obsDate' : new Date(sleep.date)
+      var obs: Obs = {
+        'obsDate': new Date(sleep.date)
       }
       if (sleep.data.durationtosleep != undefined) {
         obs.durationtosleep = sleep.data.durationtosleep;
@@ -347,49 +350,50 @@ export class BodyComponent implements OnInit {
     for (const grp of this.measures) {
       var date = new Date(+grp.date * 1000).toISOString();
 
-       var obs : Obs = {
-          'obsDate' : new Date(date)
-       }
-       // console.log(obs);
-       for (const measure of grp.measures) {
-         switch (measure.type) {
-           case 1:
-             obs.weight = +measure.value / 1000;
-             break;
-           case 76:
-             obs.muscle_mass =+measure.value / 100;
-             break;
-           case 5 :
-             // free fat mass
-             break;
-           case 8:
-             obs.fat_mass =+measure.value / 100;
-             break;
-           case 77:
-             obs.hydration =+measure.value / 100;
-             break;
-           case 91:
-             obs.pwv =+measure.value / 1000;
-             break;
-           case 9 :obs.diastolic =+measure.value /1000;
-             break;
-           case 10 :obs.systolic =+measure.value / 1000;
-             break;
-         }
-       }
+      var obs: Obs = {
+        'obsDate': new Date(date)
+      }
+      // console.log(obs);
+      for (const measure of grp.measures) {
+        switch (measure.type) {
+          case 1:
+            obs.weight = +measure.value / 1000;
+            break;
+          case 76:
+            obs.muscle_mass = +measure.value / 100;
+            break;
+          case 5 :
+            // free fat mass
+            break;
+          case 8:
+            obs.fat_mass = +measure.value / 100;
+            break;
+          case 77:
+            obs.hydration = +measure.value / 100;
+            break;
+          case 91:
+            obs.pwv = +measure.value / 1000;
+            break;
+          case 9 :
+            obs.diastolic = +measure.value / 1000;
+            break;
+          case 10 :
+            obs.systolic = +measure.value / 1000;
+            break;
+        }
+      }
 
-       this.obs.push(obs);
+      this.obs.push(obs);
     }
 
 
   }
 
 
-
   openStrava(id) {
 
     window.open(
-      'https://www.strava.com/activities/'+id,
+      'https://www.strava.com/activities/' + id,
       '_blank' // <- This is what makes it open in a new window.
     );
   }
@@ -397,12 +401,12 @@ export class BodyComponent implements OnInit {
   openPowerCC(id) {
 
     window.open(
-      'https://power-meter.cc/activities/'+id+'/power-analysis',
+      'https://power-meter.cc/activities/' + id + '/power-analysis',
       '_blank' // <- This is what makes it open in a new window.
     )
   }
 
-  processGraph(){
+  processGraph() {
 
     var charts = [
       {
@@ -428,17 +432,17 @@ export class BodyComponent implements OnInit {
         "name": "Pulse Wave Velocity",
         "chart": [{
           "name": "Pulse Wave Velocity",
-          "series": [
-          ]
-        }]},
+          "series": []
+        }]
+      },
       {
         "unit": "Kg",
         "name": "Hydration",
         "chart": [{
           "name": "Hydration",
-          "series": [
-          ]
-        }]},
+          "series": []
+        }]
+      },
       {
         "unit": "Kg",
         "name": "Muscle Mass",
@@ -481,7 +485,7 @@ export class BodyComponent implements OnInit {
             "name": "Diastolic Blood Pressure",
             "series": []
           }
-          ]
+        ]
       }
     ];
 
@@ -510,7 +514,7 @@ export class BodyComponent implements OnInit {
       },
       {
         "unit": "Score",
-        "name":"Suffer and Duration",
+        "name": "Suffer and Duration",
         "chart": [
           {
             "name": "Endurance",
@@ -531,7 +535,7 @@ export class BodyComponent implements OnInit {
       },
       {
         "unit": "time",
-        "name" : "Duration and Intensity",
+        "name": "Duration and Intensity",
         "chart": [
 
           {
@@ -551,66 +555,66 @@ export class BodyComponent implements OnInit {
             "series": []
           }]
       }
-      ];
+    ];
 
 
     for (const obs of this.obs) {
-      if (obs.weight != undefined ) {
+      if (obs.weight != undefined) {
         charts[0].chart[0].series.push({
-          name : obs.obsDate,
-          value : obs.weight
+          name: obs.obsDate,
+          value: obs.weight
         })
       }
-/*
-      if (obs.energy != undefined ) {
-        charts[1].chart[0].series.push({
-          name : obs.obsDate,
-          value : obs.energy
-        })
-      }*/
-      if (obs.pwv != undefined ) {
+      /*
+            if (obs.energy != undefined ) {
+              charts[1].chart[0].series.push({
+                name : obs.obsDate,
+                value : obs.energy
+              })
+            }*/
+      if (obs.pwv != undefined) {
         charts[2].chart[0].series.push({
-          name : obs.obsDate,
-          value : obs.pwv
+          name: obs.obsDate,
+          value: obs.pwv
         })
       }
 
-      if (obs.hydration != undefined ) {
+      if (obs.hydration != undefined) {
         charts[3].chart[0].series.push({
-          name : obs.obsDate,
-          value : obs.hydration
+          name: obs.obsDate,
+          value: obs.hydration
         })
       }
-      if (obs.muscle_mass != undefined ) {
+      if (obs.muscle_mass != undefined) {
         charts[4].chart[0].series.push({
-          name : obs.obsDate,
-          value : obs.muscle_mass
+          name: obs.obsDate,
+          value: obs.muscle_mass
         })
       }
-      if (obs.fat_mass != undefined ) {
+      if (obs.fat_mass != undefined) {
         charts[5].chart[0].series.push({
-          name : obs.obsDate,
-          value : obs.fat_mass
+          name: obs.obsDate,
+          value: obs.fat_mass
         })
       }
-      if (obs.sleep_score!= undefined ) {
+      if (obs.sleep_score != undefined) {
         charts[6].chart[0].series.push({
-          name : obs.obsDate,
-          value : obs.sleep_score
+          name: obs.obsDate,
+          value: obs.sleep_score
         })
       }
-      if (obs.diastolic!= undefined && obs.systolic != undefined ) {
+      if (obs.diastolic != undefined && obs.systolic != undefined) {
         charts[7].chart[1].series.push({
-          name : obs.obsDate,
-          value : obs.diastolic
+          name: obs.obsDate,
+          value: obs.diastolic
         });
         charts[7].chart[0].series.push({
-          name : obs.obsDate,
-          value : obs.systolic
+          name: obs.obsDate,
+          value: obs.systolic
         });
       }
-      var chartNum =0;
-      if (obs.energy != undefined && obs.duration != undefined ) {
+      var chartNum = 0;
+      if (obs.energy != undefined && obs.duration != undefined) {
         var energy = obs.energy / obs.duration;
         if (energy < 80) {
           chartNum = 0;
@@ -618,17 +622,17 @@ export class BodyComponent implements OnInit {
           chartNum = 1;
         } else if (energy < 130) {
           chartNum = 2;
-        } else  {
+        } else {
           chartNum = 3;
         }
         bars[0].chart[chartNum].series.push({
-          name : obs.name,
+          name: obs.name,
           x: obs.obsDate,
           y: obs.energy,
           r: energy
         })
       }
-      if (obs.suffer != undefined && obs.duration != undefined ) {
+      if (obs.suffer != undefined && obs.duration != undefined) {
         var suffer = obs.suffer / obs.duration;
         if (suffer < 10) {
           chartNum = 0;
@@ -636,17 +640,17 @@ export class BodyComponent implements OnInit {
           chartNum = 1;
         } else if (suffer < 30) {
           chartNum = 2;
-        } else  {
+        } else {
           chartNum = 3;
         }
         bars[1].chart[chartNum].series.push({
-          name : obs.name,
+          name: obs.name,
           x: obs.obsDate,
           y: obs.suffer,
           r: suffer
         })
       }
-      if (obs.intensity != undefined && this.isNum(obs.intensity) && obs.duration != undefined ) {
+      if (obs.intensity != undefined && this.isNum(obs.intensity) && obs.duration != undefined) {
 
         if (obs.intensity < this.intensityRange.low) {
           chartNum = 0;
@@ -654,7 +658,7 @@ export class BodyComponent implements OnInit {
           chartNum = 1;
         } else if (obs.intensity < this.intensityRange.tough) {
           chartNum = 2;
-        } else  {
+        } else {
           chartNum = 3;
         }
         bars[2].chart[chartNum].series.push({
@@ -666,15 +670,15 @@ export class BodyComponent implements OnInit {
       }
     }
 
-    this.charts=[];
+    this.charts = [];
     for (const chart of charts) {
-      if (chart.chart.length>0) {
+      if (chart.chart.length > 0) {
         this.charts.push(chart);
       }
     }
-    this.bars =[];
+    this.bars = [];
     for (const bar of bars) {
-      if (bar.chart.length>0) {
+      if (bar.chart.length > 0) {
         this.bars.push(bar);
       }
     }
@@ -704,27 +708,26 @@ export class BodyComponent implements OnInit {
   }
 
 
-
-  processHRVObs(bundle : Bundle) {
+  processHRVObs(bundle: Bundle) {
     var lastUpdate = this.phr.getLowerDate();
     var process = false;
     for (const entry of bundle.entry) {
-      process= true;
-      const fhirobs : Observation = entry.resource;
+      process = true;
+      const fhirobs: Observation = entry.resource;
       var datetime = new Date(fhirobs.effectiveDateTime);
       if (datetime > lastUpdate) {
         //  console.log(fhirobs);
-        var obs : Obs =  {
-          obsDate : datetime
+        var obs: Obs = {
+          obsDate: datetime
         }
 
-        if (fhirobs.code.coding[0].code ==="8867-4") {
+        if (fhirobs.code.coding[0].code === "8867-4") {
           obs.sdnn = fhirobs.valueQuantity.value;
         }
-        if (fhirobs.code.coding[0].code ==="60842-2") {
+        if (fhirobs.code.coding[0].code === "60842-2") {
           obs.vo2max = fhirobs.valueQuantity.value;
         }
-        if (fhirobs.code.coding[0].code ==="Recovery_Points") {
+        if (fhirobs.code.coding[0].code === "Recovery_Points") {
           obs.recoverypoints = fhirobs.valueQuantity.value;
         }
         this.obs.push(obs);
@@ -733,7 +736,32 @@ export class BodyComponent implements OnInit {
     this.processHRVGraph();
   }
 
-  processHRVGraph(){
+  processIHealthObs(bundle: Bundle) {
+    var lastUpdate = this.phr.getLowerDate();
+    var process = false;
+    for (const entry of bundle.entry) {
+      process = true;
+      const fhirobs: Observation = entry.resource;
+      var datetime = new Date(fhirobs.effectiveDateTime);
+      if (datetime > lastUpdate) {
+        //  console.log(fhirobs);
+        var obs: Obs = {
+          obsDate: datetime
+        }
+
+        if (fhirobs.code.coding[0].code === "73794-0") {
+          obs.pi = fhirobs.valueQuantity.value;
+        }
+        if (fhirobs.code.coding[0].code === "103228002") {
+          obs.spo2 = fhirobs.valueQuantity.value;
+        }
+        this.obs.push(obs);
+      }
+    }
+    this.processIHealthGraph();
+  }
+
+  processHRVGraph() {
 
     var charts = [
       {
@@ -767,30 +795,78 @@ export class BodyComponent implements OnInit {
 
 
     for (const obs of this.obs) {
-      if (obs.sdnn != undefined ) {
+      if (obs.sdnn != undefined) {
         charts[0].chart[0].series.push({
-          name : obs.obsDate,
-          value : obs.sdnn
+          name: obs.obsDate,
+          value: obs.sdnn
         })
       }
-      if (obs.recoverypoints != undefined ) {
+      if (obs.recoverypoints != undefined) {
         charts[1].chart[0].series.push({
-          name : obs.obsDate,
-          value : obs.recoverypoints
+          name: obs.obsDate,
+          value: obs.recoverypoints
         })
       }
-      if (obs.vo2max != undefined ) {
+      if (obs.vo2max != undefined) {
         charts[2].chart[0].series.push({
-          name : obs.obsDate,
-          value : obs.vo2max
+          name: obs.obsDate,
+          value: obs.vo2max
         })
       }
     }
 
-    this.hrvcharts=[];
+    this.hrvcharts = [];
     for (const chart of charts) {
-      if (chart.chart.length>0) {
+      if (chart.chart.length > 0) {
         this.hrvcharts.push(chart);
+      }
+    }
+  }
+
+  processIHealthGraph() {
+
+    var charts = [
+      {
+        "unit": "%",
+        "name": "SPO2",
+        "chart": [
+
+          {
+            "name": "SPO2",
+            "series": []
+          }]
+      },
+      {
+        "unit": "ratio",
+        name: "Perfusion Index",
+        "chart": [{
+          name: "Perfusion Index",
+          series: []
+        }]
+      }
+
+    ];
+
+
+    for (const obs of this.obs) {
+      if (obs.spo2 != undefined) {
+        charts[0].chart[0].series.push({
+          name: obs.obsDate,
+          value: obs.spo2
+        })
+      }
+      if (obs.pi != undefined) {
+        charts[1].chart[0].series.push({
+          name: obs.obsDate,
+          value: obs.pi
+        })
+      }
+
+      this.ihealthcharts = [];
+      for (const chart of charts) {
+        if (chart.chart.length > 0) {
+          this.ihealthcharts.push(chart);
+        }
       }
     }
   }

@@ -1,4 +1,6 @@
 import {EventEmitter, Injectable} from '@angular/core';
+import {HttpClient, HttpHeaders} from "@angular/common/http";
+import {PhrService} from "./phr.service";
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +16,11 @@ export class IhealthService {
   //clientSecret = '25be0a575d7a4339a7bfc57da7f3c85d';
   tokenChange: EventEmitter<any> = new EventEmitter();
 
-  constructor() { }
+
+  iHealthChange: EventEmitter<any> = new EventEmitter();
+
+  constructor(private http: HttpClient,
+              private phr : PhrService) { }
 
   authorise(routeUrl: string) {
     if (routeUrl.substring(routeUrl.length - 1,1) === '/') {
@@ -30,5 +36,26 @@ export class IhealthService {
 
   }
 
+  getHeaders() : HttpHeaders {
+
+    let headers = new HttpHeaders(
+    );
+
+    headers.append('Content-Type', 'text/html');
+    return headers;
+  }
+
+  public postCSVFile(body : any) {
+
+    let headers = this.getHeaders();
+
+    var lastUpdate = this.phr.getLowerDate();
+
+
+    return this.http.post<any>('http://localhost:8187/services/ihealth', body, { 'headers' : headers} ).subscribe(result => {
+      this.iHealthChange.emit(result);
+    });
+
+  }
 
 }

@@ -27,6 +27,8 @@ export interface Obs {
   recoverypoints? : number;
   sdnn? : number;
   vo2max?: number;
+  spo2?: number;
+  pi?:number;
  // not suported in strava calories? : number;
   /*
   1	Weight (kg)

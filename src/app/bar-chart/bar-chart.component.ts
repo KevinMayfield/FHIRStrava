@@ -9,7 +9,7 @@ import {PhrService} from "../services/phr.service";
 export class BarChartComponent implements OnInit {
 
 
-  view: any[] = [700, 400];
+  view: any[] = [700, 300];
 
   // options
   showXAxis: boolean = true;
