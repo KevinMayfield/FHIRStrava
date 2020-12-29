@@ -1,6 +1,7 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {PhrService} from "./phr.service";
+import {FhirService} from "./fhir.service";
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +21,8 @@ export class IhealthService {
   iHealthChange: EventEmitter<any> = new EventEmitter();
 
   constructor(private http: HttpClient,
-              private phr : PhrService) { }
+              private phr : PhrService,
+              ) { }
 
   authorise(routeUrl: string) {
     if (routeUrl.substring(routeUrl.length - 1,1) === '/') {

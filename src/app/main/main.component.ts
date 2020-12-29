@@ -4,6 +4,7 @@ import {Router} from "@angular/router";
 import {WithingsService} from "../services/withings.service";
 import {IhealthService} from "../services/ihealth.service";
 import {HrvService} from "../services/hrv.service";
+import {FhirService} from "../services/fhir.service";
 
 @Component({
   selector: 'app-main',
@@ -16,6 +17,7 @@ export class MainComponent implements OnInit {
     private withings: WithingsService,
               private hrv : HrvService,
               private ihealth: IhealthService,
+            private  fhirService : FhirService,
     private route : Router) { }
 
   files: File | FileList;

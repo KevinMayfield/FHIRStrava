@@ -19,6 +19,7 @@ import Observation = fhir.Observation;
 // @ts-ignore
 import Bundle = fhir.Bundle;
 import {PhrService} from "../services/phr.service";
+import {FhirService} from "../services/fhir.service";
 
 
 @Component({
@@ -33,7 +34,8 @@ export class BodyComponent implements OnInit {
               private hrv: HrvService,
               private ihealth: IhealthService,
               private phr: PhrService,
-              private _loadingService: TdLoadingService) {
+              private _loadingService: TdLoadingService,
+              private fhirService : FhirService) {
 
   }
 
@@ -136,10 +138,12 @@ export class BodyComponent implements OnInit {
     );
     this.hrv.hrvChange.subscribe(result => {
       this.processHRVObs(result);
+      this.fhirService.prepareTransaction(result);
     })
 
     this.ihealth.iHealthChange.subscribe(result => {
       this.processIHealthObs(result);
+      this.fhirService.prepareTransaction(result);
     })
 
     this.strava.connect();
