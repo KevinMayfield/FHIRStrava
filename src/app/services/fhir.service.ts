@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 import {StravaService} from "./strava.service";
 // @ts-ignore
 import Patient = fhir.Patient;
@@ -10,6 +10,8 @@ import Observation = fhir.Observation;
 import BundleEntry = fhir.BundleEntry;
 import * as uuid from 'uuid';
 import {HttpClient, HttpHeaders} from "@angular/common/http";
+import {PhrService} from "./phr.service";
+import {generateBundleStats} from "@angular-devkit/build-angular/src/webpack/utils/stats";
 
 @Injectable({
   providedIn: 'root'
@@ -18,9 +20,14 @@ export class FhirService {
 
   private patient : Patient;
 
+  private observations : Observation[] = [];
+
+  loaded: EventEmitter<any> = new EventEmitter();
+
   constructor(
     private http: HttpClient,
-    private strava : StravaService) {
+    private strava : StravaService,
+    private phr : PhrService) {
 
     this.strava.athleteChange.subscribe(athlete => {
         this.patient = {
@@ -38,9 +45,13 @@ export class FhirService {
         if (athlete.sex === 'M') this.patient.gender = "male";
         this.patient.resourceType = 'Patient';
         console.log(this.patient);
+        this.getServerPatient(this.patient);
     })
   }
 
+  getObservations() {
+    return this.observations;
+  }
 
   prepareTransaction(observations : Bundle) {
     var transaction : Bundle = {
@@ -76,6 +87,54 @@ export class FhirService {
      return entry;
   }
 
+
+  getServerPatient(patient : Patient) {
+    let headers = this.getHeaders();
+    this.http.get("http://localhost:8186/R4/Patient?identifier="+patient.identifier[0].value,{ 'headers' : headers}).subscribe(
+      result => {
+        const bundle: Bundle = result;
+        console.log(bundle);
+        if (bundle.entry != undefined && bundle.entry.length >0) {
+           this.patient.id = bundle.entry[0].resource.id;
+          this.getServerObservations(this.phr.getLowerDate());
+        }
+    }
+    )
+
+  }
+
+  getServerObservations(startDate : Date) {
+    this.getNext('http://localhost:8186/R4/Observation?patient='+this.patient.id);
+  }
+
+  getNext(url) {
+    let headers = this.getHeaders();
+
+    return this.http.get<any>(url, { 'headers' : headers} ).subscribe(result => {
+      console.log(result);
+      this.addEntries(result);
+      var next : string = undefined;
+      for (const link of result.link) {
+        console.log(link);
+        if (link.relation === 'next') next = link.url;
+      }
+
+      if (next === undefined) {
+        this.loaded.emit(true);
+      } else {
+        this.getNext(next);
+      };
+    });
+  }
+
+  addEntries(bundle : Bundle) {
+    for (const entry of bundle.entry) {
+      if (entry.resource.resourceType === "Observation") {
+        this.observations.push(entry.resource);
+      }
+    }
+  }
+
   public postTransaction(body : Bundle) {
 
     let headers = this.getHeaders();
@@ -96,6 +155,7 @@ export class FhirService {
     );
 
     headers.append('Content-Type', 'application/fhir+json');
+    headers.append('Accept', 'application/fhir+json');
     return headers;
   }
 

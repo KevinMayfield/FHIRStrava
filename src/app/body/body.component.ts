@@ -136,15 +136,12 @@ export class BodyComponent implements OnInit {
         this.stravaLoad();
       }
     );
-    this.hrv.hrvChange.subscribe(result => {
-      this.processHRVObs(result);
-      this.fhirService.prepareTransaction(result);
+    this.fhirService.loaded.subscribe(result => {
+      if (result) {
+        this.processFHIRObs();
+      }
     })
 
-    this.ihealth.iHealthChange.subscribe(result => {
-      this.processIHealthObs(result);
-      this.fhirService.prepareTransaction(result);
-    })
 
     this.strava.connect();
     this.withings.connect();
@@ -754,16 +751,14 @@ export class BodyComponent implements OnInit {
   toggle(chart: any) {
     if (chart.ticked == undefined) chart.ticked = false;
     chart.ticked = !chart.ticked;
-
   }
 
 
-  processHRVObs(bundle: Bundle) {
+  processFHIRObs() {
     var lastUpdate = this.phr.getLowerDate();
     var process = false;
-    for (const entry of bundle.entry) {
+    for (const fhirobs of this.fhirService.getObservations()) {
       process = true;
-      const fhirobs: Observation = entry.resource;
       var datetime = new Date(fhirobs.effectiveDateTime);
       if (datetime > lastUpdate) {
         //  console.log(fhirobs);
@@ -780,25 +775,6 @@ export class BodyComponent implements OnInit {
         if (fhirobs.code.coding[0].code === "Recovery_Points") {
           obs.recoverypoints = fhirobs.valueQuantity.value;
         }
-        this.obs.push(obs);
-      }
-    }
-    this.processHRVGraph();
-  }
-
-  processIHealthObs(bundle: Bundle) {
-    var lastUpdate = this.phr.getLowerDate();
-    var process = false;
-    for (const entry of bundle.entry) {
-      process = true;
-      const fhirobs: Observation = entry.resource;
-      var datetime = new Date(fhirobs.effectiveDateTime);
-      if (datetime > lastUpdate) {
-        //  console.log(fhirobs);
-        var obs: Obs = {
-          obsDate: datetime
-        }
-
         if (fhirobs.code.coding[0].code === "73794-0") {
           obs.pi = fhirobs.valueQuantity.value;
         }
@@ -808,8 +784,11 @@ export class BodyComponent implements OnInit {
         this.obs.push(obs);
       }
     }
+    this.processHRVGraph();
     this.processIHealthGraph();
   }
+
+
 
   processHRVGraph() {
 

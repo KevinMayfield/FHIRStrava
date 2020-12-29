@@ -39,6 +39,18 @@ export class MainComponent implements OnInit {
         if (token != undefined) this.ihealthConnect = false;
       }
     );
+
+    // These deal with loading the FHIR server and are triggered by
+
+    this.hrv.hrvChange.subscribe(result => {
+
+      this.fhirService.prepareTransaction(result);
+    })
+
+    this.ihealth.iHealthChange.subscribe(result => {
+      this.fhirService.prepareTransaction(result);
+    });
+
     this.strava.athleteChange.subscribe(
       athlete  => {
         console.log(athlete);
