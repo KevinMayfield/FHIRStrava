@@ -44,7 +44,6 @@ export class FhirService {
         if (athlete.sex === 'F') this.patient.gender = "female";
         if (athlete.sex === 'M') this.patient.gender = "male";
         this.patient.resourceType = 'Patient';
-        console.log(this.patient);
         this.getServerPatient(this.patient);
     })
   }
@@ -89,6 +88,8 @@ export class FhirService {
 
 
   getServerPatient(patient : Patient) {
+    if (patient === undefined) return;
+
     let headers = this.getHeaders();
     this.http.get("http://localhost:8186/R4/Patient?identifier="+patient.identifier[0].value,{ 'headers' : headers}).subscribe(
       result => {
@@ -104,7 +105,9 @@ export class FhirService {
   }
 
   getServerObservations(startDate : Date, endDate : Date) {
+    if (this.patient === undefined) return;
     console.log(startDate.toISOString());
+    this.observations = [];
     var url = 'http://localhost:8186/R4/Observation?patient='+this.patient.id;
     url = url + '&date=>'+startDate.toISOString();
     url = url + '&date=<'+endDate.toISOString();
@@ -131,9 +134,11 @@ export class FhirService {
   }
 
   addEntries(bundle : Bundle) {
-    for (const entry of bundle.entry) {
-      if (entry.resource.resourceType === "Observation") {
-        this.observations.push(entry.resource);
+    if (bundle.entry !== undefined && bundle.entry.length>0) {
+      for (const entry of bundle.entry) {
+        if (entry.resource.resourceType === "Observation") {
+          this.observations.push(entry.resource);
+        }
       }
     }
   }

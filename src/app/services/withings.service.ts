@@ -4,6 +4,7 @@ import {Observable} from "rxjs";
 import {Athlete} from "../models/athlete";
 import {JwtHelperService} from "@auth0/angular-jwt";
 import {PhrService} from "./phr.service";
+import {DatePipe} from "@angular/common";
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +18,8 @@ export class WithingsService {
   url = 'https://wbsapi.withings.net';
 
   constructor(private http: HttpClient,
-              private phr : PhrService) { }
+              private phr : PhrService,
+              private datePipe: DatePipe) { }
 
   clientId = 'e532209382d449afbb1ef360919f2fdac284fac62ec23feeea0589f043bdc41f';
 
@@ -135,7 +137,9 @@ export class WithingsService {
 
     var bodge= 'action=getworkouts'
       + '&data_field=calories,duration,hr_average,effduration,steps'
-      + '&lastupdate='+Math.floor(lastUpdate.getTime()/1000);
+      + '&startdate='+Math.floor(this.phr.getFromDate().getTime()/1000)
+      + '&enddate='+Math.floor(this.phr.getToDate().getTime()/1000);
+    //  + '&lastupdate='+Math.floor(lastUpdate.getTime()/1000);
     if (offset != undefined) {
       bodge= bodge + '&offset='+Math.floor(offset);
     }
@@ -154,11 +158,9 @@ export class WithingsService {
     var bodge= 'action=getmeas'
       + '&meastypes=1,5,8,77,76,88,91,9,10'
       + '&category=1'
-     // + '&startdate=2020-12-12'
-     // + '&enddate=2020-12-22';
-      + '&lastupdate='+Math.floor(lastUpdate.getTime()/1000);
-
-
+      + '&startdate='+Math.floor(this.phr.getFromDate().getTime()/1000)
+      + '&enddate='+Math.floor(this.phr.getToDate().getTime()/1000);
+     // + '&lastupdate='+Math.floor(lastUpdate.getTime()/1000);
 
     return this.http.post<any>(this.url+'/measure', bodge, { 'headers' : headers} );
 
@@ -171,8 +173,10 @@ export class WithingsService {
     var lastUpdate = this.phr.getFromDate();
 
     var bodge= 'action=getsummary'
-      + '&lastupdate='+Math.floor(lastUpdate.getTime()/1000)
-    + '&data_fields=breathing_disturbances_intensity,deepsleepduration,lightsleepduration,wakeupcount,durationtosleep,sleep_score,remsleepduration';
+      + '&startdateymd='+this.datePipe.transform(this.phr.getFromDate(),"yyyy-MM-dd")
+      + '&enddateymd='+ this.datePipe.transform(this.phr.getToDate(),"yyyy-MM-dd")
+      //+ '&lastupdate='+Math.floor(lastUpdate.getTime()/1000)
+      + '&data_fields=breathing_disturbances_intensity,deepsleepduration,lightsleepduration,wakeupcount,durationtosleep,sleep_score,remsleepduration';
 
     return this.http.post<any>(this.url+'/v2/sleep', bodge, { 'headers' : headers} );
 

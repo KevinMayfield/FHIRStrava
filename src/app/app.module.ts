@@ -46,6 +46,7 @@ import {
 import {MatInputModule} from "@angular/material/input";
 import {ReactiveFormsModule} from "@angular/forms";
 import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from "@angular/material/core";
+import {DatePipe} from "@angular/common";
 
 
 @NgModule({
@@ -103,6 +104,7 @@ import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from "@angular/material/
 
   ],
   providers: [
+    DatePipe,
     {provide: MAT_DATE_LOCALE
       , useValue: 'en-GB'},
 

@@ -6,49 +6,54 @@
 
   <mat-menu #menu="matMenu">
           <span *ngFor="let chart of charts">
-            <button *ngIf="chart.chart[0].series.length>0" mat-menu-item (click)="toggle(chart)"><mat-icon *ngIf="chart.ticked">done</mat-icon>{{chart.name}}</button>
+            <button *ngIf="chart.chart.length>0 && chart.chart[0].series.length>0" mat-menu-item (click)="toggle(chart)"><mat-icon *ngIf="chart.ticked">done</mat-icon>{{chart.name}}</button>
           </span>
           <span *ngFor="let chart of hrvcharts">
-            <button *ngIf="chart.chart[0].series.length>0" mat-menu-item (click)="toggle(chart)"><mat-icon *ngIf="chart.ticked">done</mat-icon>{{chart.name}}</button>
+            <button *ngIf="chart.chart.length>0 && chart.chart[0].series.length>0" mat-menu-item (click)="toggle(chart)"><mat-icon *ngIf="chart.ticked">done</mat-icon>{{chart.name}}</button>
           </span>
-    <span *ngFor="let chart of ihealthcharts">
-            <button *ngIf="chart.chart[0].series.length>0" mat-menu-item (click)="toggle(chart)"><mat-icon *ngIf="chart.ticked">done</mat-icon>{{chart.name}}</button>
+         <span *ngFor="let chart of ihealthcharts">
+            <button *ngIf="chart.chart.length>0 && chart.chart[0].series.length>0" mat-menu-item (click)="toggle(chart)"><mat-icon *ngIf="chart.ticked">done</mat-icon>{{chart.name}}</button>
           </span>
   </mat-menu>
+
   <mat-menu #menuExercise="matMenu">
           <span *ngFor="let barChart of bars">
-          <button *ngIf="barChart.chart[0].series.length>0" mat-menu-item (click)="toggle(barChart)"><mat-icon *ngIf="barChart.ticked">done</mat-icon>{{barChart.name}}</button>
+          <button *ngIf="barChart.chart.length>0 && barChart.chart[0].series.length>0" mat-menu-item (click)="toggle(barChart)"><mat-icon *ngIf="barChart.ticked">done</mat-icon>{{barChart.name}}</button>
             </span>
   </mat-menu>
+
   <div mat-row   >
      <button mat-raised-button *ngIf="stravaComplete" [matMenuTriggerFor]="menuExercise"><mat-icon>av_timer</mat-icon>Exercise</button>
     <span *ngIf="showMeasures">
       <button mat-raised-button [matMenuTriggerFor]="menu"><mat-icon>accessibility_new</mat-icon>Body Measurements</button>
     </span>
     <span>
-      <mat-form-field appearance="fill">
-      <mat-date-range-input [rangePicker]="picker">
-          <mat-label>Date range</mat-label>
-        <input matStartDate #from placeholder="Start date" [formControl]="fromDate" (dateChange)="dateFromChanged(from.value)">
-        <input matEndDate #to placeholder="End date" [formControl]="toDate" (dateChange)="dateToChanged(to.value)">
-      </mat-date-range-input>
-       <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-       <mat-date-range-picker #picker  ></mat-date-range-picker>
+      <mat-form-field color="accent" appearance="fill">
+        <mat-label>Quarter Until</mat-label>
+        <input matInput [matDatepicker]="picker1" #to placeholder="End date" [formControl]="toDate" (dateChange)="dateToChanged(to.value)">
+        <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+        <mat-datepicker #picker1></mat-datepicker>
       </mat-form-field>
     </span>
   </div>
 
   <span *ngFor="let chart of charts">
+        <span *ngIf="chart.chart.length>0 && chart.chart[0].series.length>0">
            <app-line-chart *ngIf="chart.ticked" [results]="chart.chart" [yAxisLabel]="chart.unit" [xAxisLabel]="chart.name"> </app-line-chart>
         </span>
+  </span>
   <span *ngFor="let chart of hrvcharts">
+     <span *ngIf="chart.chart.length>0 && chart.chart[0].series.length>0">
            <app-line-chart *ngIf="chart.ticked" [results]="chart.chart" [yAxisLabel]="chart.unit" [xAxisLabel]="chart.name"> </app-line-chart>
         </span>
+  </span>
   <span *ngFor="let chart of ihealthcharts">
+     <span *ngIf="chart.chart.length>0 && chart.chart[0].series.length>0">
            <app-line-chart *ngIf="chart.ticked" [results]="chart.chart" [yAxisLabel]="chart.unit" [xAxisLabel]="chart.name"> </app-line-chart>
         </span>
+  </span>
   <span *ngFor="let barChart of bars">
-        <span *ngIf="barChart.chart[0].series.length>0" >
+        <span *ngIf="barChart.chart.length>0 && barChart.chart[0].series.length>0" >
           <div class="md-padding">
                 <app-bar-chart *ngIf="barChart.ticked" [results]="barChart.chart" [yAxisLabel]="barChart.unit" [xAxisLabel]="barChart.name"></app-bar-chart>
           </div>

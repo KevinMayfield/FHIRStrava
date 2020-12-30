@@ -3,6 +3,8 @@ import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {Athlete} from "../models/athlete";
 import {PhrService} from "./phr.service";
+import {SummaryActivity} from "../models/summary-activity";
+import {Obs} from "../models/obs";
 
 
 
@@ -18,6 +20,11 @@ export class StravaService {
   private refreshingToken = false;
 
   private athlete : Athlete = undefined;
+
+  loaded: EventEmitter<any> = new EventEmitter();
+
+  activities: SummaryActivity[] = [];
+  activityMap = new Map();
 
   clientId = '8536';
 
@@ -49,11 +56,61 @@ export class StravaService {
      this.athleteChange.emit(athlete);
   }
 
-  public getActivities(page?): Observable<any> {
+
+
+  processStravaObs(result) {
+    // Filters out duplcates
+    for (const activity of result) {
+      var date = new Date(activity.start_date).toISOString();
+      activity.intensity = this.intensity(activity.weighted_average_watts);
+      if (this.activityMap.get(activity.id) == undefined) {
+        this.activityMap.set(activity.id, activity);
+        this.activities.push(activity);
+      } else {
+        console.log('Duplicate Id = ' + this.activityMap.get(activity.id))
+      }
+    }
+  }
+
+  intensity(pwr) {
+    if (pwr != +pwr) return '';
+    if (this.athlete.ftp == undefined) return '';
+
+    return Math.round((pwr / this.athlete.ftp) * 100);
+  }
+
+  getActivities(page?) {
+    if (page === undefined) {
+      this.activities = [];
+      this.activityMap = new Map();
+    }
+    this.getStravaActivities(page).subscribe(
+      result => {
+        if (page == undefined) page = 0;
+        page++;
+        this.processStravaObs(result);
+        if (result.length > 0) {
+          this.getActivities(page)
+        } else {
+          this.loaded.emit(true)
+        };
+      },
+      (err) => {
+        console.log('STRAVA Error - '+ err);
+        console.log(err);
+        if (err.status == 401) {
+          this.loaded.emit(false)
+        }
+      }
+    );
+  }
+
+  public getStravaActivities(page?): Observable<any> {
     var uri = this.url+'athlete/activities';
 
-    var lastUpdate = this.phr.getFromDate();
-    uri = uri + '?after='+Math.floor(lastUpdate.getTime()/ 1000)+'per_page=30';
+    uri = uri + '?before='+Math.floor(this.phr.getToDate().getTime()/ 1000)
+      +'&after='+Math.floor(this.phr.getFromDate().getTime()/ 1000)
+      +'&per_page=30';
 
     if (page !== undefined) {
       uri = uri +'&page='+page;

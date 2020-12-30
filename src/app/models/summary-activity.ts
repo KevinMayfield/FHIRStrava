@@ -40,4 +40,6 @@ export interface SummaryActivity {
   has_kudoed: boolean;
   kilojoules : number;
   intensity: number;
+  average_heartrate? : number;
+  weighted_average_watts? : number;
 }

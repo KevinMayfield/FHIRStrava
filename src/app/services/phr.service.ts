@@ -9,7 +9,7 @@ export class PhrService {
   constructor() {
     this.to = new Date();
     this.from = new Date();
-    this.from.setDate(this.from.getDate() - 99);
+    this.from.setDate(this.to.getDate() - 92);
   }
 
   private from : Date = undefined;
@@ -28,8 +28,11 @@ export class PhrService {
   }
   setToDate(date : Moment) {
     this.to = date.toDate();
-  }
-  setFromDate(date : Moment) {
+    console.log('New end date - ' + this.to.toISOString());
     this.from = date.toDate();
+    this.from.setDate(this.to.getDate() - 92);
+    //- 92);
+    console.log('New start date - ' + this.from.toISOString());
   }
+
 }

@@ -9,7 +9,7 @@ import {Obs} from "../models/obs";
 import {MatTableDataSource} from "@angular/material/table";
 import {MatSort} from "@angular/material/sort";
 import {TdLoadingService} from "@covalent/core/loading";
-import {IhealthComponent} from "../ihealth/ihealth.component";
+
 import {IhealthService} from "../services/ihealth.service";
 
 import {HrvService} from "../services/hrv.service";
@@ -21,6 +21,7 @@ import Bundle = fhir.Bundle;
 import {PhrService} from "../services/phr.service";
 import {FhirService} from "../services/fhir.service";
 import {FormControl} from "@angular/forms";
+import {Charts} from "../models/charts";
 
 
 @Component({
@@ -53,14 +54,110 @@ export class BodyComponent implements OnInit {
 
   datepipe: DatePipe = new DatePipe('en-GB')
 
-  charts: any[];
-  hrvcharts: any[];
-  ihealthcharts: any[];
-  bars: any[];
+  charts : Charts[] = [
+    {
+      "unit": "Kg",
+      "name": "Weight",
+      "chart": []
+    },
+    {
+      "unit": "m/s",
+      "name": "Pulse Wave Velocity",
+      "chart": []
+    },
+    {
+      "unit": "Kg",
+      "name": "Hydration",
+      "chart": []
+    },
+    {
+      "unit": "Kg",
+      "name": "Muscle Mass",
+      "chart": []
+    },
+    {
+      "unit": "Kg",
+      "name": "Fat Mass",
+      "chart": []
+    },
+    {
+      "unit": "score",
+      "name": "Sleep Score",
+      "chart": []
+    },
+    {
+      "unit": "mmHg",
+      "name": "Blood Pressure",
+      "chart": []
+    }
+  ];
+
+  bars : Charts[] = [
+    {
+      "unit": "kJ",
+      "name": "Energy and Duration",
+      "chart": [
+      ]
+    },
+    {
+      "unit": "Score",
+      "name": "Suffer and Duration",
+      "chart": [
+        ]
+    },
+    {
+      "unit": "time",
+      "name": "Duration and Intensity",
+      "chart": []
+    }
+  ];
+
+  hrvcharts : Charts[] = [
+    {
+      "unit": "SDNN",
+      "name": "HRV",
+      "chart": [
+        ]
+    },
+    {
+      "unit": "points",
+      name: "Recovery",
+      "chart": []
+    },
+    {
+      "unit": "mL/(kg·min)",
+      name: "VO2 Max",
+      "chart": []
+    },
+
+  ];
+
+
+
+  ihealthcharts: Charts[] =[
+    {
+      "unit": "%",
+      "name": "SPO2",
+      "chart": [
+        {
+          "name": "SPO2",
+          "series": []
+        }]
+    },
+    {
+      "unit": "ratio",
+      name: "Perfusion Index",
+      "chart": [{
+        name: "Perfusion Index",
+        series: []
+      }]
+    }
+  ];
+
 
   activityDisplayedColumns = ['link', 'start_date', 'type', 'name', 'powerlink', 'distance', 'moving_time', 'average_cadence', 'average_heartrate', 'weighted_average_watts', 'kilojoules', 'suffer_score', 'intensity'];
 
-  activities: SummaryActivity[] = [];
+
 
   measures: MeasureGroups[] = [];
 
@@ -69,7 +166,8 @@ export class BodyComponent implements OnInit {
   obs: Obs[] = [];
 
   activityDataSource: MatTableDataSource<SummaryActivity>;
-  activityMap = new Map();
+
+  activities: SummaryActivity[] = [];
 
   tabValue: string = 'strava';
 
@@ -115,10 +213,11 @@ export class BodyComponent implements OnInit {
 
     this.toDate = new FormControl(new Date());
     this.fromDate = new FormControl(this.phr.getFromDate());
-    this.obs = [];
+
     // this.obsDataSource = new MatTableDataSource<Obs>(this.obs);
 
     this.activities = [];
+
     this.activityDataSource = new MatTableDataSource<SummaryActivity>(this.activities);
 
     this.ihealth.tokenChange.subscribe(
@@ -133,7 +232,6 @@ export class BodyComponent implements OnInit {
         this.getWithingsObservations();
         this.getWithingsWorkouts();
         this.getWithingsSleep();
-
       }
     )
     this.strava.tokenChange.subscribe(
@@ -149,17 +247,43 @@ export class BodyComponent implements OnInit {
       }
     });
 
+    this.strava.loaded.subscribe(result => {
+      console.log("Strava Loaded result = "+result);
+      if (result) {
+
+        this.activities = this.strava.activities;
+        this.stravaComplete = true;
+        this._loadingService.resolve('overlayStarSyntax');
+        this.activityDataSource.data = this.activities;
+        // Convert Activities into Observations
+        this.processStravaObs();
+        this.processGraph();
+      }
+    });
+
     this.strava.connect();
     this.withings.connect();
   }
 
   stravaLoad() {
-
-
     this.getAthlete();
+    this.phrLoad(false);
+  }
+
+  phrLoad(withing : boolean) {
     this.stravaComplete = false;
+    this.obs = [];
+    this.clearCharts();
     this._loadingService.register('overlayStarSyntax');
-    this.getActivities()
+    this.strava.getActivities();
+
+    if (this.showMeasures && withing) {
+      this.getWithingsObservations();
+      this.getWithingsWorkouts();
+      this.getWithingsSleep();
+    }
+
+    this.fhirService.getServerObservations(this.phr.getFromDate(),this.phr.getToDate());
   }
 
 
@@ -188,12 +312,6 @@ export class BodyComponent implements OnInit {
   }
 
 
-  intensity(pwr) {
-    if (pwr != +pwr) return '';
-    if (this.athlete.ftp == undefined) return '';
-
-    return Math.round((pwr / this.athlete.ftp) * 100);
-  }
 
   connectStrava() {
 
@@ -219,43 +337,12 @@ export class BodyComponent implements OnInit {
         }
       }
     );
-
   }
 
-  getActivities(page?) {
-    this.strava.getActivities(page).subscribe(
-      result => {
-        if (page == undefined) page = 0;
-        page++;
-        this.processStravaObs(result);
-        if (result.length > 0) {
-          this.getActivities(page)
-        } else {
-          this.stravaComplete = true;
-          this._loadingService.resolve('overlayStarSyntax');
-          this.activityDataSource.data = this.activities;
-          this.processGraph();
 
-        }
-        ;
-      },
-      (err) => {
-        console.log(err);
-        if (err.status == 401) {
-          this.stravaConnect = true;
-        }
-      }
-    );
-  }
-
-  processStravaObs(result) {
-    for (const activity of result) {
+  processStravaObs() {
+    for (const activity of this.activities) {
       var date = new Date(activity.start_date).toISOString();
-      activity.intensity = this.intensity(activity.weighted_average_watts);
-      if (this.activityMap.get(activity.id) == undefined) {
-        this.activityMap.set(activity.id, activity);
-        this.activities.push(activity);
-
         var obs: Obs = {
           'obsDate': new Date(date),
           'name': activity.name,
@@ -268,9 +355,6 @@ export class BodyComponent implements OnInit {
           'intensity': activity.intensity
         }
         this.obs.push(obs);
-      } else {
-        console.log('Duplicate Id = ' + this.activityMap.get(activity.id))
-      }
     }
   }
 
@@ -459,6 +543,24 @@ export class BodyComponent implements OnInit {
     )
   }
 
+
+  clearCharts() {
+    for (const chart of this.charts) {
+      chart.chart = [];
+    }
+    for (const chart of this.bars) {
+      chart.chart = [];
+    }
+    for (const chart of this.ihealthcharts) {
+      chart.chart = [];
+    }
+    for (const chart of this.hrvcharts) {
+      chart.chart = [];
+    }
+  }
+
+
+
   processGraph() {
 
     var charts = [
@@ -471,14 +573,6 @@ export class BodyComponent implements OnInit {
             "name": "Weight",
             "series": []
           }]
-      },
-      {
-        "unit": "kJ",
-        name: "Energy",
-        "chart": [{
-          name: "Energy",
-          series: []
-        }]
       },
       {
         "unit": "m/s",
@@ -500,7 +594,6 @@ export class BodyComponent implements OnInit {
         "unit": "Kg",
         "name": "Muscle Mass",
         "chart": [
-
           {
             "name": "Muscle Mass",
             "series": []
@@ -510,7 +603,6 @@ export class BodyComponent implements OnInit {
         "unit": "Kg",
         "name": "Fat Mass",
         "chart": [
-
           {
             "name": "Fat Mass",
             "series": []
@@ -618,50 +710,43 @@ export class BodyComponent implements OnInit {
           value: obs.weight
         })
       }
-      /*
-            if (obs.energy != undefined ) {
-              charts[1].chart[0].series.push({
-                name : obs.obsDate,
-                value : obs.energy
-              })
-            }*/
       if (obs.pwv != undefined) {
-        charts[2].chart[0].series.push({
+        charts[1].chart[0].series.push({
           name: obs.obsDate,
           value: obs.pwv
         })
       }
 
       if (obs.hydration != undefined) {
-        charts[3].chart[0].series.push({
+        charts[2].chart[0].series.push({
           name: obs.obsDate,
           value: obs.hydration
         })
       }
       if (obs.muscle_mass != undefined) {
-        charts[4].chart[0].series.push({
+        charts[3].chart[0].series.push({
           name: obs.obsDate,
           value: obs.muscle_mass
         })
       }
       if (obs.fat_mass != undefined) {
-        charts[5].chart[0].series.push({
+        charts[4].chart[0].series.push({
           name: obs.obsDate,
           value: obs.fat_mass
         })
       }
       if (obs.sleep_score != undefined) {
-        charts[6].chart[0].series.push({
+        charts[5].chart[0].series.push({
           name: obs.obsDate,
           value: obs.sleep_score
         })
       }
       if (obs.diastolic != undefined && obs.systolic != undefined) {
-        charts[7].chart[1].series.push({
+        charts[6].chart[1].series.push({
           name: obs.obsDate,
           value: obs.diastolic
         });
-        charts[7].chart[0].series.push({
+        charts[6].chart[0].series.push({
           name: obs.obsDate,
           value: obs.systolic
         });
@@ -723,17 +808,15 @@ export class BodyComponent implements OnInit {
       }
     }
 
-    this.charts = [];
-    for (const chart of charts) {
-      if (chart.chart.length > 0) {
-        this.charts.push(chart);
+    for (const chart in charts) {
+      for (const series of charts[chart].chart) {
+        this.charts[chart].chart.push(series);
       }
     }
-    this.bars = [];
-    for (const bar of bars) {
-      if (bar.chart.length > 0) {
-        this.bars.push(bar);
-      }
+
+    for (const bar in bars) {
+
+      this.bars[bar].chart = bars[bar].chart;
     }
   }
 
@@ -798,11 +881,11 @@ export class BodyComponent implements OnInit {
 
   processHRVGraph() {
 
-    var charts = [
+    var charts :any = [
       {
-        "unit": "SDNN",
-        "name": "HRV",
-        "chart": [
+        unit: "SDNN",
+        name: "HRV",
+        chart: [
 
           {
             "name": "SDNN",
@@ -810,17 +893,17 @@ export class BodyComponent implements OnInit {
           }]
       },
       {
-        "unit": "points",
+        unit: "points",
         name: "Recovery",
-        "chart": [{
+        chart: [{
           name: "Recovery",
           series: []
         }]
       },
       {
-        "unit": "mL/(kg·min)",
+        unit: "mL/(kg·min)",
         name: "VO2 Max",
-        "chart": [{
+        chart: [{
           name: "Recovery",
           series: []
         }]
@@ -850,10 +933,10 @@ export class BodyComponent implements OnInit {
       }
     }
 
-    this.hrvcharts = [];
-    for (const chart of charts) {
-      if (chart.chart.length > 0) {
-        this.hrvcharts.push(chart);
+    // copy in new series values
+    for (const chart in charts) {
+      for (const series of charts[chart].chart) {
+        this.hrvcharts[chart].chart.push(series);
       }
     }
   }
@@ -897,21 +980,18 @@ export class BodyComponent implements OnInit {
         })
       }
 
-      this.ihealthcharts = [];
-      for (const chart of charts) {
-        if (chart.chart.length > 0) {
-          this.ihealthcharts.push(chart);
-        }
+    }
+    // copy in new series values
+    for (const chart in charts) {
+      for (const series of charts[chart].chart) {
+
+        this.ihealthcharts[chart].chart.push(series);
       }
     }
   }
 
-  dateFromChanged(event){
-    this.phr.setFromDate(this.fromDate.value);
-    this.fhirService.getServerObservations(this.phr.getFromDate(),this.phr.getToDate());
-  }
   dateToChanged(event){
-    this.phr.setToDate(this.fromDate.value);
-    this.fhirService.getServerObservations(this.phr.getFromDate(),this.phr.getToDate());
+    this.phr.setToDate(this.toDate.value);
+    this.phrLoad(true);
   }
 }

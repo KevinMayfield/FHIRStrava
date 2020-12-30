@@ -50,6 +50,9 @@ export class BarChartComponent implements OnInit {
     if (this.xScaleMin = undefined) {
       this.xScaleMin = this.phr.getFromDate();
     }
+    if (this.xScaleMax = undefined) {
+      this.xScaleMax = this.phr.getToDate();
+    }
 
   }
 
