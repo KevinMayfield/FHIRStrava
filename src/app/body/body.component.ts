@@ -20,6 +20,7 @@ import Observation = fhir.Observation;
 import Bundle = fhir.Bundle;
 import {PhrService} from "../services/phr.service";
 import {FhirService} from "../services/fhir.service";
+import {FormControl} from "@angular/forms";
 
 
 @Component({
@@ -72,6 +73,9 @@ export class BodyComponent implements OnInit {
 
   tabValue: string = 'strava';
 
+  fromDate : any = undefined;
+  toDate : any = undefined;
+
 
   intensityRange = {
     "tough": 95,
@@ -109,6 +113,8 @@ export class BodyComponent implements OnInit {
   ngOnInit(): void {
 
 
+    this.toDate = new FormControl(new Date());
+    this.fromDate = new FormControl(this.phr.getFromDate());
     this.obs = [];
     // this.obsDataSource = new MatTableDataSource<Obs>(this.obs);
 
@@ -136,12 +142,12 @@ export class BodyComponent implements OnInit {
         this.stravaLoad();
       }
     );
+
     this.fhirService.loaded.subscribe(result => {
       if (result) {
         this.processFHIRObs();
       }
-    })
-
+    });
 
     this.strava.connect();
     this.withings.connect();
@@ -359,7 +365,7 @@ export class BodyComponent implements OnInit {
 
       }
       // Should not be necessary as date range should prevent it
-      if (obs.obsDate > this.phr.getLowerDate()) this.obs.push(obs);
+      if (obs.obsDate > this.phr.getFromDate()) this.obs.push(obs);
     }
   }
   processWithingsSleep(sleepData) {
@@ -755,7 +761,7 @@ export class BodyComponent implements OnInit {
 
 
   processFHIRObs() {
-    var lastUpdate = this.phr.getLowerDate();
+    var lastUpdate = this.phr.getFromDate();
     var process = false;
     for (const fhirobs of this.fhirService.getObservations()) {
       process = true;
@@ -898,5 +904,14 @@ export class BodyComponent implements OnInit {
         }
       }
     }
+  }
+
+  dateFromChanged(event){
+    this.phr.setFromDate(this.fromDate.value);
+    this.fhirService.getServerObservations(this.phr.getFromDate(),this.phr.getToDate());
+  }
+  dateToChanged(event){
+    this.phr.setToDate(this.fromDate.value);
+    this.fhirService.getServerObservations(this.phr.getFromDate(),this.phr.getToDate());
   }
 }

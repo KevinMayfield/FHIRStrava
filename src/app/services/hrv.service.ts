@@ -32,7 +32,7 @@ export class HrvService {
 
     let headers = this.getHeaders();
 
-    var lastUpdate = this.phr.getLowerDate();
+    var lastUpdate = this.phr.getFromDate();
 
 
     return this.http.post<any>('http://localhost:8187/services/hrv', body, { 'headers' : headers} ).subscribe(result => {

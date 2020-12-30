@@ -37,6 +37,16 @@ import { BarChartComponent } from './bar-chart/bar-chart.component';
 import {CovalentLoadingModule} from "@covalent/core/loading";
 import { IhealthComponent } from './ihealth/ihealth.component';
 import {CovalentFileModule} from "@covalent/core/file";
+import {MatDatepickerModule} from "@angular/material/datepicker";
+import {
+  MAT_MOMENT_DATE_ADAPTER_OPTIONS, MAT_MOMENT_DATE_FORMATS,
+  MatMomentDateModule,
+  MomentDateAdapter
+} from "@angular/material-moment-adapter";
+import {MatInputModule} from "@angular/material/input";
+import {ReactiveFormsModule} from "@angular/forms";
+import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from "@angular/material/core";
+
 
 @NgModule({
   declarations: [
@@ -55,6 +65,7 @@ import {CovalentFileModule} from "@covalent/core/file";
     AppRoutingModule,
     BrowserAnimationsModule,
     FlexLayoutModule,
+    ReactiveFormsModule,
 
 
     CovalentLayoutModule,
@@ -84,11 +95,27 @@ import {CovalentFileModule} from "@covalent/core/file";
     MatCheckboxModule,
     MatSliderModule,
     MatSortModule,
+    MatDatepickerModule,
+    MatMomentDateModule,
+    MatInputModule,
 
     NgxChartsModule
 
   ],
-  providers: [],
+  providers: [
+    {provide: MAT_DATE_LOCALE
+      , useValue: 'en-GB'},
+
+    // `MomentDateAdapter` and `MAT_MOMENT_DATE_FORMATS` can be automatically provided by importing
+    // `MatMomentDateModule` in your applications root module. We provide it at the component level
+    // here, due to limitations of our example generation script.
+    {
+      provide: DateAdapter,
+      useClass: MomentDateAdapter,
+      deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS]
+    },
+    {provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS},
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

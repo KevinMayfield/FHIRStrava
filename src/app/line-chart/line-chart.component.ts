@@ -9,7 +9,7 @@ import {PhrService} from "../services/phr.service";
 })
 export class LineChartComponent implements OnInit {
 
-  constructor(private phrService : PhrService) { }
+  constructor(private phr : PhrService) { }
 
   @Input()
   results: any;
@@ -64,7 +64,7 @@ export class LineChartComponent implements OnInit {
     var min=9999;
 
     if (this.xScaleMin = undefined) {
-      this.xScaleMin = this.phrService.getLowerDate();
+      this.xScaleMin = this.phr.getFromDate();
     }
       for (const chart of this.results) {
      //   console.log(chart);

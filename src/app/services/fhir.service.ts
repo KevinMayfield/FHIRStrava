@@ -93,29 +93,32 @@ export class FhirService {
     this.http.get("http://localhost:8186/R4/Patient?identifier="+patient.identifier[0].value,{ 'headers' : headers}).subscribe(
       result => {
         const bundle: Bundle = result;
-        console.log(bundle);
+
         if (bundle.entry != undefined && bundle.entry.length >0) {
            this.patient.id = bundle.entry[0].resource.id;
-          this.getServerObservations(this.phr.getLowerDate());
+          this.getServerObservations(this.phr.getFromDate(),this.phr.getToDate());
         }
     }
     )
 
   }
 
-  getServerObservations(startDate : Date) {
-    this.getNext('http://localhost:8186/R4/Observation?patient='+this.patient.id);
+  getServerObservations(startDate : Date, endDate : Date) {
+    console.log(startDate.toISOString());
+    var url = 'http://localhost:8186/R4/Observation?patient='+this.patient.id;
+    url = url + '&date=>'+startDate.toISOString();
+    url = url + '&date=<'+endDate.toISOString();
+    this.getNext(url);
   }
 
   getNext(url) {
     let headers = this.getHeaders();
 
     return this.http.get<any>(url, { 'headers' : headers} ).subscribe(result => {
-      console.log(result);
       this.addEntries(result);
       var next : string = undefined;
       for (const link of result.link) {
-        console.log(link);
+
         if (link.relation === 'next') next = link.url;
       }
 

@@ -36,7 +36,7 @@ export class BarChartComponent implements OnInit {
   colorScheme = {
     domain: ['#1976d2', '#00695c',  '#ef6c00', '#c62828']
   };
-  constructor(private phrService : PhrService) {
+  constructor(private phr : PhrService) {
 
   }
 
@@ -48,7 +48,7 @@ export class BarChartComponent implements OnInit {
   ngOnInit(): void {
 
     if (this.xScaleMin = undefined) {
-      this.xScaleMin = this.phrService.getLowerDate();
+      this.xScaleMin = this.phr.getFromDate();
     }
 
   }

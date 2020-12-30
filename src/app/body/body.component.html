@@ -25,7 +25,17 @@
     <span *ngIf="showMeasures">
       <button mat-raised-button [matMenuTriggerFor]="menu"><mat-icon>accessibility_new</mat-icon>Body Measurements</button>
     </span>
-
+    <span>
+      <mat-form-field appearance="fill">
+      <mat-date-range-input [rangePicker]="picker">
+          <mat-label>Date range</mat-label>
+        <input matStartDate #from placeholder="Start date" [formControl]="fromDate" (dateChange)="dateFromChanged(from.value)">
+        <input matEndDate #to placeholder="End date" [formControl]="toDate" (dateChange)="dateToChanged(to.value)">
+      </mat-date-range-input>
+       <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+       <mat-date-range-picker #picker  ></mat-date-range-picker>
+      </mat-form-field>
+    </span>
   </div>
 
   <span *ngFor="let chart of charts">

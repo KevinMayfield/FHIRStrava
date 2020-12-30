@@ -51,7 +51,7 @@ export class IhealthService {
 
     let headers = this.getHeaders();
 
-    var lastUpdate = this.phr.getLowerDate();
+    var lastUpdate = this.phr.getFromDate();
 
 
     return this.http.post<any>('http://localhost:8187/services/ihealth', body, { 'headers' : headers} ).subscribe(result => {

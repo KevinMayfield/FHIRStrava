@@ -29,7 +29,7 @@ export class StravaService {
   athleteChange: EventEmitter<any> = new EventEmitter();
 
   constructor(private http: HttpClient,
-              private phrService : PhrService) { }
+              private phr : PhrService) { }
 
   getHeaders() : HttpHeaders {
 
@@ -52,7 +52,7 @@ export class StravaService {
   public getActivities(page?): Observable<any> {
     var uri = this.url+'athlete/activities';
 
-    var lastUpdate = this.phrService.getLowerDate();
+    var lastUpdate = this.phr.getFromDate();
     uri = uri + '?after='+Math.floor(lastUpdate.getTime()/ 1000)+'per_page=30';
 
     if (page !== undefined) {

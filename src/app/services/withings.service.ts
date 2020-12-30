@@ -17,7 +17,7 @@ export class WithingsService {
   url = 'https://wbsapi.withings.net';
 
   constructor(private http: HttpClient,
-              private phrService : PhrService) { }
+              private phr : PhrService) { }
 
   clientId = 'e532209382d449afbb1ef360919f2fdac284fac62ec23feeea0589f043bdc41f';
 
@@ -131,7 +131,7 @@ export class WithingsService {
 
     let headers = this.getHeaders();
 
-    var lastUpdate = this.phrService.getLowerDate();
+    var lastUpdate = this.phr.getFromDate();
 
     var bodge= 'action=getworkouts'
       + '&data_field=calories,duration,hr_average,effduration,steps'
@@ -149,7 +149,7 @@ export class WithingsService {
 
     let headers = this.getHeaders();
 
-    var lastUpdate = this.phrService.getLowerDate();
+    var lastUpdate = this.phr.getFromDate();
 
     var bodge= 'action=getmeas'
       + '&meastypes=1,5,8,77,76,88,91,9,10'
@@ -168,7 +168,7 @@ export class WithingsService {
 
     let headers = this.getHeaders();
 
-    var lastUpdate = this.phrService.getLowerDate();
+    var lastUpdate = this.phr.getFromDate();
 
     var bodge= 'action=getsummary'
       + '&lastupdate='+Math.floor(lastUpdate.getTime()/1000)
