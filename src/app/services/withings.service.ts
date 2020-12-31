@@ -5,6 +5,7 @@ import {Athlete} from "../models/athlete";
 import {JwtHelperService} from "@auth0/angular-jwt";
 import {PhrService} from "./phr.service";
 import {DatePipe} from "@angular/common";
+import {Obs} from "../models/obs";
 
 @Injectable({
   providedIn: 'root'
@@ -26,6 +27,8 @@ export class WithingsService {
   clientSecret = 'd026b695a4cacdd486ac15b2498d08d6432854679876e2c48ae6da043c00e04d';
 
   tokenChange: EventEmitter<any> = new EventEmitter();
+
+  loaded: EventEmitter<any> = new EventEmitter();
 
   public authorise(routeUrl : string) {
     if (routeUrl.substring(routeUrl.length - 1,1) === '/') {
@@ -127,7 +130,7 @@ export class WithingsService {
   }
 
 
-  public getWorkouts(offset? : number): Observable<any> {
+  public getAPIWorkouts(offset? : number): Observable<any> {
 
     // Use the postman collection for details
 
@@ -147,7 +150,9 @@ export class WithingsService {
     return this.http.post<any>(this.url+'/v2/measure', bodge, { 'headers' : headers} );
   }
 
-  public getMeasures(): Observable<any> {
+
+
+  private getAPIMeasures(): Observable<any> {
 
     // Use the postman collection for details
 
@@ -166,7 +171,7 @@ export class WithingsService {
 
   }
 
-  public getSleep(): Observable<any> {
+  private getAPISleep(): Observable<any> {
 
     let headers = this.getHeaders();
 
@@ -238,6 +243,175 @@ export class WithingsService {
 
     return !(date.valueOf() > new Date().valueOf() + offsetSeconds * 1000);
   }
+
+
+  getObservations() {
+    this.getAPIMeasures().subscribe(
+      result => {
+        if (result.status == 401) {
+          console.log('Withings 401');
+
+        }
+
+        this.processWithingsObs(result.body.measuregrps);
+      },
+      (err) => {
+        console.log(err);
+        if (err.status == 401) {
+
+        }
+      }
+    );
+  }
+
+  processWithingsObs(measures) {
+    var observations: Obs[] = [];
+    for (const grp of measures) {
+      var date = new Date(+grp.date * 1000).toISOString();
+
+      var obs: Obs = {
+        'obsDate': new Date(date)
+      }
+      // console.log(obs);
+      for (const measure of grp.measures) {
+        switch (measure.type) {
+          case 1:
+            obs.weight = +measure.value / 1000;
+            break;
+          case 76:
+            obs.muscle_mass = +measure.value / 100;
+            break;
+          case 5 :
+            // free fat mass
+            break;
+          case 8:
+            obs.fat_mass = +measure.value / 100;
+            break;
+          case 77:
+            obs.hydration = +measure.value / 100;
+            break;
+          case 91:
+            obs.pwv = +measure.value / 1000;
+            break;
+          case 9 :
+            obs.diastolic = +measure.value / 1000;
+            break;
+          case 10 :
+            obs.systolic = +measure.value / 1000;
+            break;
+        }
+      }
+
+      observations.push(obs);
+    }
+
+    this.loaded.emit(observations);
+  }
+
+  getSleep() {
+    this.getAPISleep().subscribe(
+      result => {
+        if (result.status == 401) {
+          console.log('Withings 401');
+
+        }
+        if (result.status == 403) {
+          console.log('Withings 403 - Need to ask for permission');
+
+        }
+        this.processSleep(result);
+      },
+      (err) => {
+        console.log(err);
+        if (err.status == 401) {
+
+        }
+      }
+    );
+  }
+
+  getWorkouts() {
+    this.getAPIWorkouts().subscribe(
+      result => {
+        if (result.status == 401) {
+          console.log('Withings 401');
+
+        }
+        this.processWorkout(result);
+      },
+      (err) => {
+        console.log(err);
+        if (err.status == 401) {
+
+        }
+      }
+    );
+  }
+
+  processWorkout(activityData) {
+    var observations: Obs[] = [];
+    for (const activity of activityData.body.series) {
+      var obs: Obs = {
+        'obsDate': new Date(activity.date)
+      }
+      if (activity.data.manual_calories != undefined && activity.data.manual_calories > 0) {
+        obs.calories =activity.data.manual_calories;
+      }
+      if (activity.data.duration != undefined) {
+        obs.duration =activity.data.duration;
+        console.log(obs.duration);
+      }
+      if (activity.data.effduration != undefined) {
+        obs.duration =activity.data.effduration;
+      }
+      if (activity.data.steps != undefined) {
+        obs.steps =activity.data.steps;
+        obs.name = activity.data.steps + ' steps';
+      }
+      if (activity.data.distance != undefined) {
+        obs.distance =activity.data.distance / 1000;
+      }
+      if (obs.name === undefined) {
+
+      }
+      // Should not be necessary as date range should prevent it
+      if (obs.obsDate > this.phr.getFromDate()) observations.push(obs);
+    }
+    this.loaded.emit(observations);
+  }
+  processSleep(sleepData) {
+    var observations: Obs[] = [];
+    for (const sleep of sleepData.body.series) {
+      var obs: Obs = {
+        'obsDate': new Date(sleep.date)
+      }
+      if (sleep.data.durationtosleep != undefined) {
+        obs.durationtosleep = sleep.data.durationtosleep;
+      }
+      if (sleep.data.deepsleepduration != undefined) {
+        obs.deepsleepduration = sleep.data.deepsleepduration;
+      }
+      if (sleep.data.breathing_disturbances_intensity != undefined) {
+        obs.breathing_disturbances_intensity = sleep.data.breathing_disturbances_intensity;
+      }
+      if (sleep.data.wakeupcount != undefined) {
+        obs.wakeupcount = sleep.data.wakeupcount;
+      }
+      if (sleep.data.sleep_score != undefined) {
+        obs.sleep_score = sleep.data.sleep_score;
+      }
+      if (sleep.data.remsleepduration != undefined) {
+        obs.remsleepduration = sleep.data.remsleepduration;
+      }
+      if (sleep.data.lightsleepduration != undefined) {
+        obs.lightsleepduration = sleep.data.lightsleepduration;
+      }
+      observations.push(obs);
+    }
+    this.loaded.emit(observations);
+  }
+
+
 
 
 }

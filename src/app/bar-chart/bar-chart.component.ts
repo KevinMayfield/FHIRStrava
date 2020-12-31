@@ -46,13 +46,9 @@ export class BarChartComponent implements OnInit {
 
 
   ngOnInit(): void {
-
-    if (this.xScaleMin = undefined) {
-      this.xScaleMin = this.phr.getFromDate();
-    }
-    if (this.xScaleMax = undefined) {
-      this.xScaleMax = this.phr.getToDate();
-    }
+    this.xScaleMin = this.phr.getFromDate();
+    this.xScaleMax = this.phr.getToDate();
+    console.log(this.phr.getToDate());
 
   }
 

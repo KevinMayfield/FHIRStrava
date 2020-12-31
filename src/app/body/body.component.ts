@@ -4,7 +4,6 @@ import {Athlete} from "../models/athlete";
 import {SummaryActivity} from "../models/summary-activity";
 import {DatePipe} from "@angular/common";
 import {WithingsService} from "../services/withings.service";
-import {MeasureGroups} from "../models/measure-groups";
 import {Obs} from "../models/obs";
 import {MatTableDataSource} from "@angular/material/table";
 import {MatSort} from "@angular/material/sort";
@@ -22,7 +21,6 @@ import {PhrService} from "../services/phr.service";
 import {FhirService} from "../services/fhir.service";
 import {FormControl} from "@angular/forms";
 import {Charts} from "../models/charts";
-
 
 @Component({
   selector: 'app-body',
@@ -54,6 +52,12 @@ export class BodyComponent implements OnInit {
 
   datepipe: DatePipe = new DatePipe('en-GB')
 
+  durations  = [
+    {value: 31, viewValue: 'Month'},
+    {value: 91, viewValue: 'Quarter'},
+    {value: 365, viewValue: 'Year'}
+  ];
+  selected = 91;
   charts : Charts[] = [
     {
       "unit": "Kg",
@@ -95,19 +99,19 @@ export class BodyComponent implements OnInit {
   bars : Charts[] = [
     {
       "unit": "kJ",
-      "name": "Energy and Duration",
+      "name": "Energy",
       "chart": [
       ]
     },
     {
       "unit": "Score",
-      "name": "Suffer and Duration",
+      "name": "Suffer",
       "chart": [
         ]
     },
     {
       "unit": "time",
-      "name": "Duration and Intensity",
+      "name": "Intensity",
       "chart": []
     }
   ];
@@ -158,12 +162,9 @@ export class BodyComponent implements OnInit {
   activityDisplayedColumns = ['link', 'start_date', 'type', 'name', 'powerlink', 'distance', 'moving_time', 'average_cadence', 'average_heartrate', 'weighted_average_watts', 'kilojoules', 'suffer_score', 'intensity'];
 
 
-
-  measures: MeasureGroups[] = [];
-
   showMeasures = false;
 
-  obs: Obs[] = [];
+ // obs: Obs[] = [];
 
   activityDataSource: MatTableDataSource<SummaryActivity>;
 
@@ -229,9 +230,9 @@ export class BodyComponent implements OnInit {
     this.withings.tokenChange.subscribe(
       token => {
         this.showMeasures = true;
-        this.getWithingsObservations();
-        this.getWithingsWorkouts();
-        this.getWithingsSleep();
+        this.withings.getObservations();
+        this.withings.getWorkouts();
+        this.withings.getSleep();
       }
     )
     this.strava.tokenChange.subscribe(
@@ -243,12 +244,13 @@ export class BodyComponent implements OnInit {
 
     this.fhirService.loaded.subscribe(result => {
       if (result) {
-        this.processFHIRObs();
+        this.processIHealthGraph(result);
+        this.processHRVGraph(result);
       }
     });
 
     this.strava.loaded.subscribe(result => {
-      console.log("Strava Loaded result = "+result);
+     console.log("Strava Loaded");
       if (result) {
 
         this.activities = this.strava.activities;
@@ -257,7 +259,14 @@ export class BodyComponent implements OnInit {
         this.activityDataSource.data = this.activities;
         // Convert Activities into Observations
         this.processStravaObs();
-        this.processGraph();
+
+      }
+    });
+    this.withings.loaded.subscribe(result => {
+      console.log("Withings Loaded");
+      if (result) {
+
+        this.processGraph(result);
       }
     });
 
@@ -272,15 +281,14 @@ export class BodyComponent implements OnInit {
 
   phrLoad(withing : boolean) {
     this.stravaComplete = false;
-    this.obs = [];
     this.clearCharts();
     this._loadingService.register('overlayStarSyntax');
     this.strava.getActivities();
 
     if (this.showMeasures && withing) {
-      this.getWithingsObservations();
-      this.getWithingsWorkouts();
-      this.getWithingsSleep();
+      this.withings.getObservations();
+      this.withings.getWorkouts();
+      this.withings.getSleep();
     }
 
     this.fhirService.getServerObservations(this.phr.getFromDate(),this.phr.getToDate());
@@ -341,6 +349,7 @@ export class BodyComponent implements OnInit {
 
 
   processStravaObs() {
+    var observations : Obs[] = [];
     for (const activity of this.activities) {
       var date = new Date(activity.start_date).toISOString();
         var obs: Obs = {
@@ -354,177 +363,15 @@ export class BodyComponent implements OnInit {
           'duration': Math.round(activity.moving_time),
           'intensity': activity.intensity
         }
-        this.obs.push(obs);
+        observations.push(obs);
     }
+    this.processGraph(observations);
   }
 
   round(num) {
     return Math.round(num);
   }
 
-  getWithingsSleep() {
-    this.withings.getSleep().subscribe(
-      result => {
-        if (result.status == 401) {
-          console.log('Withings 401');
-
-        }
-        if (result.status == 403) {
-          console.log('Withings 403 - Need to ask for permission');
-
-        }
-        this.processWithingsSleep(result);
-      },
-      (err) => {
-        console.log(err);
-        if (err.status == 401) {
-
-        }
-      }
-    );
-  }
-
-
-  getWithingsObservations() {
-    this.withings.getMeasures().subscribe(
-      result => {
-        if (result.status == 401) {
-          console.log('Withings 401');
-
-        }
-        this.measures = result.body.measuregrps;
-
-        this.processWithingsObs();
-      },
-      (err) => {
-        console.log(err);
-        if (err.status == 401) {
-
-        }
-      }
-    );
-  }
-  getWithingsWorkouts() {
-    this.withings.getWorkouts().subscribe(
-      result => {
-        if (result.status == 401) {
-          console.log('Withings 401');
-
-        }
-        this.processWithingsWorkout(result);
-      },
-      (err) => {
-        console.log(err);
-        if (err.status == 401) {
-
-        }
-      }
-    );
-  }
-
-  processWithingsWorkout(activityData) {
-
-    for (const activity of activityData.body.series) {
-      var obs: Obs = {
-        'obsDate': new Date(activity.date)
-      }
-      if (activity.data.manual_calories != undefined && activity.data.manual_calories > 0) {
-        obs.calories =activity.data.manual_calories;
-      }
-      if (activity.data.duration != undefined) {
-        obs.duration =activity.data.duration;
-        console.log(obs.duration);
-      }
-      if (activity.data.effduration != undefined) {
-        obs.duration =activity.data.effduration;
-      }
-      if (activity.data.steps != undefined) {
-        obs.steps =activity.data.steps;
-        obs.name = activity.data.steps + ' steps';
-      }
-      if (activity.data.distance != undefined) {
-        obs.distance =activity.data.distance / 1000;
-      }
-      if (obs.name === undefined) {
-
-      }
-      // Should not be necessary as date range should prevent it
-      if (obs.obsDate > this.phr.getFromDate()) this.obs.push(obs);
-    }
-  }
-  processWithingsSleep(sleepData) {
-    for (const sleep of sleepData.body.series) {
-      var obs: Obs = {
-        'obsDate': new Date(sleep.date)
-      }
-      if (sleep.data.durationtosleep != undefined) {
-        obs.durationtosleep = sleep.data.durationtosleep;
-      }
-      if (sleep.data.deepsleepduration != undefined) {
-        obs.deepsleepduration = sleep.data.deepsleepduration;
-      }
-      if (sleep.data.breathing_disturbances_intensity != undefined) {
-        obs.breathing_disturbances_intensity = sleep.data.breathing_disturbances_intensity;
-      }
-      if (sleep.data.wakeupcount != undefined) {
-        obs.wakeupcount = sleep.data.wakeupcount;
-      }
-      if (sleep.data.sleep_score != undefined) {
-        obs.sleep_score = sleep.data.sleep_score;
-      }
-      if (sleep.data.remsleepduration != undefined) {
-        obs.remsleepduration = sleep.data.remsleepduration;
-      }
-      if (sleep.data.lightsleepduration != undefined) {
-        obs.lightsleepduration = sleep.data.lightsleepduration;
-      }
-      this.obs.push(obs);
-    }
-  }
-
-  processWithingsObs() {
-
-    for (const grp of this.measures) {
-      var date = new Date(+grp.date * 1000).toISOString();
-
-      var obs: Obs = {
-        'obsDate': new Date(date)
-      }
-      // console.log(obs);
-      for (const measure of grp.measures) {
-        switch (measure.type) {
-          case 1:
-            obs.weight = +measure.value / 1000;
-            break;
-          case 76:
-            obs.muscle_mass = +measure.value / 100;
-            break;
-          case 5 :
-            // free fat mass
-            break;
-          case 8:
-            obs.fat_mass = +measure.value / 100;
-            break;
-          case 77:
-            obs.hydration = +measure.value / 100;
-            break;
-          case 91:
-            obs.pwv = +measure.value / 1000;
-            break;
-          case 9 :
-            obs.diastolic = +measure.value / 1000;
-            break;
-          case 10 :
-            obs.systolic = +measure.value / 1000;
-            break;
-        }
-      }
-
-      this.obs.push(obs);
-    }
-
-
-  }
 
 
   openStrava(id) {
@@ -560,79 +407,7 @@ export class BodyComponent implements OnInit {
   }
 
 
-
-  processGraph() {
-
-    var charts = [
-      {
-        "unit": "Kg",
-        "name": "Weight",
-        "chart": [
-
-          {
-            "name": "Weight",
-            "series": []
-          }]
-      },
-      {
-        "unit": "m/s",
-        "name": "Pulse Wave Velocity",
-        "chart": [{
-          "name": "Pulse Wave Velocity",
-          "series": []
-        }]
-      },
-      {
-        "unit": "Kg",
-        "name": "Hydration",
-        "chart": [{
-          "name": "Hydration",
-          "series": []
-        }]
-      },
-      {
-        "unit": "Kg",
-        "name": "Muscle Mass",
-        "chart": [
-          {
-            "name": "Muscle Mass",
-            "series": []
-          }]
-      },
-      {
-        "unit": "Kg",
-        "name": "Fat Mass",
-        "chart": [
-          {
-            "name": "Fat Mass",
-            "series": []
-          }]
-      },
-      {
-        "unit": "score",
-        "name": "Sleep Score",
-        "chart": [
-
-          {
-            "name": "Sleep Score",
-            "series": []
-          }]
-      },
-      {
-        "unit": "mmHg",
-        "name": "Blood Pressure",
-        "chart": [
-          {
-            "name": "Systolic Blood Pressure",
-            "series": []
-          },
-          {
-            "name": "Diastolic Blood Pressure",
-            "series": []
-          }
-        ]
-      }
-    ];
+  processGraph(observations : Obs[]) {
 
     var bars = [
       {
@@ -703,56 +478,59 @@ export class BodyComponent implements OnInit {
     ];
 
 
-    for (const obs of this.obs) {
+    for (const obs of observations) {
       if (obs.weight != undefined) {
-        charts[0].chart[0].series.push({
+        this.addEntry(0,0,"Weight",{
           name: obs.obsDate,
           value: obs.weight
-        })
+        });
       }
       if (obs.pwv != undefined) {
-        charts[1].chart[0].series.push({
+        this.addEntry(1,0,"PVW",{
           name: obs.obsDate,
           value: obs.pwv
-        })
+        });
       }
 
       if (obs.hydration != undefined) {
-        charts[2].chart[0].series.push({
+        this.addEntry(2,0,"Hydration",{
           name: obs.obsDate,
           value: obs.hydration
         })
       }
       if (obs.muscle_mass != undefined) {
-        charts[3].chart[0].series.push({
+        this.addEntry(3,0,"Muscle Mass",{
           name: obs.obsDate,
           value: obs.muscle_mass
-        })
+        });
       }
       if (obs.fat_mass != undefined) {
-        charts[4].chart[0].series.push({
+        this.addEntry(4,0,"Muscle Mass",{
           name: obs.obsDate,
           value: obs.fat_mass
         })
       }
       if (obs.sleep_score != undefined) {
-        charts[5].chart[0].series.push({
+        this.addEntry(5,0,"Sleep Score",{
           name: obs.obsDate,
           value: obs.sleep_score
         })
       }
       if (obs.diastolic != undefined && obs.systolic != undefined) {
-        charts[6].chart[1].series.push({
-          name: obs.obsDate,
-          value: obs.diastolic
-        });
-        charts[6].chart[0].series.push({
+        this.addEntry(6,0,"Systolic",{
           name: obs.obsDate,
           value: obs.systolic
         });
+        this.addEntry(6,1,"Diastolic",{
+          name: obs.obsDate,
+          value: obs.diastolic
+        });
+
       }
       var chartNum = 0;
-      if (obs.energy != undefined && obs.duration != undefined) {
+      if (obs.energy != undefined && obs.energy> 0 && obs.duration != undefined) {
+        if (obs.energy != +obs.energy) console.log(obs.energy);
+        if (obs.duration != +obs.duration) console.log(obs.duration);
         var energy = obs.energy / (obs.duration/ 600);
         if (energy < 80) {
           chartNum = 0;
@@ -766,11 +544,12 @@ export class BodyComponent implements OnInit {
         bars[0].chart[chartNum].series.push({
           name: obs.name,
           x: obs.obsDate,
-          y: obs.energy,
-          r: energy
+          y: +obs.energy,
+          r: +energy
         })
       }
-      if (obs.suffer != undefined && obs.duration != undefined) {
+      if (obs.suffer != undefined && obs.suffer > 0 && obs.duration != undefined) {
+
         var suffer = obs.suffer / (obs.duration/600);
         if (suffer < 10) {
           chartNum = 0;
@@ -784,11 +563,11 @@ export class BodyComponent implements OnInit {
         bars[1].chart[chartNum].series.push({
           name: obs.name,
           x: obs.obsDate,
-          y: obs.suffer,
-          r: suffer
+          y: +obs.suffer,
+          r: +suffer
         })
       }
-      if (obs.intensity != undefined && this.isNum(obs.intensity) && obs.duration != undefined) {
+      if (obs.intensity != undefined && obs.intensity> 0 && this.isNum(obs.intensity) && obs.duration != undefined) {
 
         if (obs.intensity < this.intensityRange.low) {
           chartNum = 0;
@@ -803,21 +582,33 @@ export class BodyComponent implements OnInit {
           name: obs.name,
           x: obs.obsDate,
           y: obs.duration * 10,
-          r: obs.intensity
+          r: +obs.intensity
         });
       }
     }
 
-    for (const chart in charts) {
-      for (const series of charts[chart].chart) {
-        this.charts[chart].chart.push(series);
+      for (const bar in bars) {
+        this.bars[bar].chart = bars[bar].chart;
       }
-    }
+  }
 
-    for (const bar in bars) {
+  addEntry(chart : number, series : number, name: string, entry) {
 
-      this.bars[bar].chart = bars[bar].chart;
+    if (this.charts[chart] === undefined) return;
+
+    if (series === 0 && this.charts[chart].chart.length === 0) {
+      this.charts[chart].chart.push( {
+        name: name,
+        series: []
+      });
     }
+    if (series === 1 && this.charts[chart].chart.length === 1) {
+      this.charts[chart].chart.push( {
+        name: name,
+        series: []
+      });
+    }
+    this.charts[chart].chart[series].series.push(entry);
   }
 
   togglePWV() {
@@ -843,43 +634,9 @@ export class BodyComponent implements OnInit {
   }
 
 
-  processFHIRObs() {
-    var lastUpdate = this.phr.getFromDate();
-    var process = false;
-    for (const fhirobs of this.fhirService.getObservations()) {
-      process = true;
-      var datetime = new Date(fhirobs.effectiveDateTime);
-      if (datetime > lastUpdate) {
-        //  console.log(fhirobs);
-        var obs: Obs = {
-          obsDate: datetime
-        }
-
-        if (fhirobs.code.coding[0].code === "8867-4") {
-          obs.sdnn = fhirobs.valueQuantity.value;
-        }
-        if (fhirobs.code.coding[0].code === "60842-2") {
-          obs.vo2max = fhirobs.valueQuantity.value;
-        }
-        if (fhirobs.code.coding[0].code === "Recovery_Points") {
-          obs.recoverypoints = fhirobs.valueQuantity.value;
-        }
-        if (fhirobs.code.coding[0].code === "73794-0") {
-          obs.pi = fhirobs.valueQuantity.value;
-        }
-        if (fhirobs.code.coding[0].code === "103228002") {
-          obs.spo2 = fhirobs.valueQuantity.value;
-        }
-        this.obs.push(obs);
-      }
-    }
-    this.processHRVGraph();
-    this.processIHealthGraph();
-  }
 
 
-
-  processHRVGraph() {
+  processHRVGraph(observations : Obs[]) {
 
     var charts :any = [
       {
@@ -912,7 +669,7 @@ export class BodyComponent implements OnInit {
     ];
 
 
-    for (const obs of this.obs) {
+    for (const obs of observations) {
       if (obs.sdnn != undefined) {
         charts[0].chart[0].series.push({
           name: obs.obsDate,
@@ -941,7 +698,7 @@ export class BodyComponent implements OnInit {
     }
   }
 
-  processIHealthGraph() {
+  processIHealthGraph(observations: Obs[]) {
 
     var charts = [
       {
@@ -965,15 +722,14 @@ export class BodyComponent implements OnInit {
 
     ];
 
-
-    for (const obs of this.obs) {
+    for (const obs of observations) {
       if (obs.spo2 != undefined) {
         charts[0].chart[0].series.push({
           name: obs.obsDate,
           value: obs.spo2
         })
       }
-      if (obs.pi != undefined) {
+      if (obs.pi != undefined && obs.pi < 50) {
         charts[1].chart[0].series.push({
           name: obs.obsDate,
           value: obs.pi
@@ -993,5 +749,15 @@ export class BodyComponent implements OnInit {
   dateToChanged(event){
     this.phr.setToDate(this.toDate.value);
     this.phrLoad(true);
+  }
+
+  selectDuration(event) {
+    if (!event.isUserInput) {
+      console.log(this.selected);
+
+      this.phr.setFromDuration(this.selected);
+      this.phrLoad(true);
+    }
+
   }
 }

@@ -6,7 +6,7 @@
 
   <mat-menu #menu="matMenu">
           <span *ngFor="let chart of charts">
-            <button *ngIf="chart.chart.length>0 && chart.chart[0].series.length>0" mat-menu-item (click)="toggle(chart)"><mat-icon *ngIf="chart.ticked">done</mat-icon>{{chart.name}}</button>
+            <button *ngIf="chart.chart.length>0 && chart.chart[0].series != undefined" mat-menu-item (click)="toggle(chart)"><mat-icon *ngIf="chart.ticked">done</mat-icon>{{chart.name}}</button>
           </span>
           <span *ngFor="let chart of hrvcharts">
             <button *ngIf="chart.chart.length>0 && chart.chart[0].series.length>0" mat-menu-item (click)="toggle(chart)"><mat-icon *ngIf="chart.ticked">done</mat-icon>{{chart.name}}</button>
@@ -28,17 +28,28 @@
       <button mat-raised-button [matMenuTriggerFor]="menu"><mat-icon>accessibility_new</mat-icon>Body Measurements</button>
     </span>
     <span>
+      <mat-form-field appearance="fill">
+          <mat-label>Show</mat-label>
+          <mat-select [(value)]="selected" (selectionChange)="selectDuration($event)">
+            <mat-option *ngFor="let duration of durations" [value]="duration.value">
+              {{duration.viewValue}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+    </span>
+    <span>
       <mat-form-field color="accent" appearance="fill">
-        <mat-label>Quarter Until</mat-label>
+        <mat-label>Until</mat-label>
         <input matInput [matDatepicker]="picker1" #to placeholder="End date" [formControl]="toDate" (dateChange)="dateToChanged(to.value)">
         <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
         <mat-datepicker #picker1></mat-datepicker>
       </mat-form-field>
     </span>
+
   </div>
 
   <span *ngFor="let chart of charts">
-        <span *ngIf="chart.chart.length>0 && chart.chart[0].series.length>0">
+        <span *ngIf="chart.chart.length>0 && chart.chart[0].series != undefined">
            <app-line-chart *ngIf="chart.ticked" [results]="chart.chart" [yAxisLabel]="chart.unit" [xAxisLabel]="chart.name"> </app-line-chart>
         </span>
   </span>

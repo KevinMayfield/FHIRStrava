@@ -63,12 +63,10 @@ export class LineChartComponent implements OnInit {
   ngOnInit(): void {
     var min=9999;
 
-    if (this.xScaleMin = undefined) {
-      this.xScaleMin = this.phr.getFromDate();
-    }
-    if (this.xScaleMax = undefined) {
-      this.xScaleMax = this.phr.getToDate();
-    }
+    this.xScaleMin = this.phr.getFromDate();
+    this.xScaleMax = this.phr.getToDate();
+    console.log(this.phr.getToDate());
+
       for (const chart of this.results) {
      //   console.log(chart);
         for (const val of chart.series) {

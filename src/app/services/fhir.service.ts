@@ -12,6 +12,7 @@ import * as uuid from 'uuid';
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {PhrService} from "./phr.service";
 import {generateBundleStats} from "@angular-devkit/build-angular/src/webpack/utils/stats";
+import {Obs} from "../models/obs";
 
 @Injectable({
   providedIn: 'root'
@@ -126,7 +127,8 @@ export class FhirService {
       }
 
       if (next === undefined) {
-        this.loaded.emit(true);
+      //  this.loaded.emit(true);
+        this.processFHIRObs();
       } else {
         this.getNext(next);
       };
@@ -166,5 +168,41 @@ export class FhirService {
     headers.append('Accept', 'application/fhir+json');
     return headers;
   }
+
+  processFHIRObs() {
+    var observations: Obs[] = [];
+    var lastUpdate = this.phr.getFromDate();
+    var process = false;
+    for (const fhirobs of this.getObservations()) {
+      process = true;
+      var datetime = new Date(fhirobs.effectiveDateTime);
+      if (datetime > lastUpdate) {
+        //  console.log(fhirobs);
+        var obs: Obs = {
+          obsDate: datetime
+        }
+
+        if (fhirobs.code.coding[0].code === "8867-4") {
+          obs.sdnn = fhirobs.valueQuantity.value;
+        }
+        if (fhirobs.code.coding[0].code === "60842-2") {
+          obs.vo2max = fhirobs.valueQuantity.value;
+        }
+        if (fhirobs.code.coding[0].code === "Recovery_Points") {
+          obs.recoverypoints = fhirobs.valueQuantity.value;
+        }
+        if (fhirobs.code.coding[0].code === "73794-0") {
+          obs.pi = fhirobs.valueQuantity.value;
+        }
+        if (fhirobs.code.coding[0].code === "103228002") {
+          obs.spo2 = fhirobs.valueQuantity.value;
+        }
+        observations.push(obs);
+      }
+    }
+    this.loaded.emit(observations);
+  }
+
+
 
 }

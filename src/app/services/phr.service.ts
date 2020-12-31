@@ -16,6 +16,8 @@ export class PhrService {
 
   private to : Date = undefined;
 
+  private duration = 92;
+
   getFromDate() : Date {
     return this.from;
 
@@ -26,13 +28,19 @@ export class PhrService {
   getToDate() {
     return this.to;
   }
-  setToDate(date : Moment) {
+  setToDate(date : Moment, ) {
     this.to = date.toDate();
-    console.log('New end date - ' + this.to.toISOString());
+    console.log('PHR End date - ' + this.to.toISOString());
     this.from = date.toDate();
-    this.from.setDate(this.to.getDate() - 92);
-    //- 92);
-    console.log('New start date - ' + this.from.toISOString());
+    this.setFromDuration();
+  }
+  setFromDuration(duration? : number) {
+
+    if (duration != undefined) this.duration = duration;
+    console.log('PHR duraton = ' + this.duration);
+    this.from = new Date(this.to);
+    this.from.setDate(this.to.getDate() - this.duration);
+    console.log('PHR Start date - ' + this.from.toISOString());
   }
 
 }
