@@ -44,11 +44,11 @@ export class MainComponent implements OnInit {
 
     this.hrv.hrvChange.subscribe(result => {
 
-      this.fhirService.prepareTransaction(result);
+      this.fhirService.postTransaction(result);
     })
 
     this.ihealth.iHealthChange.subscribe(result => {
-      this.fhirService.prepareTransaction(result);
+      this.fhirService.postTransaction(result);
     });
 
     this.strava.athleteChange.subscribe(

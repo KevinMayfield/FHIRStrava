@@ -6,6 +6,13 @@ import {JwtHelperService} from "@auth0/angular-jwt";
 import {PhrService} from "./phr.service";
 import {DatePipe} from "@angular/common";
 import {Obs} from "../models/obs";
+import {FhirService} from "./fhir.service";
+// @ts-ignore
+import Bundle = fhir.Bundle;
+// @ts-ignore
+import Observation = fhir.Observation;
+// @ts-ignore
+import Coding = fhir.Coding;
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +27,7 @@ export class WithingsService {
 
   constructor(private http: HttpClient,
               private phr : PhrService,
+              private fhir: FhirService,
               private datePipe: DatePipe) { }
 
   clientId = 'e532209382d449afbb1ef360919f2fdac284fac62ec23feeea0589f043bdc41f';
@@ -151,6 +159,117 @@ export class WithingsService {
   }
 
 
+  private updateFHIRServer(observations : Obs[]) {
+    var bundle : Bundle = {
+      entry: []
+    };
+    for (const obs of observations) {
+
+        if (obs.weight !== undefined) {
+          var fhirWeight = this.getObservation(bundle, obs, true, '27113001', 'Body weight', obs.weight, 'kg');
+
+          // Makes sense to make this a component
+          if (obs.muscle_mass !== undefined) {
+            this.addComponent(fhirWeight, 'http://loinc.org', '73964-9', 'Body muscle mass', obs.muscle_mass, 'kg')
+          }
+          if (obs.fat_mass !== undefined) {
+            this.addComponent(fhirWeight, 'http://loinc.org', '73708-0', 'Body fat [Mass] Calculated', obs.fat_mass, 'kg')
+          }
+          if (obs.hydration !== undefined) {
+            this.addComponent(fhirWeight, 'http://loinc.org', '73706-4', 'Extracellular fluid [Volume] Measured', obs.hydration, 'kg')
+          }
+
+        }
+
+      if (obs.remsleepduration != undefined && obs.lightsleepduration != undefined && obs.deepsleepduration != undefined) {
+        var fhirBP= this.getObservation(bundle,obs,false,'93832-4','Sleep duration',  (obs.remsleepduration + obs.lightsleepduration + obs.deepsleepduration) / 3600 ,"h" );
+        if (obs.sleep_score != undefined) {
+          this.addComponent(fhirBP,'http://withings.com/data_fields','sleep_score','Sleep Score',obs.sleep_score,'score');
+          this.addComponent(fhirBP,'http://withings.com/data_fields','remsleepduration','Rem Sleep Duration',(obs.remsleepduration) / 3600,'h');
+          this.addComponent(fhirBP,'http://withings.com/data_fields','lightsleepduration','Light Sleep Duration',(obs.lightsleepduration) / 3600,'h');
+          this.addComponent(fhirBP,'http://withings.com/data_fields','deepsleepduration','Deep Sleep Duration',(obs.deepsleepduration) / 3600,'h');
+        }
+      }
+
+        if (obs.diastolic !== undefined && obs.systolic != undefined) {
+
+          var fhirBP= this.getObservation(bundle,obs,true,'75367002','Blood pressure'  );
+          this.addComponent(fhirBP,'http://snomed.info/sct','72313002','Systolic arterial pressure',obs.systolic,'mmHg');
+          this.addComponent(fhirBP,'http://snomed.info/sct', '1091811000000102','Diastolic arterial pressure',obs.diastolic,'mmHg');
+        }
+        if (obs.pwv != undefined) {
+          this.getObservation(bundle,obs,false, '77196-4','Pulse wave velocity', obs.pwv, 'm/s'  )
+        }
+     }
+      if (bundle.entry.length> 0) this.fhir.postTransaction(bundle);
+  }
+
+  private addComponent(fhirObs: Observation,codeSystem, code: string, display, value, unit: string){
+    if (fhirObs.component === undefined) fhirObs.component = [];
+
+    var coding : Coding = {
+
+      system: codeSystem,
+      code: code,
+      display: display
+    }
+    fhirObs.component.push({
+      code : {
+        coding : [
+          coding
+        ]
+      },
+      valueQuantity: {
+        value: value,
+        unit: unit,
+        system: 'http://unitsofmeasure.org'
+      }
+    });
+  }
+
+  private getObservation(bundle: Bundle, obs: Obs, snomed : boolean, code: string, display, value?, unit?: string) : Observation {
+    var fhirObs :Observation = {
+      resourceType: 'Observation'
+    };
+    fhirObs.identifier = [
+      {
+        system: 'https://fhir.withings.com/Id',
+        value: code + '-'+this.datePipe.transform(obs.obsDate,"yyyyMMddhhmm")
+      }
+    ]
+    if (snomed) {
+    fhirObs.code = {
+      coding : [{
+        system: 'http://snomed.info/sct',
+        code: code,
+        display: display
+      }
+      ]
+    };
+    } else {
+      fhirObs.code = {
+        coding : [{
+          system: 'http://loinc.org',
+          code: code,
+          display: display
+        }
+        ]
+      };
+    }
+    fhirObs.effectiveDateTime = obs.obsDate.toISOString();
+    if (value != undefined && unit != undefined) {
+      fhirObs.valueQuantity = {
+        value: value,
+        unit: unit,
+        system: 'http://unitsofmeasure.org'
+      }
+    }
+    //console.log(fhirObs);
+    bundle.entry.push({
+      resource : fhirObs
+    })
+    return fhirObs;
+  }
 
   private getAPIMeasures(): Observable<any> {
 
@@ -189,6 +308,10 @@ export class WithingsService {
   connect() {
     var token = this.getAccessToken();
     if (token != undefined) this.tokenChange.emit(token);
+
+    this.loaded.subscribe(result => {
+      this.updateFHIRServer(result);
+    })
   }
   getAccessToken() {
     if (localStorage.getItem('withingsToken') != undefined) {

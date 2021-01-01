@@ -18,6 +18,8 @@ export class PhrService {
 
   private duration = 92;
 
+  maxhr = 175;
+
   getFromDate() : Date {
     return this.from;
 

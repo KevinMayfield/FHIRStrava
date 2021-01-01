@@ -21,6 +21,7 @@ import {PhrService} from "../services/phr.service";
 import {FhirService} from "../services/fhir.service";
 import {FormControl} from "@angular/forms";
 import {Charts} from "../models/charts";
+import {first} from "rxjs/operators";
 
 @Component({
   selector: 'app-body',
@@ -65,23 +66,13 @@ export class BodyComponent implements OnInit {
       "chart": []
     },
     {
+      "unit": "%",
+      "name": "Body Composition",
+      "chart": []
+    },
+    {
       "unit": "m/s",
       "name": "Pulse Wave Velocity",
-      "chart": []
-    },
-    {
-      "unit": "Kg",
-      "name": "Hydration",
-      "chart": []
-    },
-    {
-      "unit": "Kg",
-      "name": "Muscle Mass",
-      "chart": []
-    },
-    {
-      "unit": "Kg",
-      "name": "Fat Mass",
       "chart": []
     },
     {
@@ -92,6 +83,16 @@ export class BodyComponent implements OnInit {
     {
       "unit": "mmHg",
       "name": "Blood Pressure",
+      "chart": []
+    },
+    {
+      "unit": "h",
+      "name": "Sleep Duration",
+      "chart": []
+    },
+    {
+      "unit": "h",
+      "name": "Sleep Composition",
       "chart": []
     }
   ];
@@ -110,8 +111,13 @@ export class BodyComponent implements OnInit {
         ]
     },
     {
-      "unit": "time",
-      "name": "Intensity",
+      "unit": "hour",
+      "name": "Intensity (Power)",
+      "chart": []
+    },
+    {
+      "unit": "hour",
+      "name": "Intensity (HR)",
       "chart": []
     }
   ];
@@ -230,9 +236,14 @@ export class BodyComponent implements OnInit {
     this.withings.tokenChange.subscribe(
       token => {
         this.showMeasures = true;
-        this.withings.getObservations();
-        this.withings.getWorkouts();
-        this.withings.getSleep();
+        // Have ok to query withings but need to wait until FHIR patient (and initialisation) present
+        //
+        this.fhirService.patientChange.pipe(first()).subscribe(result => {
+            this.withings.getObservations();
+            this.withings.getWorkouts();
+            this.withings.getSleep();
+          }
+        )
       }
     )
     this.strava.tokenChange.subscribe(
@@ -243,9 +254,12 @@ export class BodyComponent implements OnInit {
     );
 
     this.fhirService.loaded.subscribe(result => {
+      console.log("FHIR CDR Loaded");
       if (result) {
+       // console.log("FHIR CDR Processing results " + result.length);
         this.processIHealthGraph(result);
         this.processHRVGraph(result);
+        this.buildGraph(result);
       }
     });
 
@@ -266,7 +280,7 @@ export class BodyComponent implements OnInit {
       console.log("Withings Loaded");
       if (result) {
 
-        this.processGraph(result);
+     // REENABLE   this.buildGraph(result);
       }
     });
 
@@ -365,7 +379,7 @@ export class BodyComponent implements OnInit {
         }
         observations.push(obs);
     }
-    this.processGraph(observations);
+    this.buildGraph(observations);
   }
 
   round(num) {
@@ -407,7 +421,7 @@ export class BodyComponent implements OnInit {
   }
 
 
-  processGraph(observations : Obs[]) {
+  buildGraph(observations : Obs[]) {
 
     var bars = [
       {
@@ -454,8 +468,30 @@ export class BodyComponent implements OnInit {
           }]
       },
       {
-        "unit": "time",
+        "unit": "hour",
         "name": "Duration and Intensity",
+        "chart": [
+
+          {
+            "name": "Endurance",
+            "series": []
+          },
+          {
+            "name": "Moderate",
+            "series": []
+          },
+          {
+            "name": "Tempo",
+            "series": []
+          },
+          {
+            "name": "Threshold",
+            "series": []
+          }]
+      },
+      {
+        "unit": "hour",
+        "name": "Duration and Av Heart Rate",
         "chart": [
 
           {
@@ -484,48 +520,72 @@ export class BodyComponent implements OnInit {
           name: obs.obsDate,
           value: obs.weight
         });
+        if (obs.hydration != undefined) {
+          this.addEntry(1,0,"Hydration",{
+            name: obs.obsDate,
+            value: Math.round((obs.hydration / obs.weight) *1000)/ 10
+          })
+        }
+        if (obs.muscle_mass != undefined) {
+          this.addEntry(1,1,"Muscle Mass",{
+            name: obs.obsDate,
+            value: Math.round((obs.muscle_mass / obs.weight) *1000)/ 10
+          });
+        }
+        if (obs.fat_mass != undefined) {
+          this.addEntry(1,2,"Fat Mass",{
+            name: obs.obsDate,
+            value: Math.round((obs.fat_mass / obs.weight) *1000)/ 10
+          })
+        }
       }
       if (obs.pwv != undefined) {
-        this.addEntry(1,0,"PVW",{
+        this.addEntry(2,0,"PVW",{
           name: obs.obsDate,
           value: obs.pwv
         });
       }
 
-      if (obs.hydration != undefined) {
-        this.addEntry(2,0,"Hydration",{
-          name: obs.obsDate,
-          value: obs.hydration
-        })
-      }
-      if (obs.muscle_mass != undefined) {
-        this.addEntry(3,0,"Muscle Mass",{
-          name: obs.obsDate,
-          value: obs.muscle_mass
-        });
-      }
-      if (obs.fat_mass != undefined) {
-        this.addEntry(4,0,"Muscle Mass",{
-          name: obs.obsDate,
-          value: obs.fat_mass
-        })
-      }
       if (obs.sleep_score != undefined) {
-        this.addEntry(5,0,"Sleep Score",{
+        this.addEntry(3,0,"Sleep Score",{
           name: obs.obsDate,
           value: obs.sleep_score
         })
       }
       if (obs.diastolic != undefined && obs.systolic != undefined) {
-        this.addEntry(6,0,"Systolic",{
+        this.addEntry(4,0,"Systolic",{
           name: obs.obsDate,
           value: obs.systolic
         });
-        this.addEntry(6,1,"Diastolic",{
+        this.addEntry(4,1,"Diastolic",{
           name: obs.obsDate,
           value: obs.diastolic
         });
 
+      }
+      if (obs.sleep_duration != undefined) {
+        this.addEntry(5,0,"Sleep Duration",{
+          name: obs.obsDate,
+          value: obs.sleep_duration
+        })
+        if (obs.deepsleepduration != undefined) {
+          this.addEntry(6,0,"Deep Sleep Duration",{
+            name: obs.obsDate,
+            value: obs.deepsleepduration
+          })
+        }
+        if (obs.lightsleepduration != undefined) {
+          this.addEntry(6,1,"Light Sleep Duration",{
+            name: obs.obsDate,
+            value: obs.lightsleepduration
+          })
+        }
+        if (obs.remsleepduration != undefined) {
+          this.addEntry(6,2,"REM Sleep Duration",{
+            name: obs.obsDate,
+            value: obs.remsleepduration
+          })
+        }
       }
       var chartNum = 0;
       if (obs.energy != undefined && obs.energy> 0 && obs.duration != undefined) {
@@ -581,10 +641,30 @@ export class BodyComponent implements OnInit {
         bars[2].chart[chartNum].series.push({
           name: obs.name,
           x: obs.obsDate,
-          y: obs.duration * 10,
+          y: obs.duration /3600,
           r: +obs.intensity
         });
       }
+
+      if (obs.average_heartrate != undefined && obs.average_heartrate> 0 && this.isNum(obs.average_heartrate) && obs.duration != undefined) {
+        var intensity = (obs.average_heartrate / this.phr.maxhr) * 100;
+        if (intensity < this.intensityRange.low) {
+          chartNum = 0;
+        } else if (intensity < this.intensityRange.medium) {
+          chartNum = 1;
+        } else if (intensity < this.intensityRange.tough) {
+          chartNum = 2;
+        } else {
+          chartNum = 3;
+        }
+        bars[3].chart[chartNum].series.push({
+          name: obs.name,
+          x: obs.obsDate,
+          y: obs.duration /3600,
+          r: +intensity
+        });
+      }
+
     }
 
       for (const bar in bars) {
@@ -595,18 +675,13 @@ export class BodyComponent implements OnInit {
   addEntry(chart : number, series : number, name: string, entry) {
 
     if (this.charts[chart] === undefined) return;
-
-    if (series === 0 && this.charts[chart].chart.length === 0) {
+    while (this.charts[chart].chart.length < (series+1)) {
       this.charts[chart].chart.push( {
-        name: name,
         series: []
       });
     }
-    if (series === 1 && this.charts[chart].chart.length === 1) {
-      this.charts[chart].chart.push( {
-        name: name,
-        series: []
-      });
+    if (this.charts[chart].chart[series].name == undefined) {
+      this.charts[chart].chart[series].name = name;
     }
     this.charts[chart].chart[series].series.push(entry);
   }

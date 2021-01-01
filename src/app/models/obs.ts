@@ -31,6 +31,7 @@ export interface Obs {
   pi?:number;
   steps? : number;
   calories? : number;
+  sleep_duration? : number;
  // not suported in strava calories? : number;
   /*
   1	Weight (kg)
