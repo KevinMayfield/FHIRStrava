@@ -256,6 +256,7 @@ export class BodyComponent implements OnInit {
     this.fhirService.loaded.subscribe(result => {
       console.log("FHIR CDR Loaded");
       if (result) {
+        this.showMeasures = true;
        // console.log("FHIR CDR Processing results " + result.length);
         this.processIHealthGraph(result);
         this.processHRVGraph(result);
