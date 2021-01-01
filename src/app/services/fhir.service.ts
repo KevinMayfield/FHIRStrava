@@ -22,6 +22,8 @@ export class FhirService {
   private patient : Patient;
   private patientId : string;
 
+  private serverUrl = 'https://fhir.mayfield-is.co.uk';
+
   private observations : Observation[] = [];
 
   loaded: EventEmitter<any> = new EventEmitter();
@@ -119,7 +121,7 @@ export class FhirService {
     if (patient === undefined) return;
 
     let headers = this.getHeaders();
-    this.http.get("http://localhost:8186/R4/Patient?identifier="+patient.identifier[0].value,{ 'headers' : headers}).subscribe(
+    this.http.get(this.serverUrl +"/R4/Patient?identifier="+patient.identifier[0].value,{ 'headers' : headers}).subscribe(
       result => {
         const bundle: Bundle = result;
 
@@ -136,7 +138,7 @@ export class FhirService {
     if (this.patient === undefined) return;
     console.log(startDate.toISOString());
     this.observations = [];
-    var url = 'http://localhost:8186/R4/Observation?patient='+this.patientId;
+    var url = this.serverUrl + '/R4/Observation?patient='+this.patientId;
     url = url + '&date=>'+startDate.toISOString();
     url = url + '&date=<'+endDate.toISOString();
     url = url + '&_count=200';
@@ -177,7 +179,7 @@ export class FhirService {
 
     let headers = this.getHeaders();
 
-    return this.http.post<any>('http://localhost:8186/R4/', body, { 'headers' : headers} ).subscribe(result => {
+    return this.http.post<any>(this.serverUrl + '/R4/', body, { 'headers' : headers} ).subscribe(result => {
 
     },
       (err)=> {

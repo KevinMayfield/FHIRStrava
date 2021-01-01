@@ -192,7 +192,9 @@ export class WithingsService {
       }
 
         if (obs.diastolic !== undefined && obs.systolic != undefined) {
-
+          // Seems withings changed data structure around sept 2017
+          if (obs.diastolic < 1) obs.diastolic = obs.diastolic * 1000;
+          if (obs.systolic < 1) obs.systolic = obs.systolic * 1000;
           var fhirBP= this.getObservation(bundle,obs,true,'75367002','Blood pressure'  );
           this.addComponent(fhirBP,'http://snomed.info/sct','72313002','Systolic arterial pressure',obs.systolic,'mmHg');
           this.addComponent(fhirBP,'http://snomed.info/sct', '1091811000000102','Diastolic arterial pressure',obs.diastolic,'mmHg');

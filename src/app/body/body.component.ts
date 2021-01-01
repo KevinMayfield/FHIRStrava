@@ -736,7 +736,7 @@ export class BodyComponent implements OnInit {
         unit: "mL/(kg·min)",
         name: "VO2 Max",
         chart: [{
-          name: "Recovery",
+          name: "VO2 Max",
           series: []
         }]
       },
