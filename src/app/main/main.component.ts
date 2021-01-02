@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 import {StravaService} from "../services/strava.service";
 import {Router} from "@angular/router";
 import {WithingsService} from "../services/withings.service";
@@ -21,7 +21,12 @@ export class MainComponent implements OnInit {
               private ihealth: IhealthService,
             private  fhirService : FhirService,
     public phr : PhrService,
-    private route : Router) { }
+    private route : Router) {
+    this.onResize();
+  }
+
+  screenWidth : number;
+  screenHeight : number;
 
   files: File | FileList;
 
@@ -40,7 +45,12 @@ export class MainComponent implements OnInit {
 
  // fromDate : any = undefined;
   toDate : any = undefined;
-
+  @HostListener
+  ('window:resize', ['$event'])
+  onResize(event?) {
+    this.screenHeight = window.innerHeight;
+    this.screenWidth = window.innerWidth;
+  }
   ngOnInit(): void {
 
     this.selected = this.phr.getDuration();

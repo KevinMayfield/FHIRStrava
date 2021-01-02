@@ -46,7 +46,7 @@
                 <mat-icon>menu</mat-icon>
             </button>
 
-            <span> {{name}}</span>
+            <span *ngIf="screenWidth>680"> {{name}}</span>
             <span flex></span>
 
       <mat-form-field appearance="standard">

@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild, ViewChildren} from '@angular/core';
+import {Component, HostListener, OnInit, ViewChild, ViewChildren} from '@angular/core';
 import {StravaService} from "../services/strava.service";
 import {Athlete} from "../models/athlete";
 import {SummaryActivity} from "../models/summary-activity";
@@ -35,13 +35,15 @@ export class BodyComponent implements OnInit {
               private phr: PhrService,
               private _loadingService: TdLoadingService,
               private fhirService : FhirService) {
-
+    this.onResize();
   }
 
   weight = true;
   pwv = false;
   overlayStarSyntax: boolean = false;
 
+  screenWidth : number;
+  screenHeight : number;
 
   athlete: Athlete;
 
@@ -52,7 +54,7 @@ export class BodyComponent implements OnInit {
   datepipe: DatePipe = new DatePipe('en-GB')
 
 
-  activityDisplayedColumns = ['link', 'start_date', 'type', 'name', 'powerlink', 'distance', 'moving_time', 'average_cadence', 'average_heartrate', 'weighted_average_watts', 'kilojoules', 'suffer_score', 'intensity'];
+  activityDisplayedColumns = ['start_date', 'type', 'name', 'powerlink', 'distance', 'moving_time', 'average_cadence', 'average_heartrate', 'weighted_average_watts', 'kilojoules', 'suffer_score', 'intensity'];
 
 
   showMeasures = false;
@@ -291,6 +293,21 @@ export class BodyComponent implements OnInit {
     )
   }
 
+  @HostListener
+  ('window:resize', ['$event'])
+  onResize(event?) {
+    this.screenHeight = window.innerHeight;
+    this.screenWidth = window.innerWidth;
+
+    if (this.screenWidth > 740) {
+      this.activityDisplayedColumns = [ 'start_date', 'type', 'name', 'powerlink', 'distance', 'moving_time', 'average_cadence', 'average_heartrate', 'weighted_average_watts', 'kilojoules', 'suffer_score', 'intensity'];
+    } else if (this.screenWidth > 640 ) {
+      this.activityDisplayedColumns = [ 'start_date', 'type', 'name', 'powerlink', 'distance', 'moving_time', 'average_heartrate', 'kilojoules', 'suffer_score', 'intensity'];
+    } else {
+      this.activityDisplayedColumns = ['start_date', 'type', 'name', 'moving_time',  'kilojoules', 'suffer_score', 'intensity'];
+    }
+
+  }
 
   clearCharts() {
     this.phr.alerts = [];
