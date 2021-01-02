@@ -32,6 +32,7 @@ export interface Obs {
   steps? : number;
   calories? : number;
   sleep_duration? : number;
+  bodytemp?: number;
  // not suported in strava calories? : number;
   /*
   1	Weight (kg)

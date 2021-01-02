@@ -1,3 +1,13 @@
+<mat-menu #menuExercise="matMenu">
+  <span *ngFor="let barChart of phr.bars">
+          <button *ngIf="barChart.chart.length>0" mat-menu-item (click)="toggle(barChart)"><mat-icon *ngIf="barChart.ticked">done</mat-icon>{{barChart.name}}</button>
+            </span>
+</mat-menu>
+<mat-menu #menu="matMenu">
+    <span *ngFor="let chart of phr.charts">
+      <button *ngIf="chart.chart.length>0 && chart.chart[0].series != undefined" mat-menu-item (click)="toggle(chart)"><mat-icon *ngIf="chart.ticked">done</mat-icon>{{chart.name}}</button>
+    </span>
+</mat-menu>
 <td-layout class="layout-nav-demo" sidenavWidth="280px">
   <td-navigation-drawer
     flex
@@ -30,14 +40,61 @@
 
 
     </div>
-    <div td-toolbar-content flex-auto>
-            <span flex>
+    <div td-toolbar-content layout="row" layout-align="start center" flex>
+
             <button mat-icon-button td-menu-button tdLayoutToggle>
                 <mat-icon>menu</mat-icon>
             </button>
-              {{name}}
-            </span>
-      <!--   <span *ngIf="drugName"> - {{drugName}}</span> -->
+
+            <span> {{name}}</span>
+            <span flex></span>
+
+      <mat-form-field appearance="standard">
+        <mat-select [(value)]="selected" (selectionChange)="selectDuration($event)">
+          <mat-option *ngFor="let duration of durations" [value]="duration.value">
+            {{duration.viewValue}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      &nbsp;
+      <mat-form-field color="accent" appearance="standard">
+        <input matInput [matDatepicker]="picker1" #to placeholder="End date" [formControl]="toDate" (dateChange)="dateToChanged(to.value)">
+        <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+        <mat-datepicker #picker1></mat-datepicker>
+      </mat-form-field>
+      <span flex></span>
+
+            <button mat-icon-button [matMenuTriggerFor]="menuExercise" matTooltip="Exercie"><mat-icon>av_timer</mat-icon><mat-icon>arrow_drop_down</mat-icon></button>
+            &nbsp;
+            <button mat-icon-button [matMenuTriggerFor]="menu" matTooltip="Body Measurements"><mat-icon>accessibility_new</mat-icon><mat-icon>arrow_drop_down</mat-icon></button>
+    &nbsp;
+      <span *ngIf="phr.alerts.length >0">
+            <button mat-icon-button matTooltip="Alerts" [matMenuTriggerFor]="notificationsMenu">
+              <td-notification-count color="accent" [notifications]="phr.alerts.length">
+                <mat-icon>notifications</mat-icon>
+              </td-notification-count>
+            </button>
+            <mat-menu #notificationsMenu="matMenu">
+              <td-menu>
+                <mat-nav-list dense>
+
+                   <ng-template let-last="last" ngFor let-flag [ngForOf]="phr.alerts">
+                    <a mat-list-item>
+                      <h4 mat-line>
+                         <span *ngIf="flag.code !== undefined && flag.code.coding.length > 0">
+                            {{flag.code.coding[0].display}}
+                           <br>
+                           {{flag.period.start | date:'mediumDate' }}
+                         </span>
+                      </h4>
+                    </a>
+                    <mat-divider *ngIf="!last"></mat-divider>
+                  </ng-template>
+                </mat-nav-list>
+              </td-menu>
+            </mat-menu>
+      </span>
+
     </div>
     <router-outlet></router-outlet>
   </td-layout-nav-list>

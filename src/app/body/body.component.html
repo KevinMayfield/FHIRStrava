@@ -4,73 +4,22 @@
   <img class="img-responsive" (click)="connectStrava()" src="assets/images/btn_strava_connectwith_orange.png">
 </span>
 
-  <mat-menu #menu="matMenu">
-          <span *ngFor="let chart of charts">
-            <button *ngIf="chart.chart.length>0 && chart.chart[0].series != undefined" mat-menu-item (click)="toggle(chart)"><mat-icon *ngIf="chart.ticked">done</mat-icon>{{chart.name}}</button>
-          </span>
-          <span *ngFor="let chart of hrvcharts">
-            <button *ngIf="chart.chart.length>0 && chart.chart[0].series.length>0" mat-menu-item (click)="toggle(chart)"><mat-icon *ngIf="chart.ticked">done</mat-icon>{{chart.name}}</button>
-          </span>
-         <span *ngFor="let chart of ihealthcharts">
-            <button *ngIf="chart.chart.length>0 && chart.chart[0].series.length>0" mat-menu-item (click)="toggle(chart)"><mat-icon *ngIf="chart.ticked">done</mat-icon>{{chart.name}}</button>
-          </span>
-  </mat-menu>
 
-  <mat-menu #menuExercise="matMenu">
-          <span *ngFor="let barChart of bars">
-          <button *ngIf="barChart.chart.length>0" mat-menu-item (click)="toggle(barChart)"><mat-icon *ngIf="barChart.ticked">done</mat-icon>{{barChart.name}}</button>
-            </span>
-  </mat-menu>
-  <div mat-row >
-     <button mat-raised-button *ngIf="stravaComplete" [matMenuTriggerFor]="menuExercise"><mat-icon>av_timer</mat-icon>Exercise</button>
-    <span *ngIf="showMeasures">
-      <button mat-raised-button [matMenuTriggerFor]="menu"><mat-icon>accessibility_new</mat-icon>Body Measurements</button>
-    </span>
-    <span>
-      <mat-form-field appearance="fill">
-          <mat-label>Show</mat-label>
-          <mat-select [(value)]="selected" (selectionChange)="selectDuration($event)">
-            <mat-option *ngFor="let duration of durations" [value]="duration.value">
-              {{duration.viewValue}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-    </span>
-    <span>
-      <mat-form-field color="accent" appearance="fill">
-        <mat-label>Until</mat-label>
-        <input matInput [matDatepicker]="picker1" #to placeholder="End date" [formControl]="toDate" (dateChange)="dateToChanged(to.value)">
-        <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
-        <mat-datepicker #picker1></mat-datepicker>
-      </mat-form-field>
-    </span>
-
-  </div>
-
-  <span *ngFor="let chart of charts">
-        <span *ngIf="chart.chart.length>0 && chart.chart[0].series != undefined">
+  <div *tdLoading="'overlayStarSyntax'; mode: 'indeterminate'; type: 'circle'; strategy: 'overlay'; color: 'accent'">
+  <span *ngFor="let chart of phr.charts">
+        <span *ngIf="chart.ticked && chart.chart.length >0">
            <app-line-chart *ngIf="chart.ticked" [results]="chart.chart" [yAxisLabel]="chart.unit" [xAxisLabel]="chart.name"> </app-line-chart>
         </span>
   </span>
-  <span *ngFor="let chart of hrvcharts">
-     <span *ngIf="chart.chart.length>0 && chart.chart[0].series.length>0">
-           <app-line-chart *ngIf="chart.ticked" [results]="chart.chart" [yAxisLabel]="chart.unit" [xAxisLabel]="chart.name"> </app-line-chart>
-        </span>
-  </span>
-  <span *ngFor="let chart of ihealthcharts">
-     <span *ngIf="chart.chart.length>0 && chart.chart[0].series.length>0">
-           <app-line-chart *ngIf="chart.ticked" [results]="chart.chart" [yAxisLabel]="chart.unit" [xAxisLabel]="chart.name"> </app-line-chart>
-        </span>
-  </span>
-  <span *ngFor="let barChart of bars">
-        <span *ngIf="barChart.chart.length>0" >
+  <span *ngFor="let barChart of phr.bars">
+        <span *ngIf="barChart.ticked  && barChart.chart.length >0" >
           <div class="md-padding">
-                <app-bar-chart *ngIf="barChart.ticked" [results]="barChart.chart" [yAxisLabel]="barChart.unit" [xAxisLabel]="barChart.name"></app-bar-chart>
+                <app-bar-chart [results]="barChart.chart" [yAxisLabel]="barChart.unit" [xAxisLabel]="barChart.name"></app-bar-chart>
           </div>
         </span>
       </span>
 
-  <div *tdLoading="'overlayStarSyntax'; mode: 'indeterminate'; type: 'circle'; strategy: 'overlay'; color: 'accent'">
+
   <table [dataSource]="activityDataSource" width="100%"
          matSort
          matSortActive="start_date" matSortDirection="desc"

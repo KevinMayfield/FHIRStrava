@@ -5,6 +5,8 @@ import {WithingsService} from "../services/withings.service";
 import {IhealthService} from "../services/ihealth.service";
 import {HrvService} from "../services/hrv.service";
 import {FhirService} from "../services/fhir.service";
+import {PhrService} from "../services/phr.service";
+import {FormControl} from "@angular/forms";
 
 @Component({
   selector: 'app-main',
@@ -18,6 +20,7 @@ export class MainComponent implements OnInit {
               private hrv : HrvService,
               private ihealth: IhealthService,
             private  fhirService : FhirService,
+    public phr : PhrService,
     private route : Router) { }
 
   files: File | FileList;
@@ -27,8 +30,22 @@ export class MainComponent implements OnInit {
   ihealthConnect = true;
   name: string = 'My PHR';
 
+  durations  = [
+    {value: 7, viewValue: 'Week'},
+    {value: 28, viewValue: '4 Weeks'},
+    {value: 91, viewValue: 'Quarter'},
+    {value: 365, viewValue: 'Year'}
+  ];
+  selected = undefined;
+
+ // fromDate : any = undefined;
+  toDate : any = undefined;
+
   ngOnInit(): void {
 
+    this.selected = this.phr.getDuration();
+    this.toDate = new FormControl(new Date());
+    //this.fromDate = new FormControl(this.phr.getFromDate());
     this.withings.tokenChange.subscribe(
       token => {
         if (token != undefined) this.withingsConnect = false;
@@ -102,4 +119,23 @@ export class MainComponent implements OnInit {
       this.ihealth.postCSVFile(file);
     }
   }
+
+  toggle(chart: any) {
+    if (chart.ticked == undefined) chart.ticked = false;
+    chart.ticked = !chart.ticked;
+  }
+
+  selectDuration(event) {
+    if (!event.isUserInput) {
+
+
+      this.phr.setFromDuration(this.selected);
+    //  this.phrLoad(true);
+    }
+  }
+  dateToChanged(event){
+    this.phr.setToDate(this.toDate.value);
+   //
+  }
+
 }

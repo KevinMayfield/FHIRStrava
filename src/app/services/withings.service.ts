@@ -1,7 +1,6 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {Observable} from "rxjs";
-import {Athlete} from "../models/athlete";
 import {JwtHelperService} from "@auth0/angular-jwt";
 import {PhrService} from "./phr.service";
 import {DatePipe} from "@angular/common";
@@ -180,6 +179,9 @@ export class WithingsService {
           }
 
         }
+      if (obs.bodytemp !== undefined) {
+        this.getObservation(bundle, obs, true, '386725007', 'Body temperature', obs.bodytemp, 'C');
+      }
 
       if (obs.remsleepduration != undefined && obs.lightsleepduration != undefined && obs.deepsleepduration != undefined) {
         var fhirBP= this.getObservation(bundle,obs,false,'93832-4','Sleep duration',  (obs.remsleepduration + obs.lightsleepduration + obs.deepsleepduration) / 3600 ,"h" );
@@ -282,7 +284,7 @@ export class WithingsService {
     var lastUpdate = this.phr.getFromDate();
 
     var bodge= 'action=getmeas'
-      + '&meastypes=1,5,8,77,76,88,91,9,10'
+      + '&meastypes=1,5,8,77,76,88,91,9,10,71'
       + '&category=1'
       + '&startdate='+Math.floor(this.phr.getFromDate().getTime()/1000)
       + '&enddate='+Math.floor(this.phr.getToDate().getTime()/1000);
@@ -390,6 +392,7 @@ export class WithingsService {
   }
 
   processWithingsObs(measures) {
+    if (measures === undefined) return;
     var observations: Obs[] = [];
     for (const grp of measures) {
       var date = new Date(+grp.date * 1000).toISOString();
@@ -414,6 +417,9 @@ export class WithingsService {
             break;
           case 77:
             obs.hydration = +measure.value / 100;
+            break;
+          case 71:
+            obs.bodytemp = +measure.value/1000;
             break;
           case 91:
             obs.pwv = +measure.value / 1000;
@@ -474,6 +480,7 @@ export class WithingsService {
   }
 
   processWorkout(activityData) {
+    if (activityData === undefined || activityData.body === undefined) return;
     var observations: Obs[] = [];
     for (const activity of activityData.body.series) {
       var obs: Obs = {
@@ -505,6 +512,7 @@ export class WithingsService {
     this.loaded.emit(observations);
   }
   processSleep(sleepData) {
+    if (sleepData === undefined || sleepData.body === undefined)  return;
     var observations: Obs[] = [];
     for (const sleep of sleepData.body.series) {
       var obs: Obs = {

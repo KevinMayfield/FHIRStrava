@@ -13,6 +13,8 @@ import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {PhrService} from "./phr.service";
 import {generateBundleStats} from "@angular-devkit/build-angular/src/webpack/utils/stats";
 import {Obs} from "../models/obs";
+// @ts-ignore
+import Flag = fhir.Flag;
 
 @Injectable({
   providedIn: 'root'
@@ -134,6 +136,17 @@ export class FhirService {
 
   }
 
+  deleteEntry(uri: string) {
+    let headers = this.getHeaders();
+
+    return this.http.delete<any>(this.serverUrl + '/R4'+uri,  { 'headers' : headers} ).subscribe(result => {
+        console.log('Deleted' + uri);
+      },
+      (err)=> {
+        console.log(err);
+
+      });
+  }
   getServerObservations(startDate : Date, endDate : Date) {
     if (this.patient === undefined) return;
     console.log(startDate.toISOString());
@@ -141,9 +154,10 @@ export class FhirService {
     var url = this.serverUrl + '/R4/Observation?patient='+this.patientId;
     url = url + '&date=>'+startDate.toISOString();
     url = url + '&date=<'+endDate.toISOString();
-    url = url + '&_count=200';
+    url = url + '&_count=500';
     this.getNext(url);
   }
+
 
   getNext(url) {
     let headers = this.getHeaders();
@@ -211,9 +225,33 @@ export class FhirService {
         var obs: Obs = {
           obsDate: datetime
         }
-
+        if (fhirobs.code.coding[0].code === "840546002") {
+           var flag : Flag = {
+             status : "active",
+             code : fhirobs.code,
+             subject : fhirobs.subject,
+             period : {
+               start : fhirobs.effectiveDateTime
+             }
+           }
+           var endDate = new Date(datetime);
+           endDate.setDate(datetime.getDate() + 10);
+           var today = new Date();
+           if (endDate < today) { flag.status  = "inactive" } else {
+             this.phr.alerts.push(flag);
+           }
+        }
         if (fhirobs.code.coding[0].code === "8867-4") {
           obs.sdnn = fhirobs.valueQuantity.value;
+        }
+        if (fhirobs.code.coding[0].code === "386725007") {
+          // TAKE THIS OUT
+          if (fhirobs.valueQuantity.value > 50) {
+            console.log(fhirobs.id);
+            this.deleteEntry('/Observation/'+fhirobs.id);
+          } else {
+            obs.bodytemp = fhirobs.valueQuantity.value;
+          }
         }
         if (fhirobs.code.coding[0].code === "60842-2") {
           obs.vo2max = fhirobs.valueQuantity.value;
