@@ -54,7 +54,7 @@ export class IhealthService {
     var lastUpdate = this.phr.getFromDate();
 
 
-    return this.http.post<any>('http://localhost:8187/services/ihealth', body, { 'headers' : headers} ).subscribe(result => {
+    return this.http.post<any>(this.phr.serviceUrl+ '/services/ihealth', body, { 'headers' : headers} ).subscribe(result => {
       this.iHealthChange.emit(result);
     });
 

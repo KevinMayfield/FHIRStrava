@@ -479,9 +479,9 @@ export class WithingsService {
     headers.append('Access-Control-Allow-Origin', '*');
     var token: any = JSON.parse(localStorage.getItem('withingsToken'));
 
-    // var url = 'https://account.withings.com/oauth2/token';
-    var url = 'http://localhost:8187/services/token';
-    //  var url = 'https://wbsapi.withings.net/v2/oauth2'
+
+    var url = this.phr.serviceUrl + '/services/token';
+
 
     var bodge= 'grant_type=refresh_token'
       + '&client_id=' + this.clientId
@@ -507,10 +507,7 @@ export class WithingsService {
     headers.append('Content-Type', 'application/x-www-form-urlencoded');
     headers.append('Access-Control-Allow-Origin', '*');
 
-
-    // var url = 'https://account.withings.com/oauth2/token';
-    var url = 'http://localhost:8187/services/token';
-    //  var url = 'https://wbsapi.withings.net/v2/oauth2'
+    var url = this.phr.serviceUrl + '/services/token';
 
     var bodge= 'grant_type=authorization_code'
       + '&client_id=' + this.clientId

@@ -9,6 +9,8 @@ import Flag = fhir.Flag;
 })
 export class PhrService {
 
+  serviceUrl = 'https://srv.mayfield-is.co.uk';
+
   alerts : Flag[] = [];
 
   charts : Charts[] = [

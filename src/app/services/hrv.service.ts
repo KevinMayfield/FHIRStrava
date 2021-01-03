@@ -35,7 +35,7 @@ export class HrvService {
     var lastUpdate = this.phr.getFromDate();
 
 
-    return this.http.post<any>('http://localhost:8187/services/hrv', body, { 'headers' : headers} ).subscribe(result => {
+    return this.http.post<any>(this.phr.serviceUrl + '/services/hrv', body, { 'headers' : headers} ).subscribe(result => {
       this.hrvChange.emit(result);
     });
 
