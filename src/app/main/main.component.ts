@@ -80,7 +80,6 @@ export class MainComponent implements OnInit {
 
     this.strava.athleteChange.subscribe(
       athlete  => {
-        console.log(athlete);
         var name = '';
         if (athlete.firstname != undefined) {
           name = athlete.firstname + ' ';

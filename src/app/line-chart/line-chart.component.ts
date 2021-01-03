@@ -65,7 +65,7 @@ export class LineChartComponent implements OnInit {
 
     this.xScaleMin = this.phr.getFromDate();
     this.xScaleMax = this.phr.getToDate();
-    console.log(this.phr.getToDate());
+
 
       for (const chart of this.results) {
      //   console.log(chart);

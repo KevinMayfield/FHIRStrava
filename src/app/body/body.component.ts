@@ -139,6 +139,7 @@ export class BodyComponent implements OnInit {
 
     this.fhirService.loaded.subscribe(result => {
       console.log("FHIR CDR Loaded");
+      this.loadComplete();
       if (result) {
         this.showMeasures = true;
        // console.log("FHIR CDR Processing results " + result.length);
@@ -150,15 +151,18 @@ export class BodyComponent implements OnInit {
 
     this.strava.loaded.subscribe(result => {
      console.log("Strava Loaded");
+      this.loadComplete();
       if (result) {
 
         this.activities = this.strava.activities;
         this.stravaComplete = true;
-        this._loadingService.resolve('overlayStarSyntax');
+
         this.activityDataSource.data = this.activities;
         // Convert Activities into Observations
         this.processStravaObs();
 
+      } else {
+        console.log('Strava Loaded - No result');
       }
     });
     this.withings.loaded.subscribe(result => {
@@ -182,10 +186,18 @@ export class BodyComponent implements OnInit {
     this.phrLoad(false);
   }
 
+  loadComplete() {
+    this._loadingService.resolve('overlayStarSyntax');
+  }
+
+  loadStart() {
+    this._loadingService.register('overlayStarSyntax');
+  }
+
   phrLoad(withing : boolean) {
     this.stravaComplete = false;
     this.clearCharts();
-    this._loadingService.register('overlayStarSyntax');
+    this.loadStart();
     this.strava.getActivities();
 
     if (this.showMeasures && withing) {
@@ -195,6 +207,18 @@ export class BodyComponent implements OnInit {
     }
 
     this.fhirService.getServerObservations(this.phr.getFromDate(),this.phr.getToDate());
+  }
+
+  clearCharts() {
+    this.phr.alerts = [];
+    this.activities = [];
+    this.activityDataSource.data = this.activities;
+    for (const chart of this.phr.charts) {
+      chart.chart = [];
+    }
+    for (const chart of this.phr.bars) {
+      chart.chart = [];
+    }
   }
 
 
@@ -303,22 +327,14 @@ export class BodyComponent implements OnInit {
       this.activityDisplayedColumns = [ 'start_date', 'type', 'name', 'powerlink', 'distance', 'moving_time', 'average_cadence', 'average_heartrate', 'weighted_average_watts', 'kilojoules', 'suffer_score', 'intensity'];
     } else if (this.screenWidth > 640 ) {
       this.activityDisplayedColumns = [ 'start_date', 'type', 'name', 'powerlink', 'distance', 'moving_time', 'average_heartrate', 'kilojoules', 'suffer_score', 'intensity'];
-    } else {
+    } else if (this.screenWidth > 375 ) {
       this.activityDisplayedColumns = ['start_date', 'type', 'name', 'moving_time',  'kilojoules', 'suffer_score', 'intensity'];
-    }
-
-  }
-
-  clearCharts() {
-    this.phr.alerts = [];
-    this.activities = [];
-    for (const chart of this.phr.charts) {
-      chart.chart = [];
-    }
-    for (const chart of this.phr.bars) {
-      chart.chart = [];
+    } else {
+      this.activityDisplayedColumns = ['start_date', 'type', 'name', 'moving_time',  'kilojoules', 'suffer_score'];
     }
   }
+
+
 
 
   buildGraph(observations : Obs[]) {

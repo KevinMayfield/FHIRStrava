@@ -149,7 +149,6 @@ export class FhirService {
   }
   getServerObservations(startDate : Date, endDate : Date) {
     if (this.patient === undefined) return;
-    console.log(startDate.toISOString());
     this.observations = [];
     var url = this.serverUrl + '/R4/Observation?patient='+this.patientId;
     url = url + '&date=>'+startDate.toISOString();

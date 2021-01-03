@@ -49,7 +49,7 @@
             <span *ngIf="screenWidth>680"> {{name}}</span>
             <span flex></span>
 
-      <mat-form-field appearance="standard">
+      <mat-form-field appearance="standard" class="units">
         <mat-select [(value)]="selected" (selectionChange)="selectDuration($event)">
           <mat-option *ngFor="let duration of durations" [value]="duration.value">
             {{duration.viewValue}}
