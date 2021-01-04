@@ -3,7 +3,8 @@
   <img class="img-responsive" (click)="connectStrava()" src="assets/images/btn_strava_connectwith_orange.png">
 </span>
 
-
+  <td-message label="Warning" sublabel="This application is under development. Do not connect to your personnel health data records - it will store your data." color="warn" icon="error"></td-message>
+  <br>
   <div *tdLoading="'overlayStarSyntax'; mode: 'indeterminate'; type: 'circle'; strategy: 'overlay'; color: 'accent'">
   <span *ngFor="let chart of phr.charts">
         <span *ngIf="chart.ticked && chart.chart.length >0">

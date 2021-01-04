@@ -103,9 +103,9 @@ export class WithingsService {
     );
   }
 
-  getWorkouts() {
+  getDayActivity() {
     if (!this.hasAccessToken()) return;
-    this.getAPIWorkouts().subscribe(
+    this.getAPIDayActivity().subscribe(
       result => {
         if (result.status == 401) {
           console.log('Withings 401');
@@ -176,6 +176,14 @@ export class WithingsService {
   }
 
   processWorkout(activityData) {
+
+    return;
+
+    /*
+    THIS NEEDS SOME WORK
+
+    IDEALLY GET DAY HEART RATE AVERAGE
+
     if (activityData === undefined || activityData.body === undefined) return;
     var observations: Obs[] = [];
     for (const activity of activityData.body.series) {
@@ -189,15 +197,10 @@ export class WithingsService {
         obs.duration =activity.data.duration;
         console.log(obs.duration);
       }
-      if (activity.data.effduration != undefined) {
-        obs.duration =activity.data.effduration;
-      }
+
       if (activity.data.steps != undefined) {
         obs.steps =activity.data.steps;
         obs.name = activity.data.steps + ' steps';
-      }
-      if (activity.data.distance != undefined) {
-        obs.distance =activity.data.distance / 1000;
       }
       if (obs.name === undefined) {
 
@@ -206,6 +209,8 @@ export class WithingsService {
       if (obs.obsDate > this.phr.getFromDate()) observations.push(obs);
     }
     this.loaded.emit(observations);
+
+     */
   }
 
   processSleep(sleepData) {
@@ -250,7 +255,7 @@ export class WithingsService {
    */
 
 
-  public getAPIWorkouts(offset? : number): Observable<any> {
+  public getAPIDayActivity(offset? : number): Observable<any> {
 
     // Use the postman collection for details
 
@@ -258,8 +263,8 @@ export class WithingsService {
 
     var lastUpdate = this.phr.getFromDate();
 
-    var bodge= 'action=getworkouts'
-      + '&data_field=calories,duration,hr_average,effduration,steps'
+    var bodge= 'action=getintradayactivity'
+      + '&data_field=calories,heart_rate,steps'
       + '&startdate='+Math.floor(this.phr.getFromDate().getTime()/1000)
       + '&enddate='+Math.floor(this.phr.getToDate().getTime()/1000);
     //  + '&lastupdate='+Math.floor(lastUpdate.getTime()/1000);

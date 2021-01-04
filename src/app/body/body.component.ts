@@ -124,7 +124,7 @@ export class BodyComponent implements OnInit {
         //
         this.fhirService.patientChange.pipe(first()).subscribe(result => {
             this.withings.getObservations();
-            this.withings.getWorkouts();
+            this.withings.getDayActivity();
             this.withings.getSleep();
           }
         )
@@ -202,7 +202,7 @@ export class BodyComponent implements OnInit {
 
     if (this.showMeasures && withing) {
       this.withings.getObservations();
-      this.withings.getWorkouts();
+      this.withings.getDayActivity();
       this.withings.getSleep();
     }
 

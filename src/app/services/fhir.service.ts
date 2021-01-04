@@ -15,6 +15,12 @@ import {generateBundleStats} from "@angular-devkit/build-angular/src/webpack/uti
 import {Obs} from "../models/obs";
 // @ts-ignore
 import Flag = fhir.Flag;
+import {SummaryActivity} from "../models/summary-activity";
+// @ts-ignore
+import DiagnosticReport = fhir.DiagnosticReport;
+// @ts-ignore
+import Coding = fhir.Coding;
+import {DatePipe} from "@angular/common";
 
 @Injectable({
   providedIn: 'root'
@@ -35,7 +41,8 @@ export class FhirService {
   constructor(
     private http: HttpClient,
     private strava : StravaService,
-    private phr : PhrService) {
+    private phr : PhrService,
+    private datePipe: DatePipe) {
 
     this.strava.athleteChange.subscribe(athlete => {
         this.patient = {
@@ -54,33 +61,45 @@ export class FhirService {
         this.patient.resourceType = 'Patient';
         this.patientChange.emit(this.patient);
         this.getServerPatient(this.patient);
-    })
+    });
+
+    this.loaded.subscribe(sucess => {
+      if (sucess) this.updateFHIRServer(this.strava.activities);
+    });
   }
 
   getObservations() {
     return this.observations;
   }
 
-  postTransaction(observations : Bundle) {
+  postTransaction(resources : Bundle) {
     var transaction = this.getTransactionBundle();
     var patientUUID = transaction.entry[0].fullUrl;
     var batchSize = 200;
 
-    for (const entry of observations.entry) {
+    for (const entry of resources.entry) {
       if (entry.resource.resourceType === "Observation") {
          var observation : Observation = entry.resource;
          observation.subject = {
            reference : patientUUID
          };
-        transaction.entry.push(this.getEntry(observation));
-        batchSize--;
-        if (batchSize <1) {
-          this.sendTransaction(transaction);
-          // reset transaction
-          batchSize = 200;
-          transaction = this.getTransactionBundle();
-          patientUUID = transaction.entry[0].fullUrl;
-        }
+        transaction.entry.push(this.convertEntry(entry));
+
+      }
+      if (entry.resource.resourceType === "DiagnosticReport") {
+        var report : DiagnosticReport = entry.resource;
+        report.subject = {
+          reference : patientUUID
+        };
+        transaction.entry.push(this.convertEntry(entry));
+      }
+      batchSize--;
+      if (batchSize <1) {
+        this.sendTransaction(transaction);
+        // reset transaction
+        batchSize = 200;
+        transaction = this.getTransactionBundle();
+        patientUUID = transaction.entry[0].fullUrl;
       }
     }
    // console.log(transaction);
@@ -95,15 +114,23 @@ export class FhirService {
     transaction.resourceType = 'Bundle';
     var patient : Patient = this.patient;
     // if (patient.id !== undefined) delete patient.id; // Otherwise POST fails.
-    transaction.entry.push(this.getEntry(this.patient));
+    transaction.entry.push(this.makeEntry(this.patient));
     return transaction;
   }
 
-  getEntry(resource) {
+  makeEntry(resource) :BundleEntry {
     if (resource === undefined) return;
-     var entry : BundleEntry = {};
-     entry.resource = resource;
-     entry.fullUrl = "urn:uuid:"+uuid.v4();
+    var entry : BundleEntry = {
+      resource : resource
+    }
+    return this.convertEntry(entry);
+  }
+  convertEntry(entry) {
+
+     if (entry.fullUrl === undefined) {
+       console.log('New UUID')
+       entry.fullUrl = "urn:uuid:"+uuid.v4();
+     }
      /*
      entry.request = {
        method : "POST",
@@ -113,7 +140,7 @@ export class FhirService {
      */
     entry.request = {
       method: "PUT",
-      url: entry.resource.resourceType + '?identifier=' + resource.identifier[0].value
+      url: entry.resource.resourceType + '?identifier=' + entry.resource.identifier[0].value
     }
      return entry;
   }
@@ -322,5 +349,153 @@ export class FhirService {
   }
 
 
+  /*
 
+STRAVA
+
+FHIR CONVERSIONS
+
+*/
+
+
+  private updateFHIRServer(activities : SummaryActivity[]) {
+
+    var bundle : Bundle = {
+      entry: []
+    };
+    for (const activity of activities) {
+
+
+      let activityReport : DiagnosticReport = {
+        resourceType : 'DiagnosticReport',
+        result : []
+      }
+      activityReport.identifier = [
+        {
+          system: 'https://fhir.strava.com/Id',
+          value: activity.id
+        }];
+      activityReport.category = [
+        {
+          coding: [{
+            system: 'http://snomed.info/sct',
+            code: '51998003',
+            display: 'Exercises'
+          }]
+        }
+      ];
+      activityReport.code = {
+        coding: [{
+          system: 'http://snomed.info/sct',
+          code: '256235009',
+          display: 'Exercise'
+        },
+          {
+            system: 'http://fhir.strava/Type',
+            code: activity.type,
+            display: this.getType(activity.type)
+          }
+        ],
+        text : activity.name
+      };
+      activityReport.effectivePeriod = {
+        start :activity.start_date,
+        end: this.getEndDate(activity).toISOString()
+      }
+
+      if (activity.moving_time != undefined) {
+        this.addBundleObservationEntry(bundle, activityReport, activity,'http://loinc.org', '55411-3', 'Exercise duration', activity.moving_time, 'min');
+      }
+      if (activity.kilojoules != undefined) {
+        this.addBundleObservationEntry(bundle, activityReport, activity,'http://fhir.strava.com/IdType', 'Kilojoules', 'Exercise Energy', activity.kilojoules , 'KJ');
+      }
+      if (activity.average_heartrate != undefined) {
+        this.addBundleObservationEntry(bundle, activityReport, activity,'http://loinc.org', '66440-9', 'Heart rate 10 minutes mean', activity.average_heartrate , 'beat/min');
+      }
+      bundle.entry.push({
+        resource : activityReport
+      });
+    }
+    if (bundle.entry.length> 0) {
+      console.log(bundle);
+      this.postTransaction(bundle);
+    }
+  }
+
+  private getType(type : string) {
+    return type;
+  }
+
+  private getEndDate(activity: SummaryActivity) {
+    var end = new Date(activity.start_date);
+    var start = new Date(activity.start_date);
+    end.setTime(end.getTime() + (activity.elapsed_time*1000));
+    return end;
+  }
+
+    private addBundleObservationEntry(bundle: Bundle, report:DiagnosticReport, obs: SummaryActivity, codeSystem: string, code: string, display, value?, unit?: string) : BundleEntry {
+      var fhirObs :Observation = {
+        resourceType: 'Observation'
+      };
+      console.log(obs.elapsed_time);
+      fhirObs.identifier = [
+        {
+          system: 'https://fhir.strava.com/Id',
+          value: obs.id + '-' + code
+        }
+      ]
+
+      fhirObs.code = {
+        coding : [{
+          system: codeSystem,
+          code: code,
+          display: display
+        }
+        ]
+      };
+
+      fhirObs.effectiveDateTime = report.effectivePeriod.end;
+      if (value != undefined && unit != undefined) {
+        fhirObs.valueQuantity = {
+          value: value,
+          unit: unit,
+          system: 'http://unitsofmeasure.org'
+        }
+      }
+
+      var entry : BundleEntry = {
+        fullUrl : "urn:uuid:"+uuid.v4(),
+        resource : fhirObs
+      }
+      report.result.push({
+        reference : entry.fullUrl,
+        display : display
+      })
+      bundle.entry.push(entry);
+      return entry;
+    }
+  /*
+    private addComponent(fhirObs: Observation,codeSystem, code: string, display, value, unit: string){
+      if (fhirObs.component === undefined) fhirObs.component = [];
+
+      var coding : Coding = {
+
+        system: codeSystem,
+        code: code,
+        display: display
+      }
+      fhirObs.component.push({
+        code : {
+          coding : [
+            coding
+          ]
+        },
+        valueQuantity: {
+          value: value,
+          unit: unit,
+          system: 'http://unitsofmeasure.org'
+        }
+      });
+    }
+  */
 }

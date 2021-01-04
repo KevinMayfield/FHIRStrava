@@ -48,6 +48,7 @@ import {ReactiveFormsModule} from "@angular/forms";
 import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from "@angular/material/core";
 import {DatePipe} from "@angular/common";
 import {CovalentNotificationsModule} from "@covalent/core/notifications";
+import {CovalentMessageModule} from "@covalent/core/message";
 
 
 @NgModule({
@@ -82,6 +83,7 @@ import {CovalentNotificationsModule} from "@covalent/core/notifications";
     CovalentLoadingModule,
     CovalentFileModule,
     CovalentNotificationsModule,
+    CovalentMessageModule,
 
     MatButtonModule,
     MatIconModule,

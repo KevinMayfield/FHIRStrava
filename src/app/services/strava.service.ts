@@ -5,6 +5,15 @@ import {Athlete} from "../models/athlete";
 import {PhrService} from "./phr.service";
 import {SummaryActivity} from "../models/summary-activity";
 import {Obs} from "../models/obs";
+// @ts-ignore
+import Bundle = fhir.Bundle;
+// @ts-ignore
+import Observation = fhir.Observation;
+import {FhirService} from "./fhir.service";
+// @ts-ignore
+import Coding = fhir.Coding;
+// @ts-ignore
+import DiagnosticReport = fhir.DiagnosticReport;
 
 
 
@@ -36,7 +45,17 @@ export class StravaService {
   athleteChange: EventEmitter<any> = new EventEmitter();
 
   constructor(private http: HttpClient,
-              private phr : PhrService) { }
+              private phr : PhrService) {
+  }
+
+
+      /*
+
+
+      API Calls
+
+       */
+
 
   getHeaders() : HttpHeaders {
 
@@ -117,6 +136,15 @@ export class StravaService {
     }
     return this.http.get<any>(uri,{'headers': this.getHeaders()});
   }
+
+
+
+  /*
+
+  OAUTH2
+
+   */
+
 
   public authorise(routeUrl) {
     window.location.href = 'http://www.strava.com/oauth/authorize?client_id='+this.clientId+'&response_type=code&redirect_uri='+routeUrl+'/exchange_token&approval_prompt=force&scope=read,activity:read_all,profile:read_all';
