@@ -8,15 +8,17 @@ import {FhirService} from "./fhir.service";
 })
 export class IhealthService {
 
-  /// Web https://developer.ihealthlabs.eu/index.htm
+  /// Web https://developer.ihealthlabs.eu/index.html
 
   clientId = '5b2b8d7fb66744c8951be697f34a4948';
   clientSecret = '8bf97e5cbd1f406dbbe6a0848d2f1974';
   //clientId = 'c4ffde29e84b4deca55dcdfc5f803983';
 
-  //clientSecret = '25be0a575d7a4339a7bfc57da7f3c85d';
   tokenChange: EventEmitter<any> = new EventEmitter();
 
+  private accessToken = undefined;
+
+  private refreshingToken = false;
 
   iHealthChange: EventEmitter<any> = new EventEmitter();
 
@@ -60,4 +62,39 @@ export class IhealthService {
 
   }
 
+  /* OAuth2
+
+  *
+   */
+  public getOAuth2AccessToken(authorisationCode) {
+
+    let headers = new HttpHeaders(
+    );
+
+    var routeUrl = localStorage.getItem('appRoute');
+
+    var url = this.phr.serviceUrl + '/services/ihealth/token';
+    url = url +'?client_id='+this.clientId +
+      '&client_secret='+this.clientSecret +
+      '&grant_type=authorization_code' +
+      '&redirect_uri=' +routeUrl+'\ihealth'
+      '&code='+authorisationCode;
+
+
+
+    this.http.post<any>(url,{'headers': headers}).subscribe(
+      token => {
+        this.setAccessToken(token);
+      },
+      (err) => {
+        console.log('iHealth Access Error: '+err);
+      }
+    );
+  }
+
+  setAccessToken(token) {
+    localStorage.setItem('iHealthToken', JSON.stringify(token));
+    this.accessToken = token.access_token;
+    this.tokenChange.emit(token);
+  }
 }

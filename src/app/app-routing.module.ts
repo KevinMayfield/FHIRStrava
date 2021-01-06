@@ -4,6 +4,7 @@ import {MainComponent} from "./main/main.component";
 import {BodyComponent} from "./body/body.component";
 import {ExchangeTokenComponent} from "./exchange-token/exchange-token.component";
 import {WithingsComponent} from "./withings/withings.component";
+import {IhealthComponent} from "./ihealth/ihealth.component";
 
 const routes: Routes = [
   {
@@ -19,6 +20,9 @@ const routes: Routes = [
   },
   {
     path: 'withings', component: WithingsComponent
+  },
+  {
+    path: 'ihealth', component: IhealthComponent
   }
 ];
 
