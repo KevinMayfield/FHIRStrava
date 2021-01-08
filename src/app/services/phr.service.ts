@@ -9,8 +9,8 @@ import Flag = fhir.Flag;
 })
 export class PhrService {
 
-  serviceUrl = 'https://srv.mayfield-is.co.uk';
-  //serviceUrl = 'http://localhost:8187';
+  //serviceUrl = 'https://srv.mayfield-is.co.uk';
+  serviceUrl = 'http://localhost:8187';
 
   alerts : Flag[] = [];
 

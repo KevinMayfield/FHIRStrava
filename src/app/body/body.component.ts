@@ -113,8 +113,13 @@ export class BodyComponent implements OnInit {
 
     this.ihealth.tokenChange.subscribe(
       token => {
+        console.log('iHealth token present')
         this.showMeasures = true;
+        this.fhirService.patientChange.pipe(first()).subscribe(result => {
+            this.ihealth.getSpO2();
 
+          }
+        )
       }
     )
     this.withings.tokenChange.subscribe(
@@ -178,6 +183,7 @@ export class BodyComponent implements OnInit {
 
     this.strava.connect();
     this.withings.connect();
+    this.ihealth.connect()
   }
 
   stravaLoad() {

@@ -437,7 +437,7 @@ FHIR CONVERSIONS
       var fhirObs :Observation = {
         resourceType: 'Observation'
       };
-      console.log(obs.elapsed_time);
+    //  console.log(obs.elapsed_time);
       fhirObs.identifier = [
         {
           system: 'https://fhir.strava.com/Id',
