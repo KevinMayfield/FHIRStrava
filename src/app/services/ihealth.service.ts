@@ -4,6 +4,14 @@ import {PhrService} from "./phr.service";
 import {Observable} from "rxjs";
 import {JwtHelperService} from "@auth0/angular-jwt";
 import {Obs} from "../models/obs";
+// @ts-ignore
+import Bundle = fhir.Bundle;
+// @ts-ignore
+import Observation = fhir.Observation;
+// @ts-ignore
+import Coding = fhir.Coding;
+import {FhirService} from "./fhir.service";
+import {DatePipe} from "@angular/common";
 
 @Injectable({
   providedIn: 'root'
@@ -30,6 +38,8 @@ export class IhealthService {
 
   constructor(private http: HttpClient,
               private phr : PhrService,
+              private  fhir : FhirService,
+              private datePipe: DatePipe
               ) { }
 
   getSpO2() {
@@ -58,7 +68,6 @@ export class IhealthService {
     for (const grp of measures) {
       console.log(grp);
       var date = new Date(+grp.MDate * 1000).toISOString();
-      console.log(date);
       var obs: Obs = {
         'obsDate': new Date(date)
       }
@@ -67,6 +76,9 @@ export class IhealthService {
       }
       if (grp.HR != undefined) {
         obs.heartrate = grp.HR;
+      }
+      if (grp.DataID != undefined) {
+        obs.identifierValue = grp.DataID;
       }
       observations.push(obs);
     }
@@ -82,6 +94,68 @@ export class IhealthService {
     return headers;
   }
 
+  /*
+  FHIR
+   */
+  private updateFHIRServer(observations : Obs[]) {
+    console.log('iHealth FHIR Update');
+    var bundle : Bundle = {
+      entry: []
+    };
+    for (const obs of observations) {
+
+      if (obs.spo2 !== undefined) {
+        this.getObservation(bundle, obs, true, '103228002', 'Blood oxygen saturation', obs.spo2, '%');
+      }
+    }
+    if (bundle.entry.length> 0) this.fhir.postTransaction(bundle);
+  }
+
+
+  private getObservation(bundle: Bundle, obs: Obs, snomed : boolean, code: string, display, value?, unit?: string) : Observation {
+    var fhirObs :Observation = {
+      resourceType: 'Observation'
+    };
+    fhirObs.identifier = [
+      {
+        system: 'https://fhir.ihealth.eu/Id',
+        value: code + '-'+obs.identifierValue
+      }
+    ]
+    if (snomed) {
+      fhirObs.code = {
+        coding : [{
+          system: 'http://snomed.info/sct',
+          code: code,
+          display: display
+        }
+        ]
+      };
+    } else {
+      fhirObs.code = {
+        coding : [{
+          system: 'http://loinc.org',
+          code: code,
+          display: display
+        }
+        ]
+      };
+    }
+    fhirObs.effectiveDateTime = obs.obsDate.toISOString();
+    if (value != undefined && unit != undefined) {
+      fhirObs.valueQuantity = {
+        value: value,
+        unit: unit,
+        system: 'http://unitsofmeasure.org'
+      }
+    }
+    //console.log(fhirObs);
+    bundle.entry.push({
+      resource : fhirObs
+    })
+    return fhirObs;
+  }
+
 
   /*
   SECURITY
@@ -90,6 +164,9 @@ export class IhealthService {
   connect() {
     var token = this.getAccessToken();
     if (token != undefined) this.tokenChange.emit(token);
+    this.loaded.subscribe(result => {
+      this.updateFHIRServer(result);
+    })
 
   }
   getAccessToken() {

@@ -1,5 +1,7 @@
 export interface Obs {
+
   obsDate : Date;
+  identifierValue?: string;
   name? : string;
   weight? : number;
   height? : number;

@@ -178,7 +178,6 @@ export class BodyComponent implements OnInit {
     });
     this.ihealth.loaded.subscribe(result => {
       console.log("iHealth Loaded");
-      console.log(result);
       if (result) {
         this.buildGraph(result);
       }
