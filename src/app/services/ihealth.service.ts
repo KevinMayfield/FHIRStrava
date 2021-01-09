@@ -66,7 +66,7 @@ export class IhealthService {
     if (measures === undefined) return;
     var observations: Obs[] = [];
     for (const grp of measures) {
-      console.log(grp);
+     // console.log(grp);
       var date = new Date(+grp.MDate * 1000).toISOString();
       var obs: Obs = {
         'obsDate': new Date(date)

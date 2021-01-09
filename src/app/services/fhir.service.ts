@@ -417,7 +417,7 @@ FHIR CONVERSIONS
       });
     }
     if (bundle.entry.length> 0) {
-      console.log(bundle);
+     // console.log(bundle);
       this.postTransaction(bundle);
     }
   }
