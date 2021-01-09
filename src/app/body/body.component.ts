@@ -176,6 +176,13 @@ export class BodyComponent implements OnInit {
         this.buildGraph(result);
       }
     });
+    this.ihealth.loaded.subscribe(result => {
+      console.log("iHealth Loaded");
+      console.log(result);
+      if (result) {
+        this.buildGraph(result);
+      }
+    });
     this.phr.dateRangeChange.subscribe(result => {
       console.log('Date Changed '+ result);
       this.phrLoad(true);
@@ -205,6 +212,7 @@ export class BodyComponent implements OnInit {
     this.clearCharts();
     this.loadStart();
     this.strava.getActivities();
+    this.ihealth.getSpO2();
 
     if (this.showMeasures && withing) {
       this.withings.getObservations();

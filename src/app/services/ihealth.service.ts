@@ -3,6 +3,7 @@ import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {PhrService} from "./phr.service";
 import {Observable} from "rxjs";
 import {JwtHelperService} from "@auth0/angular-jwt";
+import {Obs} from "../models/obs";
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,7 @@ export class IhealthService {
   clientSecret = '8bf97e5cbd1f406dbbe6a0848d2f1974';
   //clientId = 'c4ffde29e84b4deca55dcdfc5f803983';
 
-  url= 'https://openapi.ihealthlabs.eu/openapiv2/';
+  loaded: EventEmitter<any> = new EventEmitter();
 
   tokenChange: EventEmitter<any> = new EventEmitter();
 
@@ -37,10 +38,11 @@ export class IhealthService {
       result => {
         if (result.status == 401) {
           console.log('iHealth 401');
-
         }
-
-    //    this.processWithingsObs(result.body.measuregrps);
+        if (result.NextPageUrl != undefined) {
+          console.log(result.NextPageUrl);
+        }
+       this.processObs(result.BODataList);
       },
       (err) => {
         console.log(err);
@@ -50,43 +52,26 @@ export class IhealthService {
       }
     );
   }
-
-
-  private getAPISPO2(): Observable<any> {
-
-    // Use the postman collection for details
-
-    let headers = this.getHeaders();
-
-    var lastUpdate = this.phr.getFromDate();
-    var accessToken = this.getAccessToken();
-    var routeUrl = localStorage.getItem('appRoute');
-
-    var url = this.url + 'user/'+this.userID+'/spo2.json/';
-    url = url + '?client_id='+this.clientId
-    + '&client_secret='+this.clientSecret
-    + '&redirect_uri=' +routeUrl+'\ihealth' +
-    + '&access_token=' + accessToken
-    + '&start_time=1342005726'
-      + '&end_time=1405077726&page_index=1'
-
-
-    return this.http.get<any>(url,  { 'headers' : headers} );
-
+  processObs(measures) {
+    if (measures === undefined) return;
+    var observations: Obs[] = [];
+    for (const grp of measures) {
+      console.log(grp);
+      var date = new Date(+grp.MDate * 1000).toISOString();
+      console.log(date);
+      var obs: Obs = {
+        'obsDate': new Date(date)
+      }
+      if (grp.BO != undefined) {
+        obs.spo2 = grp.BO;
+      }
+      if (grp.HR != undefined) {
+        obs.heartrate = grp.HR;
+      }
+      observations.push(obs);
+    }
+    this.loaded.emit(observations);
   }
-              /*
-              Get Data
-
-              https://openapi.ihealthlabs.eu/openapiv2/user/05dffbe0dd..../spo2.json/?client_id=ddb9cbc759*****&client_secret=4738f9d00e*****
-              &redirect_uri=http%3a%2f%2f+yourcallback.com%2f%3fthis%3dthat
-              &access_token=xpoBt0ThQQ*****
-              &start_time=1342005726
-              &end_time=1405077726&page_index=1&sc=d63493704c*****
-&sv=88f34288d5*****
-
-               */
-
-
 
   getHeaders() : HttpHeaders {
 
@@ -123,8 +108,7 @@ export class IhealthService {
       }*/
       if (token != undefined) {
         this.accessToken = token.AccessToken;
-      //  console.log('iHealth token is '+this.accessToken);
-        this.userID = token.userID;
+        this.userID = token.UserID;
         return this.accessToken;
       }
     }
@@ -139,19 +123,6 @@ export class IhealthService {
 
     if (this.accessToken !== undefined) return true;
     return false;
-  }
-  authorise(routeUrl: string) {
-    if (routeUrl.substring(routeUrl.length - 1,1) === '/') {
-      routeUrl = routeUrl.substring(0, routeUrl.length - 1);
-    }
-
-    localStorage.setItem('appRoute', routeUrl);
-    window.location.href = 'https://oauthuser.ihealthlabs.eu/OpenApiV2/OAuthv2/userauthorization'
-      + '?response_type=code'
-      + '&client_id=' +this.clientId
-      + '&redirect_uri=' +routeUrl+'\ihealth'
-      + '&APIName=OpenApiSpO2';
-
   }
 
   getHeadersText() : HttpHeaders {
@@ -176,10 +147,57 @@ export class IhealthService {
 
   }
 
+  authorise(routeUrl: string) {
+    if (routeUrl.substring(routeUrl.length - 1,1) === '/') {
+      routeUrl = routeUrl.substring(0, routeUrl.length - 1);
+    }
+
+    localStorage.setItem('appRoute', routeUrl);
+    window.location.href = 'https://oauthuser.ihealthlabs.eu/OpenApiV2/OAuthv2/userauthorization'
+      + '?response_type=code'
+      + '&client_id=' +this.clientId
+      + '&redirect_uri=' +routeUrl+'\ihealth'
+      + '&APIName=OpenApiSpO2';
+
+  }
+
   /* OAuth2
 
   *
    */
+
+  private getAPISPO2(): Observable<any> {
+
+    // Use the postman collection for details
+
+    let headers = this.getHeaders();
+
+    var lastUpdate = this.phr.getFromDate();
+    var accessToken = this.getAccessToken();
+    var routeUrl = localStorage.getItem('appRoute');
+
+    // Jeez the sc and sv come from api registration.
+
+    var url = this.phr.serviceUrl + '/services/ihealth/user/'+this.userID+'/spo2.json/';
+    url = url +  '?client_id='+this.clientId
+      + '&client_secret='+this.clientSecret
+      + '&redirect_uri=' +(routeUrl+'\ihealth')
+      + '&access_token=' + accessToken
+      + '&sc=8c2c1eaa194141028b1e8de8c4b6ee87'
+      + '&sv=1c1cc31a951e4b198fa7962c6d8c7c95'
+      + '&locale=en_UK'
+    //  + '&page_index=1'
+       + '&start_time='+Math.floor(this.phr.getFromDate().getTime()/1000)
+      + '&end_time=' +Math.floor(this.phr.getToDate().getTime()/1000);
+
+
+
+    return this.http.get<any>(url,  { 'headers' : headers} );
+
+  }
+
+
+
   public getOAuth2AccessToken(authorisationCode) {
 
     let headers = new HttpHeaders(

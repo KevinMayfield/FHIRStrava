@@ -11,6 +11,7 @@ export interface Obs {
   suffer? : number;
   energy? : number;
   average_heartrate?: number;
+  heartrate?: number;
   weighted_average_watts? : number;
   distance? : number;
   duration? : number;
