@@ -21,6 +21,7 @@ import DiagnosticReport = fhir.DiagnosticReport;
 // @ts-ignore
 import Coding = fhir.Coding;
 import {DatePipe} from "@angular/common";
+import {AuthService} from "./auth.service";
 
 @Injectable({
   providedIn: 'root'
@@ -28,7 +29,6 @@ import {DatePipe} from "@angular/common";
 export class FhirService {
 
   private patient : Patient;
-  private patientId : string;
 
   private serverUrl = 'https://fhir.mayfield-is.co.uk';
 
@@ -40,27 +40,17 @@ export class FhirService {
 
   constructor(
     private http: HttpClient,
-    private strava : StravaService,
+    private auth: AuthService,
     private phr : PhrService,
+    private strava: StravaService,
     private datePipe: DatePipe) {
 
-    this.strava.athleteChange.subscribe(athlete => {
-        this.patient = {
-          identifier: [ {
-            system: "https://www.strava.com/Id/Athelete",
-            value: athlete.id
-          }
-          ],
-          name: [ {
-            "family": athlete.lastname,
-            "given" : [ athlete.firstname ]
-          }]
-        }
-        if (athlete.sex === 'F') this.patient.gender = "female";
-        if (athlete.sex === 'M') this.patient.gender = "male";
-        this.patient.resourceType = 'Patient';
-        this.patientChange.emit(this.patient);
-        this.getServerPatient(this.patient);
+    if (this.auth.currentUser != undefined) {
+      console.log(this.auth.currentUser);
+      this.setPatient();
+    }
+    this.auth.tokenChange.subscribe(athlete => {
+
     });
 
     this.loaded.subscribe(sucess => {
@@ -68,20 +58,48 @@ export class FhirService {
     });
   }
 
+  setPatient() {
+    var patient = {
+      resourceType: 'Patient',
+      identifier: [{
+        system: "https://auth.mayfield-is.co.uk/Id/UserName",
+        value: this.auth.currentUser.username
+      },
+        {
+          system: "https://auth.mayfield-is.co.uk/Id/UserId",
+          value: this.auth.currentUser.id
+        }
+      ],
+      name: [{
+        "text": this.auth.currentUser.attributes.name
+      }]
+    }
+
+    console.log(patient);
+
+    this.getServerPatient(patient);
+  }
+
   getObservations() {
     return this.observations;
   }
 
   postTransaction(resources : Bundle) {
+    if (this.patient == undefined) {
+      console.log('Patient missing - should not occur');
+    } else {
+      if (this.patient.id == undefined) {
+        console.log('Patient Id missing - should not occur');
+      }
+    }
     var transaction = this.getTransactionBundle();
-    var patientUUID = transaction.entry[0].fullUrl;
     var batchSize = 200;
 
     for (const entry of resources.entry) {
       if (entry.resource.resourceType === "Observation") {
          var observation : Observation = entry.resource;
          observation.subject = {
-           reference : patientUUID
+           reference : 'Patient/'+this.patient.id
          };
         transaction.entry.push(this.convertEntry(entry));
 
@@ -89,7 +107,7 @@ export class FhirService {
       if (entry.resource.resourceType === "DiagnosticReport") {
         var report : DiagnosticReport = entry.resource;
         report.subject = {
-          reference : patientUUID
+          reference : 'Patient/'+this.patient.id
         };
         transaction.entry.push(this.convertEntry(entry));
       }
@@ -99,7 +117,6 @@ export class FhirService {
         // reset transaction
         batchSize = 200;
         transaction = this.getTransactionBundle();
-        patientUUID = transaction.entry[0].fullUrl;
       }
     }
    // console.log(transaction);
@@ -112,9 +129,6 @@ export class FhirService {
       entry : []
     };
     transaction.resourceType = 'Bundle';
-    var patient : Patient = this.patient;
-    // if (patient.id !== undefined) delete patient.id; // Otherwise POST fails.
-    transaction.entry.push(this.makeEntry(this.patient));
     return transaction;
   }
 
@@ -154,8 +168,18 @@ export class FhirService {
         const bundle: Bundle = result;
 
         if (bundle.entry != undefined && bundle.entry.length >0) {
-          this.patientId = bundle.entry[0].resource.id;
+          console.log('Patient found.');
+          this.patient = bundle.entry[0].resource;
+          this.patientChange.emit(this.patient);
           this.getServerObservations(this.phr.getFromDate(),this.phr.getToDate());
+        } else {
+          console.log('Patient not found. Creating');
+          headers = headers.append('Prefer','return=representation');
+          this.http.post(this.serverUrl +"/R4/Patient", patient,{ 'headers' : headers}).subscribe(result => {
+            console.log(result);
+            this.patient = result;
+            this.patientChange.emit(this.patient);
+          });
         }
     }
     )
@@ -176,7 +200,7 @@ export class FhirService {
   getServerObservations(startDate : Date, endDate : Date) {
     if (this.patient === undefined) return;
     this.observations = [];
-    var url = this.serverUrl + '/R4/Observation?patient='+this.patientId;
+    var url = this.serverUrl + '/R4/Observation?patient='+this.patient.id;
     url = url + '&date=>'+startDate.toISOString();
     url = url + '&date=<'+endDate.toISOString();
     url = url + '&_count=500';
@@ -217,6 +241,7 @@ export class FhirService {
   private sendTransaction(body : Bundle) {
 
     let headers = this.getHeaders();
+    console.log(body);
 
     return this.http.post<any>(this.serverUrl + '/R4/', body, { 'headers' : headers} ).subscribe(result => {
 
@@ -254,7 +279,7 @@ export class FhirService {
            var flag : Flag = {
              status : "active",
              code : fhirobs.code,
-             subject : fhirobs.subject,
+             subject : 'Patient/'+this.patient.id,
              period : {
                start : fhirobs.effectiveDateTime
              }

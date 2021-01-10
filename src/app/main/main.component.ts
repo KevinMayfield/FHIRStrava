@@ -7,6 +7,7 @@ import {HrvService} from "../services/hrv.service";
 import {FhirService} from "../services/fhir.service";
 import {PhrService} from "../services/phr.service";
 import {FormControl} from "@angular/forms";
+import {AuthService} from "../services/auth.service";
 
 @Component({
   selector: 'app-main',
@@ -21,7 +22,8 @@ export class MainComponent implements OnInit {
               private ihealth: IhealthService,
             private  fhirService : FhirService,
     public phr : PhrService,
-    private route : Router) {
+    private route : Router,
+    private auth: AuthService) {
     this.onResize();
   }
 
@@ -58,14 +60,25 @@ export class MainComponent implements OnInit {
     //this.fromDate = new FormControl(this.phr.getFromDate());
     this.withings.tokenChange.subscribe(
       token => {
+
         if (token != undefined) this.withingsConnect = false;
       }
     );
     this.ihealth.tokenChange.subscribe(
       token => {
+
         if (token != undefined) this.ihealthConnect = false;
       }
     );
+    // Should be defined as login should have occured
+    if (this.auth.currentUser != undefined) {
+      this.name = this.auth.currentUser.attributes.name;
+    }
+    this.auth.tokenChange.subscribe(result => {
+      console.log(this.auth.currentUser);
+      console.log(this.auth.currentUser.username);
+      this.name = this.auth.currentUser.attributes.name;
+    })
 
     // These deal with loading the FHIR server and are triggered by
 
@@ -77,7 +90,7 @@ export class MainComponent implements OnInit {
     this.ihealth.iHealthChange.subscribe(result => {
       this.fhirService.postTransaction(result);
     });
-
+/*
     this.strava.athleteChange.subscribe(
       athlete  => {
         var name = '';
@@ -90,6 +103,8 @@ export class MainComponent implements OnInit {
         this.name = name;
       }
     );
+
+ */
   }
 
   logout() {

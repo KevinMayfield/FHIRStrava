@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {AuthService} from "../services/auth.service";
+import {ActivatedRoute, Router} from "@angular/router";
 
 @Component({
   selector: 'app-login',
@@ -13,9 +14,28 @@ export class LoginComponent implements OnInit {
 
   //https://console.developers.google.com/apis/credentials?project=watchful-augury-234308&folder=&organizationId=
 
-  constructor(private auth : AuthService) { }
+  constructor(private route: ActivatedRoute,
+              private auth : AuthService,
+              private router: Router) { }
 
   ngOnInit(): void {
+    this.route.queryParamMap.subscribe(params => {
+      console.log(params);
+      var code = params.get('code');
+      var state = params.get('state');
+      this.doSetup(code, state);
+    });
+  }
+
+  doSetup(authorisationCode, state) {
+
+    console.log(authorisationCode);
+    this.auth.tokenChange.subscribe(
+      token => {
+        this.router.navigateByUrl('/');
+      }
+    );
+    this.auth.getOAuth2AccessToken(authorisationCode);
   }
 
   pushTheButton() {
