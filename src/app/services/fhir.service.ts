@@ -32,6 +32,8 @@ export class FhirService {
 
   private serverUrl = 'https://fhir.mayfield-is.co.uk';
 
+  // private serverUrl = 'http://127.0.0.1:8186';
+
   private observations : Observation[] = [];
 
   loaded: EventEmitter<any> = new EventEmitter();
@@ -258,8 +260,10 @@ export class FhirService {
     let headers = new HttpHeaders(
     );
 
-    headers.append('Content-Type', 'application/fhir+json');
-    headers.append('Accept', 'application/fhir+json');
+    headers = headers.append('Content-Type', 'application/fhir+json');
+    headers = headers.append('Accept', 'application/fhir+json');
+    headers = headers.append("Authorization", "Bearer "+this.auth.accessToken);
+    console.log(headers);
     return headers;
   }
 

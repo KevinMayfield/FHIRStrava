@@ -12,6 +12,8 @@ export class AuthService {
 
   public isLoggedIn: boolean;
 
+  public accessToken = undefined;
+
   public currentUser: any = undefined;
 
   private _authState: Subject<any> = new Subject<any>();
@@ -49,9 +51,17 @@ export class AuthService {
   }
 
   public getOAuth2AccessToken(authorisationCode) {
-    Auth.currentSession().then(data => {
-      console.log(data);
+    Auth.currentSession().then(res => {
+      console.log(res);
       this.isLoggedIn = true;
+        let accessToken = res.getAccessToken();
+
+        let jwt = accessToken.getJwtToken()
+        this.accessToken = jwt;
+        //You can print them to see the full objects
+        console.log(`myAccessToken: ${JSON.stringify(accessToken)}`)
+        console.log(`myJwt: ${jwt}`)
+
       Auth.currentUserInfo().then(result => {
         this.currentUser = result;
         console.log(result);
