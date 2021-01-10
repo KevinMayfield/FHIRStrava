@@ -49,6 +49,8 @@ import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from "@angular/material/
 import {DatePipe} from "@angular/common";
 import {CovalentNotificationsModule} from "@covalent/core/notifications";
 import {CovalentMessageModule} from "@covalent/core/message";
+import { LoginComponent } from './login/login.component';
+import { LogoutComponent } from './logout/logout.component';
 
 
 @NgModule({
@@ -62,6 +64,8 @@ import {CovalentMessageModule} from "@covalent/core/message";
     LineChartComponent,
     BarChartComponent,
     IhealthComponent,
+    LoginComponent,
+    LogoutComponent,
   ],
   imports: [
     BrowserModule,

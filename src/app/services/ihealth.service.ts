@@ -42,15 +42,24 @@ export class IhealthService {
               private datePipe: DatePipe
               ) { }
 
-  getSpO2() {
+  getSpO2( page_index?, start_time?, end_time?) {
     if (!this.hasAccessToken()) return;
-    this.getAPISPO2().subscribe(
+    if (page_index == undefined) page_index = 1;
+    this.getAPISPO2(page_index, start_time, end_time).subscribe(
       result => {
         if (result.status == 401) {
           console.log('iHealth 401');
         }
         if (result.NextPageUrl != undefined) {
-          console.log(result.NextPageUrl);
+          var searchUri : string = decodeURIComponent(result.NextPageUrl);
+          searchUri = searchUri.substring(searchUri.indexOf("?"));
+          console.log(searchUri);
+          var urlParams = new URLSearchParams(searchUri);
+          // Use recursion to get next pages
+          if (urlParams.get('page_index') > page_index) {
+            console.log('ihealth get new page');
+           this.getSpO2(urlParams.get('page_index'), urlParams.get('start_time'), urlParams.get('end_time'));
+          }
         }
        this.processObs(result.BODataList);
       },
@@ -175,14 +184,14 @@ export class IhealthService {
       var token: any = JSON.parse(localStorage.getItem('iHealthToken'));
 
       const helper = new JwtHelperService();
-      /*
+
       if (this.isTokenExpired(token)) {
 
-        console.log('withings Token expired');
+        console.log('iHealth Token expired');
         this.accessToken = undefined;
-        this.getRefreshToken();
+       // this.getRefreshToken();
         return undefined;
-      }*/
+      }
       if (token != undefined) {
         this.accessToken = token.AccessToken;
         this.userID = token.UserID;
@@ -191,6 +200,74 @@ export class IhealthService {
     }
     return undefined;
   }
+
+  private isTokenExpired(
+    token: any,
+    offsetSeconds?: number
+  ): boolean {
+    if (!token || token === "") {
+      return true;
+    }
+    const date = this.getTokenExpirationDate(token);
+    offsetSeconds = offsetSeconds || 0;
+
+    console.log('iHealth expiry date '+date);
+    if (date === null) {
+      return false;
+    }
+
+    return !(date.valueOf() > new Date().valueOf() + offsetSeconds * 1000);
+  }
+
+  private getTokenExpirationDate(
+    decoded: any
+  ): Date | null {
+
+    if (!decoded || !decoded.hasOwnProperty("Expires")) {
+      // Invalid format
+      console.log('iHealth token format error');
+      localStorage.removeItem('iHealthToken');
+      return null;
+    }
+
+    const date = new Date(0);
+    date.setUTCSeconds(decoded.Expires * 1000);
+
+    return date;
+  }
+
+  public getRefreshToken() {
+
+    if (this.refreshingToken) return;
+    this.refreshingToken = true;
+    console.log('iHealth refreshing token');
+
+    var token: any = JSON.parse(localStorage.getItem('iHealthToken'));
+
+
+    let headers = new HttpHeaders(
+    );
+
+    var routeUrl = localStorage.getItem('appRoute');
+
+    var url = this.phr.serviceUrl + '/services/ihealth/token';
+    url = url +'?client_id='+this.clientId +
+      '&client_secret='+this.clientSecret +
+      '&respone_type_type=refresh_token' +
+      '&redirect_uri=' +routeUrl+'\ihealth' +
+      '&refresh_token='+token.RefreshToken;
+
+
+    this.http.post<any>(url,'',{'headers': headers}).subscribe(
+      token => {
+        this.setAccessToken(token);
+      },
+      (err) => {
+        console.log('iHealth Access Error: '+err);
+      }
+    );
+  }
+
   /*
   *
   * Authorise
@@ -243,7 +320,7 @@ export class IhealthService {
   *
    */
 
-  private getAPISPO2(): Observable<any> {
+  private getAPISPO2(page_index, start_time?, end_time? ): Observable<any> {
 
     // Use the postman collection for details
 
@@ -252,6 +329,11 @@ export class IhealthService {
     var lastUpdate = this.phr.getFromDate();
     var accessToken = this.getAccessToken();
     var routeUrl = localStorage.getItem('appRoute');
+
+    if (start_time == undefined) start_time = Math.floor(this.phr.getFromDate().getTime()/1000);
+
+    if (end_time == undefined) end_time =Math.floor(this.phr.getToDate().getTime()/1000);
+
 
     // Jeez the sc and sv come from api registration.
 
@@ -263,11 +345,9 @@ export class IhealthService {
       + '&sc=8c2c1eaa194141028b1e8de8c4b6ee87'
       + '&sv=1c1cc31a951e4b198fa7962c6d8c7c95'
       + '&locale=en_UK'
-    //  + '&page_index=1'
-       + '&start_time='+Math.floor(this.phr.getFromDate().getTime()/1000)
-      + '&end_time=' +Math.floor(this.phr.getToDate().getTime()/1000);
-
-
+      + '&page_index='+page_index
+       + '&start_time='+start_time
+      + '&end_time=' + end_time;
 
     return this.http.get<any>(url,  { 'headers' : headers} );
 

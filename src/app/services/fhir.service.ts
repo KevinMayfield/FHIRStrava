@@ -128,7 +128,6 @@ export class FhirService {
   convertEntry(entry) {
 
      if (entry.fullUrl === undefined) {
-       console.log('New UUID')
        entry.fullUrl = "urn:uuid:"+uuid.v4();
      }
      /*

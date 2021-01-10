@@ -1,0 +1,20 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-fhirstrava-dev-74440-authRole",
+      "UnauthRoleArn": "arn:aws:iam::813325872365:role/amplify-fhirstrava-dev-74440-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::813325872365:role/amplify-fhirstrava-dev-74440-authRole",
+      "Region": "eu-west-2",
+      "DeploymentBucketName": "amplify-fhirstrava-dev-74440-deployment",
+      "UnauthRoleName": "amplify-fhirstrava-dev-74440-unauthRole",
+      "StackName": "amplify-fhirstrava-dev-74440",
+      "StackId": "arn:aws:cloudformation:eu-west-2:813325872365:stack/amplify-fhirstrava-dev-74440/b3c09cb0-5317-11eb-9cb2-02c8f3eb7de6",
+      "AmplifyAppId": "d1xgtxbibref0s"
+    },
+    "categories": {
+      "auth": {
+        "fhirstrava19d3aee7": {}
+      }
+    }
+  }
+}

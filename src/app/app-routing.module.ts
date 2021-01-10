@@ -5,6 +5,8 @@ import {BodyComponent} from "./body/body.component";
 import {ExchangeTokenComponent} from "./exchange-token/exchange-token.component";
 import {WithingsComponent} from "./withings/withings.component";
 import {IhealthComponent} from "./ihealth/ihealth.component";
+import {LoginComponent} from "./login/login.component";
+import {LogoutComponent} from "./logout/logout.component";
 
 const routes: Routes = [
   {
@@ -23,6 +25,12 @@ const routes: Routes = [
   },
   {
     path: 'ihealth', component: IhealthComponent
+  },
+  {
+    path: 'login', component: LoginComponent
+  },
+  {
+    path: 'logout', component: LogoutComponent
   }
 ];
 

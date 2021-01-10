@@ -495,7 +495,7 @@ export class WithingsService {
 
     this.http.post<any>(url, bodge, { 'headers' : headers} ).subscribe(
       token => {
-        console.log('refreshed token');
+        console.log('Withings refreshed token');
         this.setAccessToken(token);
         this.refreshingToken = false;
       },
@@ -524,6 +524,7 @@ export class WithingsService {
 
     this.http.post<any>(url, bodge, { 'headers' : headers} ).subscribe(
       token => {
+        console.log('withings Access Token')
         this.setAccessToken(token);
       }
     );
