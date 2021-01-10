@@ -12,6 +12,7 @@ import Observation = fhir.Observation;
 import Coding = fhir.Coding;
 import {FhirService} from "./fhir.service";
 import {DatePipe} from "@angular/common";
+import {AuthService} from "./auth.service";
 
 @Injectable({
   providedIn: 'root'
@@ -39,7 +40,8 @@ export class IhealthService {
   constructor(private http: HttpClient,
               private phr : PhrService,
               private  fhir : FhirService,
-              private datePipe: DatePipe
+              private datePipe: DatePipe,
+              private auth: AuthService
               ) { }
 
   getSpO2( page_index?, start_time?, end_time?) {
@@ -100,6 +102,10 @@ export class IhealthService {
     );
 
     headers.append('Content-Type', 'application/x-www-form-urlencoded');
+    headers = headers.append("Access-Control-Allow-Origin", "*")
+  //  headers = headers.append("Access-Control-Allow-Methods", "DELETE, POST, GET, OPTIONS")
+  //  headers = headers.append("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With")
+  //  headers = headers.append("Authorization", "Bearer "+this.auth.accessToken);
     return headers;
   }
 

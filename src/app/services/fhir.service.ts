@@ -263,7 +263,7 @@ export class FhirService {
     headers = headers.append('Content-Type', 'application/fhir+json');
     headers = headers.append('Accept', 'application/fhir+json');
     headers = headers.append("Authorization", "Bearer "+this.auth.accessToken);
-    console.log(headers);
+ //   console.log(headers);
     return headers;
   }
 

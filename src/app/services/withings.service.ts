@@ -12,6 +12,7 @@ import Bundle = fhir.Bundle;
 import Observation = fhir.Observation;
 // @ts-ignore
 import Coding = fhir.Coding;
+import {AuthService} from "./auth.service";
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +28,8 @@ export class WithingsService {
   constructor(private http: HttpClient,
               private phr : PhrService,
               private fhir: FhirService,
-              private datePipe: DatePipe) { }
+              private datePipe: DatePipe,
+              private auth: AuthService) { }
 
   clientId = 'e532209382d449afbb1ef360919f2fdac284fac62ec23feeea0589f043bdc41f';
 
@@ -480,8 +482,9 @@ export class WithingsService {
     console.log('refreshing token');
     let headers = new HttpHeaders(
     );
-    headers.append('Content-Type', 'application/x-www-form-urlencoded');
-    headers.append('Access-Control-Allow-Origin', '*');
+    headers = headers.append('Content-Type', 'application/x-www-form-urlencoded');
+    headers = headers.append('Access-Control-Allow-Origin', '*');
+ //   headers = headers.append("Authorization", "Bearer "+this.auth.accessToken);
     var token: any = JSON.parse(localStorage.getItem('withingsToken'));
 
 
