@@ -96,18 +96,7 @@ export class IhealthService {
     this.loaded.emit(observations);
   }
 
-  getHeaders() : HttpHeaders {
 
-    let headers = new HttpHeaders(
-    );
-
-    headers.append('Content-Type', 'application/x-www-form-urlencoded');
-    headers = headers.append("Access-Control-Allow-Origin", "*")
-  //  headers = headers.append("Access-Control-Allow-Methods", "DELETE, POST, GET, OPTIONS")
-  //  headers = headers.append("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With")
-  //  headers = headers.append("Authorization", "Bearer "+this.auth.accessToken);
-    return headers;
-  }
 
   /*
   FHIR
@@ -251,8 +240,7 @@ export class IhealthService {
     var token: any = JSON.parse(localStorage.getItem('iHealthToken'));
 
 
-    let headers = new HttpHeaders(
-    );
+    let headers = this.getHeaders();
 
     var routeUrl = localStorage.getItem('appRoute');
 
@@ -290,7 +278,14 @@ export class IhealthService {
     let headers = new HttpHeaders(
     );
 
-    headers.append('Content-Type', 'text/html');
+    headers = headers.append('Content-Type', 'text/html');
+    return headers;
+  }
+  getHeaders() : HttpHeaders {
+
+    let headers = new HttpHeaders(
+    );
+    headers = headers.append("Authorization", "Bearer "+localStorage.getItem('awsToken'));
     return headers;
   }
 
@@ -347,7 +342,7 @@ export class IhealthService {
     url = url +  '?client_id='+this.clientId
       + '&client_secret='+this.clientSecret
       + '&redirect_uri=' +(routeUrl+'\ihealth')
-      + '&access_token=' + accessToken
+      + '&smeg=' + accessToken
       + '&sc=8c2c1eaa194141028b1e8de8c4b6ee87'
       + '&sv=1c1cc31a951e4b198fa7962c6d8c7c95'
       + '&locale=en_UK'
@@ -363,8 +358,7 @@ export class IhealthService {
 
   public getOAuth2AccessToken(authorisationCode) {
 
-    let headers = new HttpHeaders(
-    );
+    let headers = this.getHeaders();
 
     var routeUrl = localStorage.getItem('appRoute');
 

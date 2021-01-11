@@ -13,7 +13,8 @@ const awsmobile = {
             "openid",
             "email",
             "profile",
-            "aws.cognito.signin.user.admin"
+            "aws.cognito.signin.user.admin",
+            "patient/*.*"
         ],
         "redirectSignIn": "https://kevinmayfield.github.io/FHIRStrava/login/",
         "redirectSignOut": "https://kevinmayfield.github.io/FHIRStrava/logout/",

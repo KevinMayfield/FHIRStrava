@@ -1,7 +1,7 @@
 import { enableProdMode } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 //import Amplify from 'aws-amplify';
-// import awsconfig from './aws-exports';
+//import awsconfig from './aws-exports';
 import awsconfig from './aws-exports-github';
 
 import { AppModule } from './app/app.module';

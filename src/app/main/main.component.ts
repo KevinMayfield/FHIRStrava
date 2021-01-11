@@ -108,6 +108,7 @@ export class MainComponent implements OnInit {
   }
 
   logout() {
+    this.auth.signOut();
     this.strava.logout();
     this.withings.logout()
     // TODO tidy

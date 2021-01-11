@@ -12,7 +12,7 @@ export class AuthService {
 
   public isLoggedIn: boolean;
 
-  public accessToken = undefined;
+  private accessToken = undefined;
 
   public currentUser: any = undefined;
 
@@ -38,7 +38,7 @@ export class AuthService {
     });
   }
 
-  signOut(): Promise<any> {
+  public signOut(): Promise<any> {
     return Auth.signOut()
       .then(() => this.isLoggedIn = false)
   }
@@ -58,6 +58,8 @@ export class AuthService {
 
         let jwt = accessToken.getJwtToken()
         this.accessToken = jwt;
+        localStorage.setItem('awsToken', jwt);
+
         //You can print them to see the full objects
         console.log(`myAccessToken: ${JSON.stringify(accessToken)}`)
         console.log(`myJwt: ${jwt}`)
