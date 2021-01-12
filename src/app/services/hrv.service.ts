@@ -7,6 +7,7 @@ import {Obs} from "../models/obs";
 import Observation = fhir.Observation;
 // @ts-ignore
 import Bundle = fhir.Bundle;
+import {AuthService} from "./auth.service";
 
 @Injectable({
   providedIn: 'root'
@@ -17,14 +18,16 @@ export class HrvService {
   hrvChange: EventEmitter<any> = new EventEmitter();
 
   constructor(private http: HttpClient,
-              private phr : PhrService) { }
+              private phr : PhrService,
+              private auth : AuthService) { }
 
   getHeaders() : HttpHeaders {
 
     let headers = new HttpHeaders(
     );
 
-    headers.append('Content-Type', 'text/html');
+    headers = headers.append('Content-Type', 'text/html');
+    headers = headers.append("Authorization", "Bearer "+this.auth.getAccessToken());
     return headers;
   }
 

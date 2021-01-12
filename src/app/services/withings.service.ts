@@ -484,7 +484,7 @@ export class WithingsService {
     );
     headers = headers.append('Content-Type', 'application/x-www-form-urlencoded');
     headers = headers.append('Access-Control-Allow-Origin', '*');
-    headers = headers.append("Authorization", "Bearer "+localStorage.getItem('awsToken'));
+    headers = headers.append("Authorization", "Bearer "+this.auth.getAccessToken());
     var token: any = JSON.parse(localStorage.getItem('withingsToken'));
 
 
@@ -514,7 +514,7 @@ export class WithingsService {
     );
     headers.append('Content-Type', 'application/x-www-form-urlencoded');
     headers.append('Access-Control-Allow-Origin', '*');
-    headers = headers.append("Authorization", "Bearer "+localStorage.getItem('awsToken'));
+    headers = headers.append("Authorization", "Bearer "+this.auth.getAccessToken());
 
     var url = this.phr.serviceUrl + '/services/token';
 

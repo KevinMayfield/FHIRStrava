@@ -279,13 +279,14 @@ export class IhealthService {
     );
 
     headers = headers.append('Content-Type', 'text/html');
+    headers = headers.append("Authorization", "Bearer "+this.auth.getAccessToken());
     return headers;
   }
   getHeaders() : HttpHeaders {
 
     let headers = new HttpHeaders(
     );
-    headers = headers.append("Authorization", "Bearer "+localStorage.getItem('awsToken'));
+    headers = headers.append("Authorization", "Bearer "+this.auth.getAccessToken());
     return headers;
   }
 
