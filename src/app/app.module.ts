@@ -33,7 +33,7 @@ import {MatSortModule} from "@angular/material/sort";
 import {NgxChartsModule} from "@swimlane/ngx-charts";
 import { LineChartComponent } from './line-chart/line-chart.component';
 import {CovalentExpansionPanelModule} from "@covalent/core/expansion-panel";
-import { BarChartComponent } from './bar-chart/bar-chart.component';
+import { BubbleChartComponent } from './bubble-chart/bubble-chart.component';
 import {CovalentLoadingModule} from "@covalent/core/loading";
 import { IhealthComponent } from './ihealth/ihealth.component';
 import {CovalentFileModule} from "@covalent/core/file";
@@ -51,6 +51,7 @@ import {CovalentNotificationsModule} from "@covalent/core/notifications";
 import {CovalentMessageModule} from "@covalent/core/message";
 import { LoginComponent } from './login/login.component';
 import { LogoutComponent } from './logout/logout.component';
+import { BarChartComponent } from './bar-chart/bar-chart.component';
 
 
 @NgModule({
@@ -62,10 +63,11 @@ import { LogoutComponent } from './logout/logout.component';
     WithingsComponent,
 
     LineChartComponent,
-    BarChartComponent,
+    BubbleChartComponent,
     IhealthComponent,
     LoginComponent,
     LogoutComponent,
+    BarChartComponent,
   ],
   imports: [
     BrowserModule,

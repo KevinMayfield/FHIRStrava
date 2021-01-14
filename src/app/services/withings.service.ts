@@ -261,7 +261,7 @@ export class WithingsService {
 
     // Use the postman collection for details
 
-    let headers = this.getHeaders();
+    let headers = this.getAPIHeaders();
 
     var lastUpdate = this.phr.getFromDate();
 
@@ -283,7 +283,7 @@ export class WithingsService {
 
     // Use the postman collection for details
 
-    let headers = this.getHeaders();
+    let headers = this.getAPIHeaders();
 
     var lastUpdate = this.phr.getFromDate();
 
@@ -300,7 +300,7 @@ export class WithingsService {
 
   private getAPISleep(): Observable<any> {
 
-    let headers = this.getHeaders();
+    let headers = this.getAPIHeaders();
 
     var lastUpdate = this.phr.getFromDate();
 
@@ -480,13 +480,9 @@ export class WithingsService {
     if (this.refreshingToken) return;
     this.refreshingToken = true;
     console.log('refreshing token');
-    let headers = new HttpHeaders(
-    );
-    headers = headers.append('Content-Type', 'application/x-www-form-urlencoded');
-    headers = headers.append('Access-Control-Allow-Origin', '*');
-    headers = headers.append("Authorization", "Bearer "+this.auth.getAccessToken());
-    var token: any = JSON.parse(localStorage.getItem('withingsToken'));
 
+    let headers = this.getOAuth2Headers();
+    var token: any = JSON.parse(localStorage.getItem('withingsToken'));
 
     var url = this.phr.serviceUrl + '/services/token';
 
@@ -510,11 +506,7 @@ export class WithingsService {
 
   public getOAuth2AccessToken(authorisationCode) {
 
-    let headers = new HttpHeaders(
-    );
-    headers.append('Content-Type', 'application/x-www-form-urlencoded');
-    headers.append('Access-Control-Allow-Origin', '*');
-    headers = headers.append("Authorization", "Bearer "+this.auth.getAccessToken());
+    let headers = this.getOAuth2Headers();
 
     var url = this.phr.serviceUrl + '/services/token';
 
@@ -530,6 +522,9 @@ export class WithingsService {
       token => {
         console.log('withings Access Token')
         this.setAccessToken(token);
+      },
+      (err) => {
+        console.log(err);
       }
     );
   }
@@ -579,13 +574,22 @@ export class WithingsService {
 
 
 
-  getHeaders() : HttpHeaders {
+  getAPIHeaders() : HttpHeaders {
 
     let headers = new HttpHeaders(
     );
 
     headers = headers.append('Authorization', 'Bearer '+this.getAccessToken());
     headers.append('Content-Type', 'application/x-www-form-urlencoded');
+    return headers;
+  }
+
+  getOAuth2Headers() : HttpHeaders {
+
+    let headers = new HttpHeaders(
+    );
+
+    headers = headers.append('Authorization', 'Bearer '+this.auth.getAccessToken());
     return headers;
   }
 

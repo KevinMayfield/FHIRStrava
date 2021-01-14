@@ -1,0 +1,22 @@
+<div style="width: 100%; height: 250px;" class="mat-elevation-z8">
+<ngx-charts-bubble-chart
+
+  [scheme]="colorScheme"
+  [results]="results"
+  [xAxis]="showXAxis"
+  [yAxis]="showYAxis"
+  [legend]="showLegend"
+  [showXAxisLabel]="showXAxisLabel"
+  [showYAxisLabel]="showYAxisLabel"
+  [xAxisLabel]="xAxisLabel"
+  [yAxisLabel]="yAxisLabel"
+
+  [xScaleMin]="xScaleMin"
+  [xScaleMax]="xScaleMax"
+
+  [minRadius]="minRadius"
+  [maxRadius]="maxRadius"
+  (select)="onSelect($event)"
+ >
+</ngx-charts-bubble-chart>
+</div>

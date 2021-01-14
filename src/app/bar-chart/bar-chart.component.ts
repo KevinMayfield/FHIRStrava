@@ -8,50 +8,81 @@ import {PhrService} from "../services/phr.service";
 })
 export class BarChartComponent implements OnInit {
 
+  multi: any[]= [
+    {
+      "name": new Date('2012/1/1'),
+      "series": [
+        {
+          "name": "2010",
+          "value": 7300000
+        },
+        {
+          "name": "2011",
+          "value": 8940000
+        }
+      ]
+    },
 
-  view: any[] = [700, 300];
+    {
+      "name": 'b',
+      "series": [
+        {
+          "name": "2010",
+          "value": 7870000
+        },
+        {
+          "name": "2011",
+          "value": 8270000
+        }
+      ]
+    },
+
+    {
+      "name": new Date(),
+      "series": [
+        {
+          "name": "2010",
+          "value": 5000002
+        },
+        {
+          "name": "2011",
+          "value": 5800000
+        }
+      ]
+    }
+  ];
+
+  view: any[] = [700, 400];
 
   // options
-  showXAxis: boolean = true;
-  showYAxis: boolean = true;
-  gradient: boolean = false;
-  showLegend: boolean = false;
-  showXAxisLabel: boolean = true;
+  showXAxis = true;
+  showYAxis = true;
+  gradient = false;
+  showLegend = false;
+  showXAxisLabel = true;
+  showYAxisLabel = true;
 
   @Input()
-  yAxisLabel: string = 'KJ';
-  showYAxisLabel: boolean = true;
+  xAxisLabel = 'Country';
+
   @Input()
-  xAxisLabel: string = 'Date';
-  maxRadius: number = 7;
-  minRadius: number = 0;
+  yAxisLabel = 'Population';
+
   @Input()
   xScaleMin: Date;
 
-  xScaleMax = new Date();
-
-  @Input()
-  results : [];
+  xScaleMax: Date = new Date();
 
   colorScheme = {
     domain: ['#1976d2', '#00695c',  '#ef6c00', '#c62828']
   };
-  constructor(private phr : PhrService) {
 
-  }
-
-  onSelect(event) {
-    console.log(event);
-  }
-
+  constructor(private phr : PhrService) { }
 
   ngOnInit(): void {
     this.xScaleMin = this.phr.getFromDate();
     this.xScaleMax = this.phr.getToDate();
     console.log(this.phr.getToDate());
-
   }
-
-
 
 }

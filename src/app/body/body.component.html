@@ -14,11 +14,11 @@
   <span *ngFor="let barChart of phr.bars">
         <span *ngIf="barChart.ticked  && barChart.chart.length >0" >
           <div class="md-padding">
-                <app-bar-chart [results]="barChart.chart" [yAxisLabel]="barChart.unit" [xAxisLabel]="barChart.name"></app-bar-chart>
+                <app-bubble-chart [results]="barChart.chart" [yAxisLabel]="barChart.unit" [xAxisLabel]="barChart.name"></app-bubble-chart>
           </div>
         </span>
       </span>
-
+  <!-- <app-bar-chart yAxisLabel="y label" xAxisLabel="x label"></app-bar-chart> -->
 
   <table [dataSource]="activityDataSource" width="100%"
          matSort

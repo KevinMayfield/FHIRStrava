@@ -1,22 +1,13 @@
-<div style="width: 100%; height: 250px;" class="mat-elevation-z8">
-<ngx-charts-bubble-chart
-
+<ngx-charts-bar-vertical-stacked
+  [view]="view"
   [scheme]="colorScheme"
-  [results]="results"
+  [results]="multi"
+  [gradient]="gradient"
   [xAxis]="showXAxis"
   [yAxis]="showYAxis"
   [legend]="showLegend"
   [showXAxisLabel]="showXAxisLabel"
   [showYAxisLabel]="showYAxisLabel"
   [xAxisLabel]="xAxisLabel"
-  [yAxisLabel]="yAxisLabel"
-
-  [xScaleMin]="xScaleMin"
-  [xScaleMax]="xScaleMax"
-
-  [minRadius]="minRadius"
-  [maxRadius]="maxRadius"
-  (select)="onSelect($event)"
- >
-</ngx-charts-bubble-chart>
-</div>
+  [yAxisLabel]="yAxisLabel">
+</ngx-charts-bar-vertical-stacked>
