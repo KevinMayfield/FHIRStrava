@@ -163,6 +163,7 @@ export class StravaService {
       var token: any = JSON.parse(localStorage.getItem('stravaToken'));
 
       if (this.isTokenExpired(token)) {
+        console.log('Strava refresh token');
         this.accessToken = undefined;
         this.getRefreshToken();
         return undefined;
@@ -197,7 +198,7 @@ export class StravaService {
         this.refreshingToken = false;
       },
       (err) => {
-          console.log('Strava Refresh Error: '+err);
+          console.log('Strava Refresh Error: ', err);
       }
     );
   }
@@ -218,7 +219,7 @@ export class StravaService {
         this.setAccessToken(token);
       },
       (err) => {
-        console.log('Strava Access Error: '+err);
+        console.log('Strava Access Error: ', err);
       }
     );
   }

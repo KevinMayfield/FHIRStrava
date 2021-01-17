@@ -169,7 +169,6 @@ export class PhrService {
   }
   getClients() {
     var clients = JSON.parse(localStorage.getItem('clients'));
-    console.log(clients);
     return clients;
   }
 

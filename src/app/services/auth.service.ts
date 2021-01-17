@@ -30,7 +30,6 @@ export class AuthService {
 
   constructor() {
     Hub.listen('auth',(data) => {
-      console.log(data);
       const { channel, payload } = data;
       if (channel === 'auth') {
         this._authState.next(payload.event);
@@ -82,6 +81,10 @@ export class AuthService {
          cognitoUser.refreshSession(currentSession.getRefreshToken(), (err, session) => {
            console.log('new aws session', err, session);
            this.refreshingToken = false;
+           let token = session.getRefreshToken();
+           localStorage.setItem('awsToken', JSON.stringify(token));
+           this.tokenChange.emit(token);
+
            const { idToken, refreshToken, accessToken } = session;
          });
        })
@@ -122,7 +125,6 @@ export class AuthService {
 
   public getOAuth2AccessToken(authorisationCode) {
     Auth.currentSession().then(res => {
-      console.log(res);
       this.isLoggedIn = true;
         let accessToken = res.getAccessToken();
         localStorage.setItem('awsToken', JSON.stringify(accessToken));

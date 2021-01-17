@@ -62,11 +62,12 @@ export class WithingsService {
     this.getAPIMeasures().subscribe(
       result => {
         if (result.status == 401) {
-          console.log('Withings 401');
+          console.log('Withings 401',result);
+          this.deleteAccessToken();
+        } else {
 
+          this.processWithingsObs(result.body.measuregrps);
         }
-
-        this.processWithingsObs(result.body.measuregrps);
       },
       (err) => {
         console.log(err);
@@ -84,14 +85,15 @@ export class WithingsService {
     this.getAPISleep().subscribe(
       result => {
         if (result.status == 401) {
-          console.log('Withings 401');
-
+          console.log('Withings 401',result);
+         this.deleteAccessToken();
         }
-        if (result.status == 403) {
-          console.log('Withings 403 - Need to ask for permission');
+        else if (result.status == 403) {
+          console.log('Withings 403 - Need to ask for permission', result);
 
+        } else {
+          this.processSleep(result);
         }
-        this.processSleep(result);
       },
       (err) => {
         console.log(err);
@@ -107,10 +109,11 @@ export class WithingsService {
     this.getAPIDayActivity().subscribe(
       result => {
         if (result.status == 401) {
-          console.log('Withings 401');
-
+          console.log('Withings 401',result);
+          this.deleteAccessToken();
+        } else {
+          this.processWorkout(result);
         }
-        this.processWorkout(result);
       },
       (err) => {
         console.log(err);
@@ -530,6 +533,10 @@ export class WithingsService {
   }
 
 
+  private deleteAccessToken() {
+    this.accessToken = undefined;
+    localStorage.removeItem('withingsToken');
+  }
 
   private getTokenExpirationDate(
     decoded: any

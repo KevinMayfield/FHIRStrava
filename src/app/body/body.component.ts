@@ -198,7 +198,7 @@ export class BodyComponent implements OnInit {
       this.fhirService.getClientsID();
     }
     this.auth.tokenChange.subscribe(athlete => {
-        console.log('Auth current user refreshed');
+        console.log('Auth refreshed refreshed');
         this.fhirService.setPatient();
         this.fhirService.getClientsID();
     });

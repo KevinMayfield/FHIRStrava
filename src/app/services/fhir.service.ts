@@ -54,7 +54,18 @@ export class FhirService {
     });
   }
 
+  getPatientID() : string {
+    if (this.patient == undefined) return this.patient;
+    return this.patient.id;
+  }
+
   setPatient() {
+
+    if (this.getPatientID() != undefined) {
+      // this should force body.ts to call data retrieval.
+      this.patientChange.emit(this.patient);
+      return;
+    }
     var patient = {
       resourceType: 'Patient',
       identifier: [{
@@ -70,8 +81,6 @@ export class FhirService {
         "text": this.auth.currentUser.attributes.name
       }]
     }
-
-    console.log(patient);
 
     this.getServerPatient(patient);
   }

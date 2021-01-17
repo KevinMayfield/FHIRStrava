@@ -41,10 +41,13 @@ export class IhealthService {
               ) { }
 
   getSpO2( page_index?, start_time?, end_time?) {
+
     if (!this.hasAccessToken()) return;
     if (page_index == undefined) page_index = 1;
+
     this.getAPISPO2(page_index, start_time, end_time).subscribe(
       result => {
+
         if (result.status == 401) {
           console.log('iHealth 401');
         }
@@ -58,10 +61,11 @@ export class IhealthService {
            this.getSpO2(urlParams.get('page_index'), urlParams.get('start_time'), urlParams.get('end_time'));
           }
         }
+        console.log('iHealth Get SPO2 API Process',result);
        this.processObs(result.BODataList);
       },
       (err) => {
-        console.log(err);
+        console.log('iHealth Error', err);
         if (err.status == 401) {
 
         }
@@ -71,8 +75,9 @@ export class IhealthService {
   processObs(measures) {
     if (measures === undefined) return;
     var observations: Obs[] = [];
+
     for (const grp of measures) {
-     // console.log(grp);
+
       var date = new Date(+grp.MDate * 1000).toISOString();
       var obs: Obs = {
         'obsDate': new Date(date)
@@ -203,7 +208,7 @@ export class IhealthService {
     const date = this.getTokenExpirationDate(token);
     offsetSeconds = offsetSeconds || 0;
 
-    console.log('iHealth expiry date '+date);
+   // console.log('iHealth expiry date '+date);
     if (date === null) {
       return false;
     }

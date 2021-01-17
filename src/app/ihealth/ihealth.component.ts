@@ -17,7 +17,6 @@ export class IhealthComponent implements OnInit {
   ngOnInit(): void {
 
     this.route.queryParamMap.subscribe(params => {
-      console.log(params);
       var code = params.get('code');
       var state = params.get('state');
       this.doSetup(code, state);
@@ -26,7 +25,6 @@ export class IhealthComponent implements OnInit {
 
   doSetup(authorisationCode, state) {
 
-    console.log(authorisationCode);
     this.iHealth.tokenChange.subscribe(
       token => {
         this.router.navigateByUrl('/');
