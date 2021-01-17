@@ -60,6 +60,9 @@ export class BodyComponent implements OnInit {
 
 
   showMeasures = false;
+  ihealthToken = false;
+  withingsToken = false;
+  stravaPatient = false;
 
  // obs: Obs[] = [];
 
@@ -68,8 +71,6 @@ export class BodyComponent implements OnInit {
   activities: SummaryActivity[] = [];
 
   tabValue: string = 'strava';
-
-
 
   intensityRange = {
     "tough": 95,
@@ -115,30 +116,23 @@ export class BodyComponent implements OnInit {
 
     this.ihealth.tokenChange.subscribe(
       token => {
-        console.log('iHealth token present')
+        console.log('Ihealth token updated. Loading data');
         this.showMeasures = true;
-        this.fhirService.patientChange.pipe(first()).subscribe(result => {
-            this.ihealth.getSpO2();
-
-          }
-        )
+        this.ihealthToken = true;
+        this.checkIhealth();
       }
     )
     this.withings.tokenChange.subscribe(
       token => {
+        console.log('Withings token updated.');
         this.showMeasures = true;
-        // Have ok to query withings but need to wait until FHIR patient (and initialisation) present
-        //
-        this.fhirService.patientChange.pipe(first()).subscribe(result => {
-            this.withings.getObservations();
-            this.withings.getDayActivity();
-            this.withings.getSleep();
-          }
-        )
+        this.withingsToken = true;
+        this.checkWithings();
       }
     )
     this.strava.tokenChange.subscribe(
       token => {
+        console.log('Strava token updated. Loading data');
         if (token != undefined) this.stravaConnect = false;
         this.stravaLoad();
       }
@@ -155,9 +149,18 @@ export class BodyComponent implements OnInit {
         this.buildGraph(result);
       }
     });
+    this.fhirService.patientChange.subscribe( result => {
+      if (result != undefined) {
+        console.log('FHIR Patient present');
+        this.stravaPatient = true;
+        this.checkIhealth();
+        this.checkWithings();
+      }
+
+    })
 
     this.strava.loaded.subscribe(result => {
-     console.log("Strava Loaded");
+     console.log("Strava data loaded");
       this.loadComplete();
       if (result) {
 
@@ -173,13 +176,13 @@ export class BodyComponent implements OnInit {
       }
     });
     this.withings.loaded.subscribe(result => {
-      console.log("Withings Loaded");
+      console.log("Withings data loaded");
       if (result) {
         this.buildGraph(result);
       }
     });
     this.ihealth.loaded.subscribe(result => {
-      console.log("iHealth Loaded");
+      console.log("IHealth data loaded");
       if (result) {
         this.buildGraph(result);
       }
@@ -203,12 +206,30 @@ export class BodyComponent implements OnInit {
     this.phr.connected.subscribe(result => {
       console.log('PHR Clients returned. Call device APIs');
       this.strava.connect();
-      this.withings.connect();
-      this.ihealth.connect()
+      this.withings.initToken();
+      this.ihealth.initToken();
     });
 
   }
 
+  checkIhealth() {
+    if (this.ihealthToken && this.stravaPatient) {
+      console.log('iHealth calling API');
+      this.ihealth.getSpO2();
+    } else {
+      console.log('iHealth unable to call API');
+    }
+  }
+  checkWithings() {
+    if (this.withingsToken && this.stravaPatient) {
+      console.log('Wihtings calling API');
+      this.withings.getObservations();
+      this.withings.getDayActivity();
+      this.withings.getSleep();
+    } else {
+      console.log('Wihtings unable to call API');
+    }
+  }
   stravaLoad() {
     this.getAthlete();
 

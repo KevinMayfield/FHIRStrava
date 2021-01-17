@@ -13,7 +13,7 @@
     flex
     sidenavTitle="Menu" >
     <mat-list>
-      <mat-list-item (click)="logout()">Logout</mat-list-item>
+      <mat-list-item routerLink="/logout">Logout</mat-list-item>
 
     <mat-list-item  *ngIf="withingsConnect" (click)="connectWithings()">
   <img class="img-responsive"  width="25" height="25"  src="assets/images/withings.png"> Withings

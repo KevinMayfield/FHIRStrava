@@ -102,7 +102,7 @@ export class AuthService {
     const date = this.getTokenExpirationDate(token);
     offsetSeconds = offsetSeconds || 0;
 
-    console.log('aws expiry date '+date);
+   // console.log('aws expiry date '+date);
     if (date === null) {
       return false;
     }

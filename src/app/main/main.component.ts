@@ -107,13 +107,6 @@ export class MainComponent implements OnInit {
  */
   }
 
-  logout() {
-    this.auth.signOut();
-    this.strava.logout();
-    this.withings.logout()
-    // TODO tidy
-    this.route.navigateByUrl('/');
-  }
   connectWithings() {
     this.withings.authorise(window.location.href);
   }

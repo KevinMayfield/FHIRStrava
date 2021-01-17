@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import {ActivatedRoute, Router} from "@angular/router";
+import {AuthService} from "../services/auth.service";
 
 @Component({
   selector: 'app-logout',
@@ -7,9 +9,17 @@ import { Component, OnInit } from '@angular/core';
 })
 export class LogoutComponent implements OnInit {
 
-  constructor() { }
+  constructor(private route: ActivatedRoute,
+              private auth : AuthService,
+              private router: Router) { }
 
   ngOnInit(): void {
+    this.auth.signOut();
+    localStorage.removeItem('stravaToken');
+    localStorage.removeItem('withingsToken');
+    localStorage.removeItem('iHealthToken')
+
+    this.router.navigateByUrl('/');
   }
 
 }

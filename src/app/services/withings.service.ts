@@ -440,7 +440,7 @@ export class WithingsService {
 
    */
 
-  connect() {
+  initToken() {
     var token = this.getAccessToken();
     if (token != undefined) this.tokenChange.emit(token);
 
@@ -557,7 +557,7 @@ export class WithingsService {
     const date = this.getTokenExpirationDate(token);
     offsetSeconds = offsetSeconds || 0;
 
-    console.log('withings expiry date '+date);
+    //console.log('withings expiry date '+date);
     if (date === null) {
       return false;
     }
@@ -594,12 +594,6 @@ export class WithingsService {
     localStorage.setItem('withingsToken', JSON.stringify(token));
     this.accessToken = token.access_token;
     this.tokenChange.emit(token);
-  }
-
-
-
-  public logout() {
-    localStorage.removeItem('withingsToken');
   }
 
 

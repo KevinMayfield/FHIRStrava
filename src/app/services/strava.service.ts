@@ -223,9 +223,7 @@ export class StravaService {
     );
   }
 
-  logout(){
-    localStorage.removeItem('stravaToken')
-  }
+
 
   public getTokenExpirationDate(
     decoded: any

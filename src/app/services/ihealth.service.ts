@@ -160,17 +160,19 @@ export class IhealthService {
   SECURITY
    */
 
-  connect() {
+  initToken() {
+    console.log('ihealth initToken');
     var token = this.getAccessToken();
     if (token != undefined) this.tokenChange.emit(token);
     this.loaded.subscribe(result => {
+      console.log('ihealth emit token');
       this.updateFHIRServer(result);
     })
 
   }
   getAccessToken() {
     if (localStorage.getItem('iHealthToken') != undefined) {
-    //  console.log('iHealth Access Token present')
+     console.log('iHealth Access Token present')
       var token: any = JSON.parse(localStorage.getItem('iHealthToken'));
 
       const helper = new JwtHelperService();
