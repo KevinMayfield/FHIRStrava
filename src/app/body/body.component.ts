@@ -20,6 +20,7 @@ import Bundle = fhir.Bundle;
 import {PhrService} from "../services/phr.service";
 import {FhirService} from "../services/fhir.service";
 import {first} from "rxjs/operators";
+import {AuthService} from "../services/auth.service";
 
 @Component({
   selector: 'app-body',
@@ -34,7 +35,8 @@ export class BodyComponent implements OnInit {
               private ihealth: IhealthService,
               private phr: PhrService,
               private _loadingService: TdLoadingService,
-              private fhirService : FhirService) {
+              private fhirService : FhirService,
+              private auth: AuthService) {
     this.onResize();
   }
 
@@ -187,9 +189,24 @@ export class BodyComponent implements OnInit {
       this.phrLoad(true);
     })
 
-    this.strava.connect();
-    this.withings.connect();
-    this.ihealth.connect()
+    if (this.auth.currentUser != undefined) {
+      console.log('Auth current user defined');
+      this.fhirService.setPatient();
+      this.fhirService.getClientsID();
+    }
+    this.auth.tokenChange.subscribe(athlete => {
+        console.log('Auth current user refreshed');
+        this.fhirService.setPatient();
+        this.fhirService.getClientsID();
+    });
+
+    this.phr.connected.subscribe(result => {
+      console.log('PHR Clients returned. Call device APIs');
+      this.strava.connect();
+      this.withings.connect();
+      this.ihealth.connect()
+    });
+
   }
 
   stravaLoad() {

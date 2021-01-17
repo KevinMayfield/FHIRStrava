@@ -27,9 +27,6 @@ export class AuthService {
 
   tokenChange: EventEmitter<any> = new EventEmitter();
 
-  clientId = '8536';
-
-  clientSecret = '6c34eb8997791f315f2f4d9c932a01a903f6beaa';
 
   constructor() {
     Hub.listen('auth',(data) => {
@@ -128,13 +125,12 @@ export class AuthService {
       console.log(res);
       this.isLoggedIn = true;
         let accessToken = res.getAccessToken();
-      localStorage.setItem('awsToken', JSON.stringify(accessToken));
+        localStorage.setItem('awsToken', JSON.stringify(accessToken));
 
 
       Auth.currentUserInfo().then(result => {
         this.currentUser = result;
-        console.log(result);
-        console.log(result.username);
+        console.log('Auth have current user');
         this.tokenChange.emit(result);
       })
 

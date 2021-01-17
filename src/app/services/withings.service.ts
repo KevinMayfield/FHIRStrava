@@ -1,5 +1,5 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
+import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {JwtHelperService} from "@auth0/angular-jwt";
 import {PhrService} from "./phr.service";
@@ -31,9 +31,6 @@ export class WithingsService {
               private datePipe: DatePipe,
               private auth: AuthService) { }
 
-  clientId = 'e532209382d449afbb1ef360919f2fdac284fac62ec23feeea0589f043bdc41f';
-
-  clientSecret = 'd026b695a4cacdd486ac15b2498d08d6432854679876e2c48ae6da043c00e04d';
 
   tokenChange: EventEmitter<any> = new EventEmitter();
 
@@ -53,7 +50,7 @@ export class WithingsService {
 
     localStorage.setItem('appRoute', routeUrl);
     window.location.href = 'https://account.withings.com/oauth2_user/authorize2?response_type=code&client_id='
-      +this.clientId
+      +this.phr.getClients().withings.client_id
       + '&redirect_uri=' +routeUrl+'\withings'
       +'&state=12345'
       +'&scope=user.metrics,user.activity';
@@ -263,7 +260,6 @@ export class WithingsService {
 
     let headers = this.getAPIHeaders();
 
-    var lastUpdate = this.phr.getFromDate();
 
     var bodge= 'action=getintradayactivity'
       + '&data_field=calories,heart_rate,steps'
@@ -285,7 +281,6 @@ export class WithingsService {
 
     let headers = this.getAPIHeaders();
 
-    var lastUpdate = this.phr.getFromDate();
 
     var bodge= 'action=getmeas'
       + '&meastypes=1,5,8,77,76,88,91,9,10,71'
@@ -302,7 +297,6 @@ export class WithingsService {
 
     let headers = this.getAPIHeaders();
 
-    var lastUpdate = this.phr.getFromDate();
 
     var bodge= 'action=getsummary'
       + '&startdateymd='+this.datePipe.transform(this.phr.getFromDate(),"yyyy-MM-dd")
@@ -348,7 +342,7 @@ export class WithingsService {
       }
 
       if (obs.remsleepduration != undefined && obs.lightsleepduration != undefined && obs.deepsleepduration != undefined) {
-        var fhirBP= this.getObservation(bundle,obs,false,'93832-4','Sleep duration',  (obs.remsleepduration + obs.lightsleepduration + obs.deepsleepduration) / 3600 ,"h" );
+        fhirBP= this.getObservation(bundle,obs,false,'93832-4','Sleep duration',  (obs.remsleepduration + obs.lightsleepduration + obs.deepsleepduration) / 3600 ,"h" );
         if (obs.sleep_score != undefined) {
           this.addComponent(fhirBP,'http://withings.com/data_fields','sleep_score','Sleep Score',obs.sleep_score,'score');
           this.addComponent(fhirBP,'http://withings.com/data_fields','remsleepduration','Rem Sleep Duration',(obs.remsleepduration) / 3600,'h');
@@ -488,8 +482,8 @@ export class WithingsService {
 
 
     var bodge= 'grant_type=refresh_token'
-      + '&client_id=' + this.clientId
-      + '&client_secret=' + this.clientSecret
+      + '&client_id=' + this.phr.getClients().withings.client_id
+      + '&client_secret=' + this.phr.getClients().withings.client_secret
       + '&refresh_token=' + token.refresh_token;
 
     this.http.post<any>(url, bodge, { 'headers' : headers} ).subscribe(
@@ -511,8 +505,8 @@ export class WithingsService {
     var url = this.phr.serviceUrl + '/services/token';
 
     var bodge= 'grant_type=authorization_code'
-      + '&client_id=' + this.clientId
-      + '&client_secret=' + this.clientSecret
+      + '&client_id=' + this.phr.getClients().withings.client_id
+      + '&client_secret=' + this.phr.getClients().withings.client_secret
       + '&redirect_uri=' + localStorage.getItem('appRoute')+'\withings'
       + '&code=' + authorisationCode;
 

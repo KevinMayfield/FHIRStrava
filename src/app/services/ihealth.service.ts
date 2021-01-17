@@ -21,10 +21,6 @@ export class IhealthService {
 
   /// Web https://developer.ihealthlabs.eu/index.html
 
-  clientId = '5b2b8d7fb66744c8951be697f34a4948';
-  clientSecret = '8bf97e5cbd1f406dbbe6a0848d2f1974';
-  //clientId = 'c4ffde29e84b4deca55dcdfc5f803983';
-
   loaded: EventEmitter<any> = new EventEmitter();
 
   tokenChange: EventEmitter<any> = new EventEmitter();
@@ -55,7 +51,6 @@ export class IhealthService {
         if (result.NextPageUrl != undefined) {
           var searchUri : string = decodeURIComponent(result.NextPageUrl);
           searchUri = searchUri.substring(searchUri.indexOf("?"));
-          console.log(searchUri);
           var urlParams = new URLSearchParams(searchUri);
           // Use recursion to get next pages
           if (urlParams.get('page_index') > page_index) {
@@ -245,9 +240,7 @@ export class IhealthService {
     var routeUrl = localStorage.getItem('appRoute');
 
     var url = this.phr.serviceUrl + '/services/ihealth/token';
-    url = url +'?client_id='+this.clientId +
-      '&client_secret='+this.clientSecret +
-      '&respone_type_type=refresh_token' +
+    url = url +'?respone_type_type=refresh_token' +
       '&redirect_uri=' +routeUrl+'\ihealth' +
       '&refresh_token='+token.RefreshToken;
 
@@ -311,7 +304,7 @@ export class IhealthService {
     localStorage.setItem('appRoute', routeUrl);
     window.location.href = 'https://oauthuser.ihealthlabs.eu/OpenApiV2/OAuthv2/userauthorization'
       + '?response_type=code'
-      + '&client_id=' +this.clientId
+      + '&client_id=' +this.phr.getClients().ihealth.client_id
       + '&redirect_uri=' +routeUrl+'\ihealth'
       + '&APIName=OpenApiSpO2';
 
@@ -340,12 +333,8 @@ export class IhealthService {
     // Jeez the sc and sv come from api registration.
 
     var url = this.phr.serviceUrl + '/services/ihealth/user/'+this.userID+'/spo2.json/';
-    url = url +  '?client_id='+this.clientId
-      + '&client_secret='+this.clientSecret
-      + '&redirect_uri=' +(routeUrl+'\ihealth')
+    url = url +  '?redirect_uri=' +(routeUrl+'\ihealth')
       + '&smeg=' + accessToken
-      + '&sc=8c2c1eaa194141028b1e8de8c4b6ee87'
-      + '&sv=1c1cc31a951e4b198fa7962c6d8c7c95'
       + '&locale=en_UK'
       + '&page_index='+page_index
        + '&start_time='+start_time
@@ -364,9 +353,7 @@ export class IhealthService {
     var routeUrl = localStorage.getItem('appRoute');
 
     var url = this.phr.serviceUrl + '/services/ihealth/token';
-    url = url +'?client_id='+this.clientId +
-      '&client_secret='+this.clientSecret +
-      '&grant_type=authorization_code' +
+    url = url +'?grant_type=authorization_code' +
       '&redirect_uri=' +routeUrl+'\ihealth' +
       '&code='+authorisationCode;
 

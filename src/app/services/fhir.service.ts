@@ -47,13 +47,7 @@ export class FhirService {
     private strava: StravaService,
     private datePipe: DatePipe) {
 
-    if (this.auth.currentUser != undefined) {
-      console.log(this.auth.currentUser);
-      this.setPatient();
-    }
-    this.auth.tokenChange.subscribe(athlete => {
 
-    });
 
     this.loaded.subscribe(sucess => {
       if (sucess) this.updateFHIRServer(this.strava.activities);
@@ -188,6 +182,16 @@ export class FhirService {
 
   }
 
+  getClientsID() {
+
+    let headers = this.getHeaders();
+    this.http.get(this.phr.serviceUrl +'/services/clients',{ 'headers' : headers}).subscribe(
+      result => {
+        this.phr.setClients(result);
+      }
+    )
+  }
+
   deleteEntry(uri: string) {
     let headers = this.getHeaders();
 
@@ -204,7 +208,7 @@ export class FhirService {
     this.observations = [];
     var url = this.serverUrl + '/R4/Observation?patient='+this.patient.id;
     url = url + '&date=>'+startDate.toISOString();
-    url = url + '&date=<'+endDate.toISOString();
+    url = url + '&date=<='+endDate.toISOString();
     url = url + '&_count=500';
     this.getNext(url);
   }
@@ -243,7 +247,6 @@ export class FhirService {
   private sendTransaction(body : Bundle) {
 
     let headers = this.getHeaders();
-    console.log(body);
 
     return this.http.post<any>(this.serverUrl + '/R4/', body, { 'headers' : headers} ).subscribe(result => {
 

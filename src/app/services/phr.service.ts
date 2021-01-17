@@ -14,6 +14,8 @@ export class PhrService {
 
   alerts : Flag[] = [];
 
+  clients :any =  {};
+
   charts : Charts[] = [
     {
       "unit": "Kg",
@@ -124,6 +126,8 @@ export class PhrService {
 
   dateRangeChange: EventEmitter<any> = new EventEmitter();
 
+  connected: EventEmitter<any> = new EventEmitter();
+
   private duration = 28;
 
   maxhr = 175;
@@ -156,6 +160,17 @@ export class PhrService {
     this.from = new Date(this.to);
     this.from.setDate(this.to.getDate() - this.duration);
     this.dateRangeChange.emit(this.from.toISOString());
+  }
+
+  setClients(clients) {
+    this.clients = clients;
+    localStorage.setItem('clients', JSON.stringify(clients));
+    this.connected.emit(clients);
+  }
+  getClients() {
+    var clients = JSON.parse(localStorage.getItem('clients'));
+    console.log(clients);
+    return clients;
   }
 
 }
