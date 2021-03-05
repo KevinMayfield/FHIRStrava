@@ -265,7 +265,7 @@ export class WithingsService {
 
 
     var bodge= 'action=getintradayactivity'
-      + '&data_field=calories,heart_rate,steps'
+      + '&data_field=calories,heart_rate,steps,spo2_auto'
       + '&startdate='+Math.floor(this.phr.getFromDate().getTime()/1000)
       + '&enddate='+Math.floor(this.phr.getToDate().getTime()/1000);
     //  + '&lastupdate='+Math.floor(lastUpdate.getTime()/1000);
@@ -286,7 +286,7 @@ export class WithingsService {
 
 
     var bodge= 'action=getmeas'
-      + '&meastypes=1,5,8,77,76,88,91,9,10,71'
+      + '&meastypes=1,5,8,77,76,88,91,9,10,71,54'
       + '&category=1'
       + '&startdate='+Math.floor(this.phr.getFromDate().getTime()/1000)
       + '&enddate='+Math.floor(this.phr.getToDate().getTime()/1000);
