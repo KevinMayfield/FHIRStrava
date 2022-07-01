@@ -47,6 +47,11 @@ import { LogoutComponent } from './logout/logout.component';
 import { AmplifyAuthenticatorModule } from '@aws-amplify/ui-angular';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {BodyComponent} from "./body/body.component";
+import {PatientFindComponent} from "./patient/patient-find/patient-find.component";
+import {PatientSearchComponent} from "./component/patient-search/patient-search.component";
+import {PatientComponent} from "./component/patient/patient.component";
+import {ResourceDialogComponent} from "./dialog/resource-dialog/resource-dialog.component";
+import {MatDialogModule} from "@angular/material/dialog";
 
 
 @NgModule({
@@ -54,6 +59,10 @@ import {BodyComponent} from "./body/body.component";
     AppComponent,
     MainComponent,
     BodyComponent,
+    PatientFindComponent,
+    PatientSearchComponent,
+    PatientComponent,
+    ResourceDialogComponent,
 
     LoginComponent,
     LogoutComponent
@@ -102,7 +111,8 @@ import {BodyComponent} from "./body/body.component";
     MatMomentDateModule,
     MatInputModule,
 
-    NgxChartsModule
+    NgxChartsModule,
+    MatDialogModule
 
   ],
   providers: [

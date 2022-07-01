@@ -18,6 +18,7 @@ import DiagnosticReport = fhir.DiagnosticReport;
 import Coding = fhir.Coding;
 import {DatePipe} from "@angular/common";
 import {AuthService} from "./auth.service";
+import {Observable} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -26,7 +27,9 @@ export class FhirService {
 
   private patient : Patient;
 
-  private serverUrl = 'https://fhir.mayfield-is.co.uk';
+  private serverUrl = 'https://ek1wj5eye3.execute-api.eu-west-2.amazonaws.com/dev';
+
+  private apiKey = 'K5wfy9doLB3LzeNGK8T201A26rqMXQ4m7hDHHZyj';
 
   // private serverUrl = 'http://127.0.0.1:8186';
 
@@ -49,7 +52,7 @@ export class FhirService {
   }
 
   getPatientID() : string {
-    if (this.patient == undefined) return this.patient;
+    if (this.patient == undefined) return undefined;
     return this.patient.id;
   }
 
@@ -96,7 +99,7 @@ export class FhirService {
 
     for (const entry of resources.entry) {
       if (entry.resource.resourceType === "Observation") {
-         var observation : Observation = entry.resource;
+         var observation : Observation = <Observation> entry.resource;
          observation.subject = {
            reference : 'Patient/'+this.patient.id
          };
@@ -104,7 +107,7 @@ export class FhirService {
 
       }
       if (entry.resource.resourceType === "DiagnosticReport") {
-        var report : DiagnosticReport = entry.resource;
+        var report : DiagnosticReport = <DiagnosticReport> entry.resource;
         report.subject = {
           reference : 'Patient/'+this.patient.id
         };
@@ -162,19 +165,19 @@ export class FhirService {
     if (patient === undefined) return;
 
     let headers = this.getHeaders();
-    this.http.get(this.serverUrl +"/R4/Patient?identifier="+patient.identifier[0].value,{ 'headers' : headers}).subscribe(
+    this.http.get(this.serverUrl +"/Patient?identifier="+patient.identifier[0].value,{ 'headers' : headers}).subscribe(
       result => {
-        const bundle: Bundle = result;
+        const bundle: Bundle = <Bundle> result;
 
         if (bundle.entry != undefined && bundle.entry.length >0) {
           console.log('Patient found.');
-          this.patient = bundle.entry[0].resource;
+          this.patient = <Patient>bundle.entry[0].resource;
           this.patientChange.emit(this.patient);
 
         } else {
           console.log('Patient not found. Creating');
           headers = headers.append('Prefer','return=representation');
-          this.http.post(this.serverUrl +"/R4/Patient", patient,{ 'headers' : headers}).subscribe(result => {
+          this.http.post(this.serverUrl +"/Patient", patient,{ 'headers' : headers}).subscribe(result => {
             console.log(result);
             this.patient = result;
             this.patientChange.emit(this.patient);
@@ -184,7 +187,19 @@ export class FhirService {
     )
 
   }
+  searchPatients(term: string): Observable<fhir.Bundle> {
+    const url = this.serverUrl;
+    let headers = this.getHeaders();
+    if (!isNaN(parseInt(term))) {
+      return this.http.get<fhir.Bundle>(url + `/Patient?identifier=${term}`, {'headers': headers});
+    } else {
 
+      return this.http.get<fhir.Bundle>(url + `/Patient?name=${term}`, {'headers': headers});
+
+    }
+
+
+  }
 
   deleteEntry(uri: string) {
     let headers = this.getHeaders();
@@ -232,7 +247,7 @@ export class FhirService {
     if (bundle.entry !== undefined && bundle.entry.length>0) {
       for (const entry of bundle.entry) {
         if (entry.resource.resourceType === "Observation") {
-          this.observations.push(entry.resource);
+          this.observations.push(<Observation>entry.resource);
         }
       }
     }
@@ -260,6 +275,7 @@ export class FhirService {
     headers = headers.append('Content-Type', 'application/fhir+json');
     headers = headers.append('Accept', 'application/fhir+json');
     headers = headers.append("Authorization", "Bearer "+this.auth.getAccessToken());
+    headers = headers.append('x-api-key',this.apiKey);
  //   console.log(headers);
     return headers;
   }
