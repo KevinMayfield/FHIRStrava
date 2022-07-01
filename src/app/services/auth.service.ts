@@ -2,9 +2,8 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {Observable, Subject} from "rxjs";
 import Auth, { CognitoHostedUIIdentityProvider } from '@aws-amplify/auth'
 import { Hub, ICredentials } from '@aws-amplify/core'
-import {HttpHeaders} from "@angular/common/http";
-import {A} from "@angular/cdk/keycodes";
 import {JwtHelperService} from "@auth0/angular-jwt";
+import {AuthenticatorService} from "@aws-amplify/ui-angular";
 
 @Injectable({
   providedIn: 'root'
@@ -28,11 +27,23 @@ export class AuthService {
   tokenChange: EventEmitter<any> = new EventEmitter();
 
 
-  constructor() {
-    Hub.listen('auth',(data) => {
+  constructor( private awsService : AuthenticatorService) {
+    console.log(awsService.authStatus);
+    Hub.listen('auth',({ payload: { event, data } }) => {
+      console.log("Me TWO")
+      console.log(event);
       const { channel, payload } = data;
       if (channel === 'auth') {
         this._authState.next(payload.event);
+      }
+      switch (event) {
+        case "signIn":
+
+          this.isLoggedIn =true;
+          break;
+        case "signOut":
+          this.isLoggedIn =false;
+          break;
       }
     });
   }
@@ -42,12 +53,6 @@ export class AuthService {
       .then(() => this.isLoggedIn = false)
   }
 
-  googleSocialSignIn():Promise<ICredentials> {
-    console.log("googleSocialSignIn");
-    return Auth.federatedSignIn({
-      'provider': CognitoHostedUIIdentityProvider.Google
-    });
-  }
 
   getAccessToken() {
     if (localStorage.getItem('awsToken') != undefined) {

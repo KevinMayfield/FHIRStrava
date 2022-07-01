@@ -1,7 +1,8 @@
 {
   "auth": {
-    "fhirstrava19d3aee7": {
+    "virtuallyebf289f0": {
       "service": "Cognito",
+      "serviceType": "imported",
       "providerPlugin": "awscloudformation",
       "dependsOn": [],
       "customAuth": false

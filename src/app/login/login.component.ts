@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import {AuthService} from "../services/auth.service";
 import {ActivatedRoute, Router} from "@angular/router";
+import { Amplify, Auth, Hub } from 'aws-amplify';
+import {AuthenticatorService} from "@aws-amplify/ui-angular";
 
 @Component({
   selector: 'app-login',
@@ -16,33 +18,31 @@ export class LoginComponent implements OnInit {
 
   constructor(private route: ActivatedRoute,
               private auth : AuthService,
+              private awsService : AuthenticatorService,
               private router: Router) { }
 
-  ngOnInit(): void {
-    this.route.queryParamMap.subscribe(params => {
-      var code = params.get('code');
-      var state = params.get('state');
-      this.doSetup(code, state);
-    });
+
+
+  go() {
+    this.router.navigateByUrl('/');
   }
-
-  doSetup(authorisationCode, state) {
-
-    this.auth.tokenChange.subscribe(
-      token => {
+  ngOnInit(): void {
+    Hub.listen("auth",({ payload: { event, data } }) => {
+      console.log(event);
+      console.log(data);
+      switch (event) {
+        case "signIn":
+          this.router.navigateByUrl('/');
+          break;
+      }
+    });
+    Auth.currentAuthenticatedUser().then(
+      data => {
+        console.log(data);
+        this.auth.isLoggedIn = true;
         this.router.navigateByUrl('/');
       }
     );
-    this.auth.getOAuth2AccessToken(authorisationCode);
-  }
 
-  pushTheButton() {
-    console.log('push the button');
-  }
-  async federatedSignIn(option) {
-    console.log('federatedSignIn');
-    const socialResult =
-      await this.auth.googleSocialSignIn();
-    console.log('google Result:', socialResult);
   }
 }

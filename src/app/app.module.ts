@@ -24,18 +24,12 @@ import {CovalentCommonModule} from "@covalent/core/common";
 import {FlexLayoutModule} from "@angular/flex-layout";
 import {MatSelectModule} from "@angular/material/select";
 import {MatToolbarModule} from "@angular/material/toolbar";
-import { BodyComponent } from './body/body.component';
 import {CovalentJsonFormatterModule} from "@covalent/core/json-formatter";
-import { ExchangeTokenComponent } from './exchange-token/exchange-token.component';
 import {MatSliderModule} from "@angular/material/slider";
-import { WithingsComponent } from './withings/withings.component';
 import {MatSortModule} from "@angular/material/sort";
 import {NgxChartsModule} from "@swimlane/ngx-charts";
-import { LineChartComponent } from './line-chart/line-chart.component';
 import {CovalentExpansionPanelModule} from "@covalent/core/expansion-panel";
-import { BubbleChartComponent } from './bubble-chart/bubble-chart.component';
 import {CovalentLoadingModule} from "@covalent/core/loading";
-import { IhealthComponent } from './ihealth/ihealth.component';
 import {CovalentFileModule} from "@covalent/core/file";
 import {MatDatepickerModule} from "@angular/material/datepicker";
 import {
@@ -44,14 +38,15 @@ import {
   MomentDateAdapter
 } from "@angular/material-moment-adapter";
 import {MatInputModule} from "@angular/material/input";
-import {ReactiveFormsModule} from "@angular/forms";
 import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from "@angular/material/core";
 import {DatePipe} from "@angular/common";
 import {CovalentNotificationsModule} from "@covalent/core/notifications";
 import {CovalentMessageModule} from "@covalent/core/message";
 import { LoginComponent } from './login/login.component';
 import { LogoutComponent } from './logout/logout.component';
-import { BarChartComponent } from './bar-chart/bar-chart.component';
+import { AmplifyAuthenticatorModule } from '@aws-amplify/ui-angular';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {BodyComponent} from "./body/body.component";
 
 
 @NgModule({
@@ -59,22 +54,19 @@ import { BarChartComponent } from './bar-chart/bar-chart.component';
     AppComponent,
     MainComponent,
     BodyComponent,
-    ExchangeTokenComponent,
-    WithingsComponent,
 
-    LineChartComponent,
-    BubbleChartComponent,
-    IhealthComponent,
     LoginComponent,
-    LogoutComponent,
-    BarChartComponent,
+    LogoutComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     FlexLayoutModule,
+    FormsModule,
     ReactiveFormsModule,
+
+    AmplifyAuthenticatorModule,
 
 
     CovalentLayoutModule,

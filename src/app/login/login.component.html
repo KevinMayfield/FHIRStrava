@@ -1,9 +1,19 @@
 <mat-card>
-  <mat-card-header><h3>Login Method</h3></mat-card-header>
+
   <mat-card-content>
-<div className="App">
-<!--  <button (onClick)="federatedSignIn({provider: 'Facebook'})">Open Facebook</button> -->
-  <button mat-raised-button (click)="federatedSignIn($event)">Logon via Google</button>
+<div>
+  <amplify-authenticator hand>
+    <ng-template
+      amplifySlot="authenticated"
+      let-user="user"
+      let-signOut="signOut"
+    >
+      <h1>Welcome {{ user.username }}!</h1>
+      <button (click)="signOut()">Sign Out</button>
+      <button (click)="go()">Go</button>
+    </ng-template>
+  </amplify-authenticator>
 </div>
   </mat-card-content>
 </mat-card>
+
