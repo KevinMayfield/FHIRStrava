@@ -54,6 +54,17 @@ import {ResourceDialogComponent} from "./dialog/resource-dialog/resource-dialog.
 import {MatDialogModule} from "@angular/material/dialog";
 import {CovalentDialogsModule} from "@covalent/core/dialogs";
 import {EprService} from "./services/epr.service";
+import {PatientSummaryComponent} from "./patient/patient-summary/patient-summary.component";
+import {MatChipsModule} from "@angular/material/chips";
+import {ConditionComponent} from "./component/condition/condition.component";
+import {LinksService} from "./services/links.service";
+import {MedicationRequestComponent} from "./component/medication-request/medication-request.component";
+import {MatTabsModule} from "@angular/material/tabs";
+import {ObservationComponent} from "./component/observation/observation.component";
+import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
+import {DocumentReferenceComponent} from "./component/document-reference/document-reference.component";
+import {CompositionComponent} from "./component/composition/composition.component";
+import {CompositionDetailComponent} from "./component/composition-detail/composition-detail.component";
 
 
 @NgModule({
@@ -64,6 +75,13 @@ import {EprService} from "./services/epr.service";
     PatientFindComponent,
     PatientSearchComponent,
     PatientComponent,
+    PatientSummaryComponent,
+    ConditionComponent,
+    ObservationComponent,
+    MedicationRequestComponent,
+    DocumentReferenceComponent,
+    CompositionComponent,
+    CompositionDetailComponent,
     ResourceDialogComponent,
 
     LoginComponent,
@@ -115,12 +133,16 @@ import {EprService} from "./services/epr.service";
     MatInputModule,
 
     NgxChartsModule,
-    MatDialogModule
+    MatDialogModule,
+    MatChipsModule,
+    MatTabsModule,
+    MatProgressSpinnerModule
 
   ],
   providers: [
     DatePipe,
     EprService,
+    LinksService,
     {provide: MAT_DATE_LOCALE
       , useValue: 'en-GB'},
 

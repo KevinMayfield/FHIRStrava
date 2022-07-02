@@ -7,6 +7,7 @@ import {LoginComponent} from "./login/login.component";
 import {LogoutComponent} from "./logout/logout.component";
 import {AuthGuard} from "./services/auth-guard";
 import {PatientSearchComponent} from "./component/patient-search/patient-search.component";
+import {PatientSummaryComponent} from "./patient/patient-summary/patient-summary.component";
 
 const routes: Routes = [
   {
@@ -14,9 +15,11 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     children: [
       {
-      path: '', component: PatientSearchComponent
-    },
+      path: '', component: PatientSearchComponent,
 
+    },{
+        path: 'patient/:patientid', component: PatientSummaryComponent
+      }
     ]
   },
   {

@@ -1,0 +1,51 @@
+<mat-card>
+    <mat-card-content>
+        <h3>Patient Summary</h3>
+    </mat-card-content>
+</mat-card>
+
+<span *ngIf="patientId!=undefined">
+
+   <mat-card>
+     <mat-card-content>
+
+       <mat-tab-group>
+  <mat-tab label="Problems">
+
+         <!-- Conditions -->
+
+    <app-condition [patientId]="patientId" (encounter)="selectEncounter($event)"> </app-condition>
+
+
+  </mat-tab>
+  <mat-tab label="Prescriptions">
+
+    <app-medication-request [patientId]="patientId" > </app-medication-request>
+
+</mat-tab>
+         <mat-tab label="Observations">
+
+    <app-observation [patientId]="patientId" > </app-observation>
+
+</mat-tab>
+         <mat-tab label="Documents">
+
+    <app-document-reference [patientId]="patientId" > </app-document-reference>
+
+</mat-tab>
+           <mat-tab label="Consultations">
+
+    <app-composition [patientId]="patientId" > </app-composition>
+
+</mat-tab>
+       </mat-tab-group>
+  </mat-card-content>
+     </mat-card>
+</span>
+
+
+
+
+
+
+

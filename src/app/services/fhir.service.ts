@@ -19,6 +19,11 @@ import Coding = fhir.Coding;
 import {DatePipe} from "@angular/common";
 import {AuthService} from "./auth.service";
 import {Observable} from "rxjs";
+import {environment} from "../../environments/environment";
+import Condition = fhir.Condition;
+import MedicationRequest = fhir.MedicationRequest;
+import Composition = fhir.Composition;
+import DocumentReference = fhir.DocumentReference;
 
 @Injectable({
   providedIn: 'root'
@@ -31,23 +36,35 @@ export class FhirService {
 
   //private serverUrl = 'https://jtm3f8nxwe.execute-api.eu-west-2.amazonaws.com/Development/EMIS/F83004';
 
-  private serverUrl = 'http://127.0.0.1:8180/R4';
 
   private apiKey = 'K5wfy9doLB3LzeNGK8T201A26rqMXQ4m7hDHHZyj';
 
   // private serverUrl = 'http://127.0.0.1:8186';
 
-  private observations : Observation[] = [];
 
   loaded: EventEmitter<any> = new EventEmitter();
 
   patientChange: EventEmitter<any> = new EventEmitter();
 
+  conditionsChanged: EventEmitter<any> = new EventEmitter();
+  private conditions: fhir.Condition[] = [];
+
+  private medicationRequests: fhir.MedicationRequest[] = [];
+  medicationRequestsChanged: EventEmitter<any> = new EventEmitter();
+
+  private observations: fhir.Observation[] = [];
+  observationsChanged: EventEmitter<any> = new EventEmitter();
+
+  private documentReferences: fhir.DocumentReference[] = [];
+  documentReferencesChanged: EventEmitter<any> = new EventEmitter();
+
+  private compositions: fhir.Composition[] = [];
+  compositionsChanged: EventEmitter<any> = new EventEmitter();
+
   constructor(
     private http: HttpClient,
     private auth: AuthService,
     private datePipe: DatePipe) {
-
 
 
     this.loaded.subscribe(sucess => {
@@ -59,6 +76,140 @@ export class FhirService {
     if (this.patient == undefined) return undefined;
     return this.patient.id;
   }
+
+
+  /// Conditions
+
+  public getConditions() : any {
+    return this.conditions;
+  }
+  public queryConditions(patientId): any {
+
+    const headers = this.getHeaders();
+    // tslint:disable-next-line:typedef
+    this.http.get(environment.gpUrl + '/Condition?patient='+patientId, { headers}).subscribe(
+      result => {
+        const bundle = result as Bundle;
+        if (bundle.entry !== undefined && bundle.entry.length > 0) {
+
+          this.conditions = [];
+          for (const entry of bundle.entry) {
+            this.conditions.push(entry.resource as Condition);
+          }
+          this.conditionsChanged.emit({});
+        } else {
+          console.log('Condition not found.');
+        }
+      }
+    );
+  }
+
+  /// Compositions
+
+  public getCompositions() : any {
+    return this.compositions;
+  }
+  public queryCompositions(patientId): any {
+
+    const headers = this.getHeaders();
+    // tslint:disable-next-line:typedef
+    this.http.get(environment.gpUrl + '/Composition?patient='+patientId +'&date=2022-01-01', { headers}).subscribe(
+      result => {
+        const bundle = result as Bundle;
+        if (bundle.entry !== undefined && bundle.entry.length > 0) {
+
+          this.compositions = [];
+          for (const entry of bundle.entry) {
+            this.compositions.push(entry.resource as Composition);
+          }
+          this.compositionsChanged.emit({});
+        } else {
+          console.log('Composition not found.');
+        }
+      }
+    );
+  }
+
+
+  /// DocumentReferences
+
+  public getDocumentReferences() : any {
+    return this.documentReferences;
+  }
+  public queryDocumentReferences(patientId): any {
+
+    const headers = this.getHeaders();
+    // tslint:disable-next-line:typedef
+    this.http.get(environment.gpUrl + '/DocumentReference?patient='+patientId, { headers}).subscribe(
+      result => {
+        const bundle = result as Bundle;
+        if (bundle.entry !== undefined && bundle.entry.length > 0) {
+
+          this.documentReferences = [];
+          for (const entry of bundle.entry) {
+            this.documentReferences.push(entry.resource as DocumentReference);
+          }
+          this.documentReferencesChanged.emit({});
+        } else {
+          console.log('DocumentRerence not found.');
+        }
+      }
+    );
+  }
+
+  // MedicationRequests
+
+  public getMedicationRequests() : any {
+    return this.medicationRequests;
+  }
+  public queryMedicationRequests(patientId): any {
+
+    const headers = this.getHeaders();
+    // tslint:disable-next-line:typedef
+    this.http.get(environment.gpUrl + '/MedicationRequest?patient='+patientId + '&date=2019-01-01', { headers}).subscribe(
+      result => {
+        const bundle = result as Bundle;
+        if (bundle.entry !== undefined && bundle.entry.length > 0) {
+
+          this.medicationRequests = [];
+          for (const entry of bundle.entry) {
+            this.medicationRequests.push(entry.resource as MedicationRequest);
+          }
+          this.medicationRequestsChanged.emit({});
+        } else {
+          console.log('MedicationRequest not found.');
+        }
+      }
+    );
+  }
+
+
+  // Observations
+
+  public getObservations() : any {
+    return this.observations;
+  }
+  public queryObservations(patientId): any {
+
+    const headers = this.getHeaders();
+    // tslint:disable-next-line:typedef
+    this.http.get(environment.gpUrl + '/Observation?patient='+patientId , { headers}).subscribe(
+      result => {
+        const bundle = result as Bundle;
+        if (bundle.entry !== undefined && bundle.entry.length > 0) {
+
+          this.observations = [];
+          for (const entry of bundle.entry) {
+            this.observations.push(entry.resource as Observation);
+          }
+          this.observationsChanged.emit({});
+        } else {
+          console.log('Observation not found.');
+        }
+      }
+    );
+  }
+
 
   setPatient() {
 
@@ -86,57 +237,8 @@ export class FhirService {
     this.getServerPatient(patient);
   }
 
-  getObservations() {
-    return this.observations;
-  }
 
-  postTransaction(resources : Bundle) {
-    if (this.patient == undefined) {
-      console.log('Patient missing - should not occur');
-    } else {
-      if (this.patient.id == undefined) {
-        console.log('Patient Id missing - should not occur');
-      }
-    }
-    var transaction = this.getTransactionBundle();
-    var batchSize = 200;
 
-    for (const entry of resources.entry) {
-      if (entry.resource.resourceType === "Observation") {
-         var observation : Observation = <Observation> entry.resource;
-         observation.subject = {
-           reference : 'Patient/'+this.patient.id
-         };
-        transaction.entry.push(this.convertEntry(entry));
-
-      }
-      if (entry.resource.resourceType === "DiagnosticReport") {
-        var report : DiagnosticReport = <DiagnosticReport> entry.resource;
-        report.subject = {
-          reference : 'Patient/'+this.patient.id
-        };
-        transaction.entry.push(this.convertEntry(entry));
-      }
-      batchSize--;
-      if (batchSize <1) {
-        this.sendTransaction(transaction);
-        // reset transaction
-        batchSize = 200;
-        transaction = this.getTransactionBundle();
-      }
-    }
-   // console.log(transaction);
-    this.sendTransaction(transaction);
-  }
-
-  getTransactionBundle() : Bundle {
-    var transaction : Bundle = {
-      type : "transaction",
-      entry : []
-    };
-    transaction.resourceType = 'Bundle';
-    return transaction;
-  }
 
   makeEntry(resource) :BundleEntry {
     if (resource === undefined) return;
@@ -169,7 +271,7 @@ export class FhirService {
     if (patient === undefined) return;
 
     let headers = this.getHeaders();
-    this.http.get(this.serverUrl +"/Patient?identifier="+patient.identifier[0].value,{ 'headers' : headers}).subscribe(
+    this.http.get(environment.gpUrl +"/Patient?identifier="+patient.identifier[0].value,{ 'headers' : headers}).subscribe(
       result => {
         const bundle: Bundle = <Bundle> result;
 
@@ -181,7 +283,7 @@ export class FhirService {
         } else {
           console.log('Patient not found. Creating');
           headers = headers.append('Prefer','return=representation');
-          this.http.post(this.serverUrl +"/Patient", patient,{ 'headers' : headers}).subscribe(result => {
+          this.http.post(environment.gpUrl +"/Patient", patient,{ 'headers' : headers}).subscribe(result => {
             console.log(result);
             this.patient = result;
             this.patientChange.emit(this.patient);
@@ -192,7 +294,7 @@ export class FhirService {
 
   }
   searchPatients(term: string): Observable<fhir.Bundle> {
-    const url = this.serverUrl;
+    const url = environment.gpUrl;
     let headers = this.getHeaders();
     if (!isNaN(parseInt(term))) {
       return this.http.get<fhir.Bundle>(url + `/Patient?identifier=${term}`, {'headers': headers});
@@ -208,7 +310,7 @@ export class FhirService {
   deleteEntry(uri: string) {
     let headers = this.getHeaders();
 
-    return this.http.delete<any>(this.serverUrl + '/R4'+uri,  { 'headers' : headers} ).subscribe(result => {
+    return this.http.delete<any>(environment.gpUrl +uri,  { 'headers' : headers} ).subscribe(result => {
         console.log('Deleted' + uri);
       },
       (err)=> {
@@ -219,7 +321,7 @@ export class FhirService {
   getServerObservations(startDate : Date, endDate : Date) {
     if (this.patient === undefined) return;
     this.observations = [];
-    var url = this.serverUrl + '/R4/Observation?patient='+this.patient.id;
+    var url = environment.gpUrl + '/Observation?patient='+this.patient.id;
     url = url + '&date=>'+startDate.toISOString();
     url = url + '&date=<='+endDate.toISOString();
     url = url + '&_count=500';
@@ -257,19 +359,6 @@ export class FhirService {
     }
   }
 
-  private sendTransaction(body : Bundle) {
-
-    let headers = this.getHeaders();
-
-    return this.http.post<any>(this.serverUrl + '/R4/', body, { 'headers' : headers} ).subscribe(result => {
-
-    },
-      (err)=> {
-          console.log(err);
-
-      });
-
-  }
 
   getHeaders() : HttpHeaders {
 

@@ -16,6 +16,7 @@ import {HttpErrorResponse} from '@angular/common/http';
 
 import {NEVER} from "rxjs/internal/observable/never";
 import {FhirService} from "../../services/fhir.service";
+import {Router} from "@angular/router";
 
 
 
@@ -32,10 +33,9 @@ export class PatientSearchComponent implements OnInit {
 
   @Output() patientSelected : EventEmitter<fhir.Patient> = new EventEmitter();
 
-  constructor( private fhirService: FhirService
+  constructor( private fhirService: FhirService, private router: Router
 
   ) {}
-
 
 
   // Push a search term into the observable stream.
@@ -96,10 +96,12 @@ export class PatientSearchComponent implements OnInit {
   }
 
   selectPatient(patient: fhir.Patient) {
-    console.log(patient);
-    //this.patientChange.set(patient);
-    this.patients$ = undefined;
+    console.log('patient search ' + patient.id);
     this.patientSelected.emit(patient);
+    if (patient !== undefined) {
+      this.router.navigateByUrl('patient/' + patient.id  );
+
+    }
   }
 
 
