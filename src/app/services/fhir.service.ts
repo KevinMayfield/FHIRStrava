@@ -27,7 +27,11 @@ export class FhirService {
 
   private patient : Patient;
 
-  private serverUrl = 'https://ek1wj5eye3.execute-api.eu-west-2.amazonaws.com/dev';
+ // private serverUrl = 'https://ek1wj5eye3.execute-api.eu-west-2.amazonaws.com/dev';
+
+  //private serverUrl = 'https://jtm3f8nxwe.execute-api.eu-west-2.amazonaws.com/Development/EMIS/F83004';
+
+  private serverUrl = 'http://127.0.0.1:8180/R4';
 
   private apiKey = 'K5wfy9doLB3LzeNGK8T201A26rqMXQ4m7hDHHZyj';
 

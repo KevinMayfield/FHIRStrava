@@ -31,7 +31,7 @@ export class PatientComponent implements OnInit {
 
   organisations: fhir.Organization[];
 
-  displayedColumns = ['patient', 'dob', 'gender', 'identifier', 'contact', 'gp', 'prac', 'resource'];
+  displayedColumns = ['patient', 'dob', 'gender', 'identifier', 'contact',  'practice', 'resource'];
 
   constructor( private dialog: MatDialog,
                public fhirService: FhirService) {
@@ -40,7 +40,7 @@ export class PatientComponent implements OnInit {
 
   ngOnInit() {
     if (!this.showResourceLink) {
-      this.displayedColumns = ['select', 'patient', 'dob', 'gender', 'identifier', 'contact', 'gp', 'prac'];
+      this.displayedColumns = ['select', 'patient', 'dob', 'gender', 'identifier', 'contact',  'practice', 'resource'];
     }
     if (this.useObservable) {
       this.dataSource = new PatientDataSource( undefined, this.patientsObservable, this.useObservable);
@@ -99,14 +99,20 @@ export class PatientComponent implements OnInit {
   }
 
   getIdentifier(identifier: fhir.Identifier): String {
+
     let name: String = identifier.system;
     if (identifier.system.indexOf('nhs-number') !== -1) {
-
       name = 'NHS Number';
     } else if (identifier.system.indexOf('pas-number') !== -1) {
       name = 'PAS Number';
     } else if (identifier.system.indexOf('PPMIdentifier') !== -1) {
       name = 'LTH PPM Id';
+    }
+    else if (identifier.system.indexOf('Patient/DBID') !== -1) {
+      name = 'EMIS Id';
+    }
+    else if (identifier.system.indexOf('ID') !== -1) {
+      name = 'Patient Id';
     }
     return name;
   }

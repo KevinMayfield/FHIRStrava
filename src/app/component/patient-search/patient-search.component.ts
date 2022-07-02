@@ -96,7 +96,7 @@ export class PatientSearchComponent implements OnInit {
   }
 
   selectPatient(patient: fhir.Patient) {
-
+    console.log(patient);
     //this.patientChange.set(patient);
     this.patients$ = undefined;
     this.patientSelected.emit(patient);

@@ -52,6 +52,8 @@ import {PatientSearchComponent} from "./component/patient-search/patient-search.
 import {PatientComponent} from "./component/patient/patient.component";
 import {ResourceDialogComponent} from "./dialog/resource-dialog/resource-dialog.component";
 import {MatDialogModule} from "@angular/material/dialog";
+import {CovalentDialogsModule} from "@covalent/core/dialogs";
+import {EprService} from "./services/epr.service";
 
 
 @NgModule({
@@ -91,6 +93,7 @@ import {MatDialogModule} from "@angular/material/dialog";
     CovalentFileModule,
     CovalentNotificationsModule,
     CovalentMessageModule,
+    CovalentDialogsModule,
 
     MatButtonModule,
     MatIconModule,
@@ -117,6 +120,7 @@ import {MatDialogModule} from "@angular/material/dialog";
   ],
   providers: [
     DatePipe,
+    EprService,
     {provide: MAT_DATE_LOCALE
       , useValue: 'en-GB'},
 

@@ -15,7 +15,7 @@ export class ResourceDialogComponent implements OnInit {
 
 
   constructor(
-    public dialogRef: MatDialogRef<ResourceDialogComponent>,
+   // public dialogRef: MatDialogRef<ResourceDialogComponent>,
     public patientEPRService: EprService,
     @Inject(MAT_DIALOG_DATA) data) {
     this.resource = data.resource;
@@ -31,26 +31,10 @@ export class ResourceDialogComponent implements OnInit {
     this.patientEPRService.getResourceChangeEvent().subscribe(
       resource => {
         this.resource = resource;
-        /*
-        this.buildNodes();
-
-        $('#docTreeView').jstree('destroy');
-
-        $('#docTreeView').jstree({
-          'core' : {
-            'data' : this.treeData
-          }
-        });
-        */
       }
     );
 
   }
-
-
-
-
-
 
 
   entityMap = {

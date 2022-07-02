@@ -15,9 +15,6 @@ export class LogoutComponent implements OnInit {
 
   ngOnInit(): void {
     this.auth.signOut();
-    localStorage.removeItem('stravaToken');
-    localStorage.removeItem('withingsToken');
-    localStorage.removeItem('iHealthToken')
 
     this.router.navigateByUrl('/');
   }

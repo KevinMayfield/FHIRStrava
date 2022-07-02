@@ -6,6 +6,7 @@
     sidenavTitle="Menu" >
     <mat-list>
       <mat-list-item routerLink="/logout">Logout</mat-list-item>
+      <mat-list-item routerLink="/">Patient Find</mat-list-item>
 
 <!--
     <mat-list-item  *ngIf="ihealthConnect" (click)="connectIHealth()" >
@@ -30,19 +31,21 @@
             <span *ngIf="screenWidth>680"> {{name}}</span>
             <span flex></span>
 
-      <mat-form-field appearance="standard" class="units">
+     <!-- <mat-form-field appearance="standard" class="units">
         <mat-select [(value)]="selected" (selectionChange)="selectDuration($event)">
           <mat-option *ngFor="let duration of durations" [value]="duration.value">
             {{duration.viewValue}}
           </mat-option>
         </mat-select>
       </mat-form-field>
+
       &nbsp;
       <mat-form-field color="accent" appearance="standard">
         <input matInput [matDatepicker]="picker1" #to placeholder="End date" [formControl]="toDate" (dateChange)="dateToChanged(to.value)">
         <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
         <mat-datepicker #picker1></mat-datepicker>
       </mat-form-field>
+        -->
       <span flex></span>
 
     </div>
