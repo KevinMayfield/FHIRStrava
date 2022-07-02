@@ -43,6 +43,16 @@
     <app-immunisation [patientId]="patientId" > </app-immunisation>
 
 </mat-tab>
+         <mat-tab label="Allergies">
+
+    <app-allergy-intolerance [patientId]="patientId" > </app-allergy-intolerance>
+
+</mat-tab>
+         <mat-tab label="Diary/Task">
+
+    <app-task [patientId]="patientId" > </app-task>
+
+</mat-tab>
        </mat-tab-group>
   </mat-card-content>
      </mat-card>

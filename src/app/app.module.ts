@@ -65,6 +65,8 @@ import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 import {DocumentReferenceComponent} from "./component/document-reference/document-reference.component";
 import {CompositionComponent} from "./component/composition/composition.component";
 import {ImmunisationComponent} from "./component/immunisation/immunisation.component";
+import {TaskComponent} from "./component/task/task.component";
+import {AllergyIntoleranceComponent} from "./component/allergy-intolerance/allergy-intolerance.component";
 
 
 @NgModule({
@@ -82,6 +84,8 @@ import {ImmunisationComponent} from "./component/immunisation/immunisation.compo
     DocumentReferenceComponent,
     CompositionComponent,
     ImmunisationComponent,
+    TaskComponent,
+    AllergyIntoleranceComponent,
     ResourceDialogComponent,
 
     LoginComponent,

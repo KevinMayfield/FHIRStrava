@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  gpUrl : 'http://127.0.0.1:8180/R4'
+  gpUrl : 'https://test-emis.virtually.healthcare/R4'
 };
 
 /*

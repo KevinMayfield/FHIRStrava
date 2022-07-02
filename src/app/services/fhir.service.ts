@@ -25,6 +25,7 @@ import MedicationRequest = fhir.MedicationRequest;
 import Composition = fhir.Composition;
 import DocumentReference = fhir.DocumentReference;
 import Immunization = fhir.Immunization;
+import AllergyIntolerance = fhir.AllergyIntolerance;
 
 @Injectable({
   providedIn: 'root'
@@ -65,6 +66,11 @@ export class FhirService {
   private immunizations: fhir.Immunization[] = [];
   immunizationsChanged: EventEmitter<any> = new EventEmitter();
 
+  private allergies: fhir.AllergyIntolerance[] = [];
+  allergiesChanged: EventEmitter<any> = new EventEmitter();
+
+  private tasks: fhir.Task[] = [];
+  tasksChanged: EventEmitter<any> = new EventEmitter();
 
   constructor(
     private http: HttpClient,
@@ -82,6 +88,33 @@ export class FhirService {
     return this.patient.id;
   }
 
+
+  /// Allergiew
+
+  public getAllergies() : any {
+    return this.allergies;
+  }
+  public queryAllergies(patientId): any {
+
+    const headers = this.getHeaders();
+    // tslint:disable-next-line:typedef
+    this.http.get(environment.gpUrl + '/AllergyIntolerance?patient='+patientId, { headers}).subscribe(
+      result => {
+        const bundle = result as Bundle;
+        if (bundle.entry !== undefined && bundle.entry.length > 0) {
+
+          this.allergies = [];
+          for (const entry of bundle.entry) {
+            this.allergies.push(entry.resource as AllergyIntolerance);
+          }
+          this.allergiesChanged.emit({});
+        } else {
+          console.log('Allergies not found.');
+          this.allergiesChanged.emit({});
+        }
+      }
+    );
+  }
 
   /// Conditions
 
@@ -109,6 +142,7 @@ export class FhirService {
       }
     );
   }
+
 
   /// Compositions
 
@@ -248,6 +282,33 @@ export class FhirService {
     );
   }
 
+
+  // Observations
+
+  public getTasks() : any {
+    return this.tasks;
+  }
+  public queryTasks(patientId): any {
+
+    const headers = this.getHeaders();
+    // tslint:disable-next-line:typedef
+    this.http.get(environment.gpUrl + '/Task?patient='+patientId , { headers}).subscribe(
+      result => {
+        const bundle = result as Bundle;
+        if (bundle.entry !== undefined && bundle.entry.length > 0) {
+
+          this.tasks = [];
+          for (const entry of bundle.entry) {
+            this.tasks.push(entry.resource as fhir.Task);
+          }
+          this.tasksChanged.emit({});
+        } else {
+          console.log('Tasks not found.');
+          this.tasksChanged.emit({});
+        }
+      }
+    );
+  }
 
   setPatient() {
 

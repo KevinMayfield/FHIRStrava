@@ -42,7 +42,7 @@
   <ng-container matColumnDef="code">
     <th mat-header-cell *matHeaderCellDef> Observation </th>
     <td mat-cell *matCellDef="let observation">
-      <span *ngIf="observation.code && observation.code.coding.length > 0">
+      <span *ngIf="observation.code && observation.code.coding != null">
         <b>{{observation.code.coding[0].display}}</b>
       </span>
 
