@@ -46,7 +46,11 @@ export class ConditionComponent implements OnInit {
           this.conditions = this.fhir.getConditions();
           this.dataSource = new MatTableDataSource(this.conditions);
           this.dataSource.sort = this.sort;
-        });
+        }, () =>
+      {
+        this.resourcesLoaded = true;
+      }
+        );
       }
     }
 
@@ -62,9 +66,7 @@ export class ConditionComponent implements OnInit {
         };
         const resourceDialog: MatDialogRef<ResourceDialogComponent> = this.dialog.open( ResourceDialogComponent, dialogConfig);
     }
-  getCodeSystem(system: string): string {
-    return this.linkService.getCodeSystem(system);
-  }
+
 
   getCodeTip(codeableConcept : fhir.CodeableConcept) {
     for (var code of codeableConcept.coding) {

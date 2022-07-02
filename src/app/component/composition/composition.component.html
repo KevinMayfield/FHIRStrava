@@ -14,13 +14,34 @@
 
     <ng-container matColumnDef="date">
       <th mat-sort-header mat-header-cell *matHeaderCellDef> Date </th>
-      <td mat-cell *matCellDef="let document"> {{document.date | date: 'dd-MMM-yyyy HH:mm'}} </td>
+      <td mat-cell *matCellDef="let document">
+        {{document.date | date: 'dd-MMM-yyyy HH:mm'}} <br/>
+        <span *ngIf="document.type != undefined">
+        <br/>
+          <b>{{document.type.coding[0].display}}</b>
+          </span>
+        <br/>
+         <span *ngFor="let author of document.author">
+          <div>{{author.display}}</div>
+        </span>
+      </td>
     </ng-container>
     <ng-container matColumnDef="description">
       <th mat-header-cell *matHeaderCellDef> Description </th>
       <td mat-cell *matCellDef="let document"> {{document.description}} </td>
     </ng-container>
+  <ng-container matColumnDef="body">
+      <th mat-header-cell *matHeaderCellDef> Notes </th>
+      <td mat-cell *matCellDef="let document">
 
+         <span *ngFor="let section of document.section">
+           <h3>{{section.title}}</h3>
+            <span *ngIf="section.text !== undefined">
+             <div [innerHTML]="fix(section.text.div)"></div>
+          </span>
+        </span>
+      </td>
+    </ng-container>
 
 
     <ng-container matColumnDef="type">

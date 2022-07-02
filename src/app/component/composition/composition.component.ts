@@ -28,7 +28,8 @@ export class CompositionComponent implements OnInit {
   resourcesLoaded = false;
   @ViewChild(MatSort) sort: MatSort | undefined;
 
-  displayedColumns = ['open', 'date', 'type', 'typelink', 'author', 'resource'];
+  displayedColumns = [ 'date', 'body',
+    'resource'];
 
   constructor(private router: Router,
               private _dialogService: TdDialogService,
@@ -105,5 +106,11 @@ export class CompositionComponent implements OnInit {
       resource: resource
     };
     const resourceDialog: MatDialogRef<ResourceDialogComponent> = this.dialog.open( ResourceDialogComponent, dialogConfig);
+  }
+
+  fix(div: string) {
+    div =div.replace('&gt;','>');
+
+  return div;
   }
 }

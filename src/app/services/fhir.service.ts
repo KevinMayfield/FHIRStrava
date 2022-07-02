@@ -24,6 +24,7 @@ import Condition = fhir.Condition;
 import MedicationRequest = fhir.MedicationRequest;
 import Composition = fhir.Composition;
 import DocumentReference = fhir.DocumentReference;
+import Immunization = fhir.Immunization;
 
 @Injectable({
   providedIn: 'root'
@@ -60,6 +61,10 @@ export class FhirService {
 
   private compositions: fhir.Composition[] = [];
   compositionsChanged: EventEmitter<any> = new EventEmitter();
+
+  private immunizations: fhir.Immunization[] = [];
+  immunizationsChanged: EventEmitter<any> = new EventEmitter();
+
 
   constructor(
     private http: HttpClient,
@@ -99,6 +104,7 @@ export class FhirService {
           this.conditionsChanged.emit({});
         } else {
           console.log('Condition not found.');
+          this.conditionsChanged.emit({});
         }
       }
     );
@@ -125,6 +131,7 @@ export class FhirService {
           this.compositionsChanged.emit({});
         } else {
           console.log('Composition not found.');
+          this.compositionsChanged.emit({});
         }
       }
     );
@@ -152,6 +159,34 @@ export class FhirService {
           this.documentReferencesChanged.emit({});
         } else {
           console.log('DocumentRerence not found.');
+          this.documentReferencesChanged.emit({});
+        }
+      }
+    );
+  }
+
+  /// Conditions
+
+  public getImmunizations() : any {
+    return this.immunizations;
+  }
+  public queryImmunizations(patientId): any {
+
+    const headers = this.getHeaders();
+    // tslint:disable-next-line:typedef
+    this.http.get(environment.gpUrl + '/Immunization?patient='+patientId, { headers}).subscribe(
+      result => {
+        const bundle = result as Bundle;
+        if (bundle.entry !== undefined && bundle.entry.length > 0) {
+
+          this.immunizations = [];
+          for (const entry of bundle.entry) {
+            this.immunizations.push(entry.resource as Immunization);
+          }
+          this.immunizationsChanged.emit({});
+        } else {
+          console.log('Immunisation not found.');
+          this.immunizationsChanged.emit({});
         }
       }
     );
@@ -177,7 +212,9 @@ export class FhirService {
           }
           this.medicationRequestsChanged.emit({});
         } else {
+
           console.log('MedicationRequest not found.');
+          this.medicationRequestsChanged.emit({});
         }
       }
     );
@@ -205,6 +242,7 @@ export class FhirService {
           this.observationsChanged.emit({});
         } else {
           console.log('Observation not found.');
+          this.observationsChanged.emit({});
         }
       }
     );

@@ -64,7 +64,7 @@ import {ObservationComponent} from "./component/observation/observation.componen
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 import {DocumentReferenceComponent} from "./component/document-reference/document-reference.component";
 import {CompositionComponent} from "./component/composition/composition.component";
-import {CompositionDetailComponent} from "./component/composition-detail/composition-detail.component";
+import {ImmunisationComponent} from "./component/immunisation/immunisation.component";
 
 
 @NgModule({
@@ -81,7 +81,7 @@ import {CompositionDetailComponent} from "./component/composition-detail/composi
     MedicationRequestComponent,
     DocumentReferenceComponent,
     CompositionComponent,
-    CompositionDetailComponent,
+    ImmunisationComponent,
     ResourceDialogComponent,
 
     LoginComponent,

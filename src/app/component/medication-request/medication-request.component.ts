@@ -47,6 +47,15 @@ export class MedicationRequestComponent implements OnInit {
         this.resourcesLoaded = true;
         this.dataSource = new MatTableDataSource(this.medicationRequests);
         this.dataSource.sort = this.sort;
+      }, (event) =>
+      {
+        console.log(event);
+        console.log('error');
+        this.resourcesLoaded = true;
+      }, (event) =>
+      {
+        console.log('complete');
+        this.resourcesLoaded = true;
       });
     }
 
