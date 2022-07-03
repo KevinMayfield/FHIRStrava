@@ -27,6 +27,7 @@ export class LoginComponent implements OnInit {
     this.router.navigateByUrl('/');
   }
   ngOnInit(): void {
+
     Hub.listen("auth",({ payload: { event, data } }) => {
       console.log(event);
       console.log(data);
@@ -36,9 +37,10 @@ export class LoginComponent implements OnInit {
           break;
       }
     });
+
     Auth.currentAuthenticatedUser().then(
       data => {
-        console.log(data);
+        this.auth.getOAuth2AccessToken();
         this.auth.isLoggedIn = true;
         this.router.navigateByUrl('/');
       }

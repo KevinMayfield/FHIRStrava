@@ -26,7 +26,7 @@
     <ng-container matColumnDef="type">
       <th mat-header-cell *matHeaderCellDef> Type </th>
       <td mat-cell *matCellDef="let document">
-        <span *ngIf="document.type != undefined">
+        <span *ngIf="document.type != undefined && document.type.coding != undefined">
           <b>{{document.type.coding[0].display}}</b>
         </span>
       </td>
@@ -35,15 +35,10 @@
     <ng-container matColumnDef="typelink">
       <th mat-header-cell *matHeaderCellDef width="5%"> </th>
       <td mat-cell *matCellDef="let document">
-      <span *ngIf="document.type.coding[0].code !== undefined" >
-        <span *ngIf="isSNOMED(document.type.coding[0].system)">
+      <span *ngIf="document.type.coding !== undefined" >
           <button mat-icon-button color="accent" matTooltip="{{getCodeTip(document.type)}}" (click)="getSNOMEDLink(document.type)">
               <mat-icon>book</mat-icon>
           </button>
-        </span>
-         <span *ngIf="!isSNOMED(document.type.coding[0].system)">
-              <mat-icon matTooltip="{{getCodeTip(document.type)}} ">book_outline</mat-icon>
-        </span>
       </span>
       </td>
     </ng-container>

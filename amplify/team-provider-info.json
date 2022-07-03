@@ -13,7 +13,7 @@
     },
     "categories": {
       "auth": {
-        "virtuallyebf289f0": {
+        "virtuallycc6fd163": {
           "userPoolId": "eu-west-2_B3pZ3UVOd",
           "userPoolName": "fhir-service-dev",
           "webClientId": "3bqtkaohjofnna2o8b4npv4r2h",

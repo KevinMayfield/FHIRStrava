@@ -44,6 +44,8 @@ export class FhirService {
   // private serverUrl = 'http://127.0.0.1:8186';
 
 
+   private token;
+
   loaded: EventEmitter<any> = new EventEmitter();
 
   patientChange: EventEmitter<any> = new EventEmitter();
@@ -77,10 +79,31 @@ export class FhirService {
     private auth: AuthService,
     private datePipe: DatePipe) {
 
-
+    this.auth.tokenChange.subscribe(accessToken => {
+      console.log("token changed");
+      this.token = accessToken;
+    });
     this.loaded.subscribe(sucess => {
 
     });
+  }
+
+
+
+
+  getHeaders() : HttpHeaders {
+
+    let headers = new HttpHeaders(
+    );
+
+    this.auth.getAccessToken();
+    //console.log("FHIR Service using "+this.token);
+    headers = headers.append('Content-Type', 'application/fhir+json');
+    headers = headers.append('Accept', 'application/fhir+json');
+    headers = headers.append("Authorization", "Bearer "+this.token);
+    headers = headers.append('x-api-key',this.apiKey);
+    //   console.log(headers);
+    return headers;
   }
 
   getPatientID() : string {
@@ -459,18 +482,7 @@ export class FhirService {
   }
 
 
-  getHeaders() : HttpHeaders {
 
-    let headers = new HttpHeaders(
-    );
-
-    headers = headers.append('Content-Type', 'application/fhir+json');
-    headers = headers.append('Accept', 'application/fhir+json');
-    headers = headers.append("Authorization", "Bearer "+this.auth.getAccessToken());
-    headers = headers.append('x-api-key',this.apiKey);
- //   console.log(headers);
-    return headers;
-  }
 
   processFHIRObs() {
 

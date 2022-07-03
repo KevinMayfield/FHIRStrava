@@ -12,7 +12,13 @@ export class AuthService {
 
   public isLoggedIn: boolean;
 
+  private useIdToken = false;
+
   private accessToken = undefined;
+  private idToken = undefined;
+
+  private jwt = undefined;
+
 
   private refreshingToken = false;
 
@@ -29,8 +35,8 @@ export class AuthService {
 
   constructor( private awsService : AuthenticatorService) {
     console.log(awsService.authStatus);
+
     Hub.listen('auth',({ payload: { event, data } }) => {
-      console.log("Me TWO")
       console.log(event);
       const { channel, payload } = data;
       if (channel === 'auth') {
@@ -49,31 +55,48 @@ export class AuthService {
   }
 
   public signOut(): Promise<any> {
+    this.isLoggedIn = false;
     return Auth.signOut()
       .then(() => this.isLoggedIn = false)
   }
 
 
   getAccessToken() {
-    if (localStorage.getItem('awsToken') != undefined) {
-      var token: any = JSON.parse(localStorage.getItem('awsToken'));
 
+    if (this.jwt != undefined) {
+      var token: any = this.accessToken;
       const helper = new JwtHelperService();
       if (this.isTokenExpired(token)) {
-
         console.log('aws Token expired');
-        this.accessToken = undefined;
         this.getRefreshToken();
-        return undefined;
       }
-      if (token != undefined) {
-        this.accessToken = token.jwtToken;
-        return this.accessToken;
-
-      }
+    } else {
+      this.getOAuth2AccessToken();
     }
-    return undefined;
   }
+
+  public  getOAuth2AccessToken() {
+    Auth.currentSession().then(res => {
+      this.isLoggedIn = true;
+      this.accessToken = res.getAccessToken()
+      this.idToken = res.getIdToken()
+
+    //  this.jwt = this.accessToken.getJwtToken()
+
+      if (this.useIdToken) {
+       // console.log(`myIdToken: ${JSON.stringify(this.idToken)}`)
+        this.jwt = this.idToken.getJwtToken()
+        this.tokenChange.emit(this.jwt);
+      } else {
+       // console.log(`myAccessToken: ${JSON.stringify(this.accessToken)}`)
+        this.jwt = this.accessToken.getJwtToken()
+        this.tokenChange.emit(this.jwt);
+      }
+
+   //   console.log(`myJwt: ${this.jwt}`)
+    });
+  }
+
 
   public getRefreshToken() {
 
@@ -81,35 +104,8 @@ export class AuthService {
     this.refreshingToken = true;
     console.log('AWS Refresh Token');
     // See note below on AWS handling refresh internally
-    this.getOAuth2AccessToken(undefined);
-    /*
+    this.getOAuth2AccessToken();
 
-    Libs apparently handle behind the scenes - so not needed.
-
-    try {
-     Auth.currentAuthenticatedUser().then(cognitoUser => {
-       Auth.currentSession().then(currentSession => {
-         cognitoUser.refreshSession(currentSession.getRefreshToken(), (err, session) => {
-           if (err != undefined) {
-             console.log('AWS Refresh Error',err);
-           } else {
-             this.refreshingToken = false;
-             let token = session.getRefreshToken();
-             console.log('AWS Refresh Token', token);
-             localStorage.setItem('awsToken', JSON.stringify(token));
-             this.tokenChange.emit(token);
-
-             const {idToken, refreshToken, accessToken} = session;
-           }
-         });
-       })
-     });
-    } catch (e) {
-      console.log('Unable to refresh Token', e);
-      this.refreshingToken = false;
-    }
-
-     */
   }
 
   private isTokenExpired(
@@ -122,7 +118,6 @@ export class AuthService {
     const date = this.getTokenExpirationDate(token);
     offsetSeconds = offsetSeconds || 0;
 
-   // console.log('aws expiry date '+date);
     if (date === null) {
       return false;
     }
@@ -140,20 +135,5 @@ export class AuthService {
     return date;
   }
 
-  public getOAuth2AccessToken(authorisationCode) {
-    Auth.currentSession().then(res => {
-      this.isLoggedIn = true;
-        let accessToken = res.getAccessToken();
-        console.log('AWS Access Token',accessToken);
-        localStorage.setItem('awsToken', JSON.stringify(accessToken));
 
-
-      Auth.currentUserInfo().then(result => {
-        this.currentUser = result;
-        console.log('Auth have current user');
-        this.tokenChange.emit(result);
-      })
-
-    });
-  }
 }

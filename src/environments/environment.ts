@@ -4,8 +4,17 @@
 
 export const environment = {
   production: false,
-  gpUrl : 'https://test-emis.virtually.healthcare/R4'
+  gpUrl : 'https://jtm3f8nxwe.execute-api.eu-west-2.amazonaws.com/Development/EMIS/F83004',
+
+  awsUrl : 'https://ek1wj5eye3.execute-api.eu-west-2.amazonaws.com/dev',
+  gpOuth2Url : 'https://jtm3f8nxwe.execute-api.eu-west-2.amazonaws.com/Development/EMIS/F83004'
 };
+
+/*
+this is the unsecured endpoint for emis
+
+ // emisUrl : 'https://test-emis.virtually.healthcare/R4',
+ */
 
 /*
  * For easier debugging in development mode, you can import the following file

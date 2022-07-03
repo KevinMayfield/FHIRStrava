@@ -1,6 +1,6 @@
 {
   "auth": {
-    "virtuallyebf289f0": {
+    "virtuallycc6fd163": {
       "service": "Cognito",
       "serviceType": "imported",
       "providerPlugin": "awscloudformation",
