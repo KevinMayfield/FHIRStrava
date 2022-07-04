@@ -24,7 +24,7 @@ export class ImmunisationComponent implements OnInit {
   resourcesLoaded = false;
 
 
-  displayedColumns = ['date', 'code','practitioner','codelink','indication','indicationlink','dose','status','procedure',  'resource'];
+  displayedColumns = ['occurrenceDateTime', 'code','practitioner','codelink','indication','indicationlink','dose','status','procedure',  'resource'];
 
   constructor(private linkService: LinksService,
               public dialog: MatDialog,

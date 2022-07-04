@@ -124,6 +124,7 @@ import {AllergyIntoleranceComponent} from "./component/allergy-intolerance/aller
     MatSidenavModule,
     MatFormFieldModule,
     MatTableModule,
+    MatSortModule,
     MatCardModule,
     MatButtonModule,
     MatTooltipModule,
@@ -131,7 +132,7 @@ import {AllergyIntoleranceComponent} from "./component/allergy-intolerance/aller
     MatToolbarModule,
     MatCheckboxModule,
     MatSliderModule,
-    MatSortModule,
+
     MatDatepickerModule,
     MatMomentDateModule,
     MatInputModule,

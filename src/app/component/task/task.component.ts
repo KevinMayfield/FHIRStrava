@@ -25,7 +25,7 @@ export class TaskComponent implements OnInit {
   resourcesLoaded = false;
   @ViewChild(MatSort) sort: MatSort | undefined;
 
-  displayedColumns = ['start','alert', 'status', 'author', 'resource'];
+  displayedColumns = ['executionPeriod.start','alert', 'status', 'author', 'resource'];
 
   constructor(private linksService: LinksService,
               public dialog: MatDialog,

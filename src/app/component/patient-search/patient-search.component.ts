@@ -2,7 +2,7 @@
 
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 
-import { Observable, Subject, of, throwError  } from 'rxjs';
+import {Observable, Subject, of, throwError, EMPTY} from 'rxjs';
 
 
 
@@ -75,7 +75,10 @@ export class PatientSearchComponent implements OnInit {
         }
         return pat$;}
         )
-    ), catchError(this.handleError('getPatients', []));
+    ),  catchError((err, caught) => {
+      console.log(err);
+      return EMPTY;
+    });
 
   }
 

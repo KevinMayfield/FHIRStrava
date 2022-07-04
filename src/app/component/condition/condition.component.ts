@@ -6,6 +6,8 @@ import {FhirService} from "../../services/fhir.service";
 import {LinksService} from "../../services/links.service";
 import {MatTableDataSource} from "@angular/material/table";
 import {MatSort} from "@angular/material/sort";
+import Condition = fhir.Condition;
+import {MatPaginator} from "@angular/material/paginator";
 
 
 @Component({
@@ -27,9 +29,11 @@ export class ConditionComponent implements OnInit {
   resourcesLoaded = false;
 
   dataSource : any;
-  @ViewChild(MatSort) sort: MatSort | undefined;
 
-  displayedColumns = ['asserted','onset', 'code','codelink','category','categorylink', 'clinicalstatus','severity','asserterLink','contextLink', 'resource'];
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatSort) sort: MatSort;
+
+  displayedColumns = ['onsetDateTime', 'code','codelink','category','categorylink', 'clinicalStatus','severity','asserterLink','contextLink', 'resource'];
 
   constructor(
               public  linkService: LinksService,
@@ -39,13 +43,12 @@ export class ConditionComponent implements OnInit {
   ngOnInit() {
     if (this.patientId !== undefined) {
       this.dataSource = new MatTableDataSource <any>(this.conditions);
-
         this.fhir.queryConditions(this.patientId);
         this.fhir.conditionsChanged.subscribe(() => {
           this.resourcesLoaded = true;
           this.conditions = this.fhir.getConditions();
           this.dataSource = new MatTableDataSource(this.conditions);
-          this.dataSource.sort = this.sort;
+            this.dataSource.sort = this.sort;
         }, () =>
       {
         this.resourcesLoaded = true;
@@ -54,6 +57,10 @@ export class ConditionComponent implements OnInit {
       }
     }
 
+  ngAfterViewInit() {
+    console.log('Afterview init '+ this.sort)
+    this.dataSource.sort = this.sort;
+  }
 
     select(resource) {
         const dialogConfig = new MatDialogConfig();
@@ -77,6 +84,8 @@ export class ConditionComponent implements OnInit {
     return undefined;
   }
 
+
+
   isSNOMED(system: string): boolean {
     return this.linkService.isSNOMED(system);
   }
@@ -88,7 +97,6 @@ export class ConditionComponent implements OnInit {
       }
     }
   }
-
 
 
   showEncounter(condition: fhir.Condition) {

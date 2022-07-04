@@ -3,7 +3,7 @@ import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angula
 import {ResourceDialogComponent} from '../../dialog/resource-dialog/resource-dialog.component';
 import {MatDialog, MatDialogConfig, MatDialogRef} from '@angular/material/dialog';
 import {MatTableDataSource} from "@angular/material/table";
-import {MatSort} from "@angular/material/sort";
+import {MatSort, Sort} from "@angular/material/sort";
 import {LinksService} from "../../services/links.service";
 import {FhirService} from "../../services/fhir.service";
 
@@ -28,7 +28,7 @@ export class ObservationComponent implements OnInit {
 
   resourcesLoaded = false;
 
-  displayedColumns = ['date', 'code', 'codelink', 'category', 'value',  'performer', 'resource'];
+  displayedColumns = ['effectiveDateTime', 'code', 'codelink', 'category', 'value',  'performer', 'resource'];
 
   constructor(private linkService: LinksService,
 
@@ -146,6 +146,8 @@ export class ObservationComponent implements OnInit {
     };
     const resourceDialog: MatDialogRef<ResourceDialogComponent> = this.dialog.open( ResourceDialogComponent, dialogConfig);
   }
+
+
 
 
 

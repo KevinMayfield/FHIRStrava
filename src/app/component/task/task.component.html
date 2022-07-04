@@ -1,5 +1,5 @@
 <div>
-  <table fxFill="100" mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+  <table fxFill="100" [hidden]="!resourcesLoaded" matSort matSortActive="start" matSortDirection="desc" mat-table [dataSource]="dataSource" class="mat-elevation-z8">
 
 
 
@@ -31,8 +31,8 @@
       </td>
     </ng-container>
 
-    <ng-container matColumnDef="start">
-      <th mat-header-cell *matHeaderCellDef width="10%"> Date Due </th>
+    <ng-container matColumnDef="executionPeriod.start">
+      <th mat-sort-header mat-header-cell *matHeaderCellDef width="10%"> Date Due </th>
       <td mat-cell *matCellDef="let task">  <span *ngIf="task.executionPeriod !== undefined  && task.executionPeriod.start !== undefined"> {{task.executionPeriod.start | date: 'dd-MMM-yyyy'}} </span> </td>
     </ng-container>
     <ng-container matColumnDef="end">

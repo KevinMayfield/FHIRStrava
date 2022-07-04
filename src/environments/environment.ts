@@ -4,10 +4,17 @@
 
 export const environment = {
   production: false,
-  gpUrl : 'https://jtm3f8nxwe.execute-api.eu-west-2.amazonaws.com/Development/EMIS/F83004',
-
-  awsUrl : 'https://ek1wj5eye3.execute-api.eu-west-2.amazonaws.com/dev',
-  gpOuth2Url : 'https://jtm3f8nxwe.execute-api.eu-west-2.amazonaws.com/Development/EMIS/F83004'
+  gpUrl : 'https://ek1wj5eye3.execute-api.eu-west-2.amazonaws.com/dev',
+  servers : [
+    {
+      name: "EMIS",
+      fhirServer: "https://jtm3f8nxwe.execute-api.eu-west-2.amazonaws.com/Development/EMIS/F83004"
+    },
+    {
+      name: "Virtually AWS",
+      fhirServer : 'https://ek1wj5eye3.execute-api.eu-west-2.amazonaws.com/dev',
+    }
+  ]
 };
 
 /*

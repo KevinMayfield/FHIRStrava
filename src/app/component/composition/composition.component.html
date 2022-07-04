@@ -1,7 +1,7 @@
 <div>
   <mat-spinner *ngIf="resourcesLoaded === false"></mat-spinner>
-  <span *ngIf="resourcesLoaded === true">
-  <table fxFill="100" mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+
+  <table fxFill="100" [hidden]="!resourcesLoaded" mat-table [dataSource]="dataSource" matSort matSortActive="date" matSortDirection="desc" class="mat-elevation-z8">
 
     <!--- Note that these columns can be defined in any order.
           The actual rendered columns are set as a property on the row definition" -->
@@ -13,7 +13,7 @@
     </ng-container>
 
     <ng-container matColumnDef="date">
-      <th mat-sort-header mat-header-cell *matHeaderCellDef> Date </th>
+      <th mat-sort-header="date" mat-header-cell *matHeaderCellDef> Date </th>
       <td mat-cell *matCellDef="let document">
         {{document.date | date: 'dd-MMM-yyyy HH:mm'}} <br/>
         <span *ngIf="document.type != undefined">
@@ -123,6 +123,6 @@
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
   </table>
-  </span>
+
 </div>
 
