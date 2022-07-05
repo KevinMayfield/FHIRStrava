@@ -3,7 +3,7 @@ import {EventEmitter, Injectable} from '@angular/core';
 // @ts-ignore
 import Patient = fhir.Patient;
 // @ts-ignore
-import Bundle = fhir.Bundle;
+import Bundle = fhir4.Bundle;
 // @ts-ignore
 import Observation = fhir.Observation;
 // @ts-ignore
@@ -12,6 +12,7 @@ import * as uuid from 'uuid';
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 // @ts-ignore
 import Flag = fhir.Flag;
+import Task = fhir.Task;
 // @ts-ignore
 import DiagnosticReport = fhir.DiagnosticReport;
 // @ts-ignore
@@ -20,7 +21,8 @@ import {DatePipe} from "@angular/common";
 import {AuthService} from "./auth.service";
 import {Observable} from "rxjs";
 import {environment} from "../../environments/environment";
-import Condition = fhir.Condition;
+// @ts-ignore
+import Condition = fhir4.Condition;
 import MedicationRequest = fhir.MedicationRequest;
 import Composition = fhir.Composition;
 import DocumentReference = fhir.DocumentReference;
@@ -51,27 +53,27 @@ export class FhirService {
   patientChange: EventEmitter<any> = new EventEmitter();
 
   conditionsChanged: EventEmitter<any> = new EventEmitter();
-  private conditions: fhir.Condition[] = [];
+  private conditions: Condition[] = [];
 
-  private medicationRequests: fhir.MedicationRequest[] = [];
+  private medicationRequests: MedicationRequest[] = [];
   medicationRequestsChanged: EventEmitter<any> = new EventEmitter();
 
-  private observations: fhir.Observation[] = [];
+  private observations: Observation[] = [];
   observationsChanged: EventEmitter<any> = new EventEmitter();
 
-  private documentReferences: fhir.DocumentReference[] = [];
+  private documentReferences: DocumentReference[] = [];
   documentReferencesChanged: EventEmitter<any> = new EventEmitter();
 
-  private compositions: fhir.Composition[] = [];
+  private compositions: Composition[] = [];
   compositionsChanged: EventEmitter<any> = new EventEmitter();
 
-  private immunizations: fhir.Immunization[] = [];
+  private immunizations: Immunization[] = [];
   immunizationsChanged: EventEmitter<any> = new EventEmitter();
 
-  private allergies: fhir.AllergyIntolerance[] = [];
+  private allergies: AllergyIntolerance[] = [];
   allergiesChanged: EventEmitter<any> = new EventEmitter();
 
-  private tasks: fhir.Task[] = [];
+  private tasks: Task[] = [];
   tasksChanged: EventEmitter<any> = new EventEmitter();
 
   constructor(
@@ -144,18 +146,29 @@ export class FhirService {
   public getConditions() : any {
     return this.conditions;
   }
-  public queryConditions(patientId): any {
+  public queryConditions(patientId, clinicalStatus): any {
 
     const headers = this.getHeaders();
+    var search = environment.gpUrl + '/Condition?patient='+patientId;
+    /* not supported on EMIS
+    if (clinicalStatus!= undefined) {
+      search += '&clinical-status='+clinicalStatus;
+    }
+
+     */
     // tslint:disable-next-line:typedef
-    this.http.get(environment.gpUrl + '/Condition?patient='+patientId, { headers}).subscribe(
+    this.http.get(search, { headers}).subscribe(
       result => {
         const bundle = result as Bundle;
         if (bundle.entry !== undefined && bundle.entry.length > 0) {
 
           this.conditions = [];
           for (const entry of bundle.entry) {
-            this.conditions.push(entry.resource as Condition);
+           let conditon = entry.resource as Condition;
+
+           if (clinicalStatus === undefined || (conditon.clinicalStatus.coding != undefined && conditon.clinicalStatus.coding[0].code === clinicalStatus)) {
+             this.conditions.push(conditon);
+           }
           }
           this.conditionsChanged.emit({});
         } else {

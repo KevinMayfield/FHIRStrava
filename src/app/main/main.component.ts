@@ -81,7 +81,13 @@ export class MainComponent implements OnInit {
   }
 
   onClickR(route) {
-    this.router.navigate([ '/patient/137/'+ route ]);
+    var split = route.split('/');
+    if (split.length > 1) {
+      if (split[0] === 'patient') {
+        this.router.navigate([ '/patient/'+split[1]+'/'+ route ]);
+      }
+    }
+
   }
   dateToChanged(value: string) {
 

@@ -1,1 +1,4 @@
-<p>patient-immunisation works!</p>
+<mat-card>
+  <h2>Immunisations</h2>
+  <app-immunisation *ngIf="patientId!=undefined" [patientId]="patientId" > </app-immunisation>
+</mat-card>

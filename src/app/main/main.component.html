@@ -33,7 +33,8 @@
     <mat-nav-list td-sidenav-content [tdLayoutManageListClose]="!media.query('gt-sm')">
       <a mat-list-item routerLink="/" matTooltip="Patient Search"><mat-icon>search</mat-icon></a>
       <span *ngIf="patient">
-        <a mat-list-item (click)="onClickR('')" matTooltip="Summary"><mat-icon>info</mat-icon></a>
+        <a mat-list-item (click)="onClickR('')" matTooltip="Summary"><mat-icon>dashboard</mat-icon></a>
+         <a mat-list-item (click)="onClickR('problem')" matTooltip="Summary"><mat-icon>info</mat-icon></a>
         <a mat-list-item (click)="onClickR('observation')" matTooltip="Observations"><mat-icon>event_note</mat-icon></a>
         <a mat-list-item (click)="onClickR('medication')" matTooltip="Medications"><mat-icon>local_pharmacy</mat-icon></a>
         <a mat-list-item (click)="onClickR('immunisation')" matTooltip="Immunisations"><mat-icon>flight</mat-icon></a>

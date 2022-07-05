@@ -73,6 +73,7 @@ import { PatientMedicationComponent } from './patient/patient-medication/patient
 import { PatientMainComponent } from './patient/patient-main/patient-main.component';
 import { PatientDocumentComponent } from './patient/patient-document/patient-document.component';
 import { PatientImmunisationComponent } from './patient/patient-immunisation/patient-immunisation.component';
+import { PatientProblemComponent } from './patient/patient-problem/patient-problem.component';
 
 
 @NgModule({
@@ -100,7 +101,8 @@ import { PatientImmunisationComponent } from './patient/patient-immunisation/pat
     PatientMedicationComponent,
     PatientMainComponent,
     PatientDocumentComponent,
-    PatientImmunisationComponent
+    PatientImmunisationComponent,
+    PatientProblemComponent
   ],
   imports: [
     BrowserModule,

@@ -2,11 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
 
 @Component({
-  selector: 'app-patient-immunisation',
-  templateUrl: './patient-immunisation.component.html',
-  styleUrls: ['./patient-immunisation.component.scss']
+  selector: 'app-patient-problem',
+  templateUrl: './patient-problem.component.html',
+  styleUrls: ['./patient-problem.component.scss']
 })
-export class PatientImmunisationComponent implements OnInit {
+export class PatientProblemComponent implements OnInit {
 
   constructor( private route: ActivatedRoute) { }
   patientId = undefined;
@@ -14,5 +14,4 @@ export class PatientImmunisationComponent implements OnInit {
     this.patientId = this.route.snapshot.paramMap.get('patientid');
     console.log(this.patientId);
   }
-
 }

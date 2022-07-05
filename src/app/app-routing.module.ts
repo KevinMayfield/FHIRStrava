@@ -13,6 +13,7 @@ import {PatientMedicationComponent} from "./patient/patient-medication/patient-m
 import {PatientMainComponent} from "./patient/patient-main/patient-main.component";
 import {PatientImmunisationComponent} from "./patient/patient-immunisation/patient-immunisation.component";
 import {PatientDocumentComponent} from "./patient/patient-document/patient-document.component";
+import {PatientProblemComponent} from "./patient/patient-problem/patient-problem.component";
 
 const routes: Routes = [
   {
@@ -38,6 +39,9 @@ const routes: Routes = [
             path: ':patientid/immunisation', component: PatientImmunisationComponent
           },{
             path: ':patientid/document', component: PatientDocumentComponent
+          },{
+            path: ':patientid/problem', component: PatientProblemComponent
+
           }
           ]
       }

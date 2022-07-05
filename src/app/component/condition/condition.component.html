@@ -94,7 +94,7 @@
 
 
     <ng-container matColumnDef="clinicalStatus">
-      <th mat-sort-header="clinicalStatus" mat-header-cell  *matHeaderCellDef> Clinical Status </th>
+      <th mat-sort-header="clinicalStatus.coding[0].display" mat-header-cell  *matHeaderCellDef> Clinical Status </th>
       <td mat-cell *matCellDef="let condition"> {{condition.clinicalStatus.coding[0].display}} </td>
     </ng-container>
 

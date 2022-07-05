@@ -23,6 +23,8 @@ export class ConditionComponent implements OnInit {
 
   @Input() useBundle :boolean = false;
 
+  @Input() clinicalStatus :string = undefined;
+
   @Output() condition = new EventEmitter<fhir.Condition>();
 
   @Output() encounter = new EventEmitter<fhir.Reference>();
@@ -43,11 +45,16 @@ export class ConditionComponent implements OnInit {
   ngOnInit() {
     if (this.patientId !== undefined) {
       this.dataSource = new MatTableDataSource <any>(this.conditions);
-        this.fhir.queryConditions(this.patientId);
+        this.fhir.queryConditions(this.patientId, this.clinicalStatus);
         this.fhir.conditionsChanged.subscribe(() => {
           this.resourcesLoaded = true;
           this.conditions = this.fhir.getConditions();
           this.dataSource = new MatTableDataSource(this.conditions);
+          /*
+            this.dataSource.filterPredicate = (data:
+                                                 {name: string}, filterValue: string) =>
+              data.name.trim().toLowerCase().indexOf(filterValue) !== -1;
+            this.applyFilter('dora');*/
             this.dataSource.sort = this.sort;
         }, () =>
       {
@@ -57,6 +64,9 @@ export class ConditionComponent implements OnInit {
       }
     }
 
+  applyFilter(filterValue: string) {
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+  }
   ngAfterViewInit() {
     console.log('Afterview init '+ this.sort)
     this.dataSource.sort = this.sort;

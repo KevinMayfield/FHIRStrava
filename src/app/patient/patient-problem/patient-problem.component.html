@@ -1,0 +1,6 @@
+<mat-card>
+  <h2>Problems</h2>
+  <span *ngIf="patientId!=undefined">
+    <app-condition [patientId]="patientId" > </app-condition>
+</span>
+</mat-card>
