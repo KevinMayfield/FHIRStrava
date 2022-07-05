@@ -11,44 +11,40 @@
     <span>
     </span>
   </td-navigation-drawer>
-  <td-layout-nav-list navigationRoute="/" opened="false" mode="side">
+  <td-layout-nav-list navigationRoute="/" opened="false" mode="side"
+                      [opened]="media.registerQuery('gt-sm') | async"
+                      [mode]="(media.registerQuery('gt-sm') | async) ? 'side' : 'over'"
+                      [sidenavWidth]="(media.registerQuery('gt-xs') | async) ? '50px' : '100%'">
 
-    <div td-sidenav-content>
-
-
-    </div>
     <div td-toolbar-content layout="row" layout-align="start center" flex>
-<!--
-            <button mat-icon-button routerLink="" tdLayoutToggle>
-                <mat-icon>menu</mat-icon>
-            </button>
--->
             <span *ngIf="screenWidth>680"> {{name}}</span>
             <span flex></span>
-
-     <!-- <mat-form-field appearance="standard" class="units">
-        <mat-select [(value)]="selected" (selectionChange)="selectDuration($event)">
-          <mat-option *ngFor="let duration of durations" [value]="duration.value">
-            {{duration.viewValue}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-
-      &nbsp;
-      <mat-form-field color="accent" appearance="standard">
-        <input matInput [matDatepicker]="picker1" #to placeholder="End date" [formControl]="toDate" (dateChange)="dateToChanged(to.value)">
-        <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
-        <mat-datepicker #picker1></mat-datepicker>
-      </mat-form-field>
-        -->
       <span flex></span>
-      <button mat-icon-button matTooltip="Patient Search">
-        <mat-icon routerLink="/">search</mat-icon>
-      </button>
       <button mat-icon-button matTooltip="Account">
           <mat-icon routerLink="/logout">person</mat-icon>
       </button>
     </div>
+    <!--
+    <div td-sidenav-toolbar-content layout="row" layout-align="start center">
+      <button mat-icon-button tdLayoutToggle>
+        <mat-icon>menu</mat-icon>
+      </button>
+    </div> -->
+    <mat-nav-list td-sidenav-content [tdLayoutManageListClose]="!media.query('gt-sm')">
+      <a mat-list-item routerLink="/" matTooltip="Patient Search"><mat-icon>search</mat-icon></a>
+      <span *ngIf="patient">
+        <a mat-list-item (click)="onClickR('')" matTooltip="Summary"><mat-icon>info</mat-icon></a>
+        <a mat-list-item (click)="onClickR('observation')" matTooltip="Observations"><mat-icon>event_note</mat-icon></a>
+        <a mat-list-item (click)="onClickR('medication')" matTooltip="Medications"><mat-icon>local_pharmacy</mat-icon></a>
+        <a mat-list-item (click)="onClickR('immunisation')" matTooltip="Immunisations"><mat-icon>flight</mat-icon></a>
+        <a mat-list-item (click)="onClickR('document')" matTooltip="Documents"><mat-icon> insert_drive_file</mat-icon></a>
+      </span>
+    </mat-nav-list>
     <router-outlet></router-outlet>
+    <td-layout-footer>
+      <div layout="row" layout-align="start center">
+        <span class="mat-caption">Copyright &copy; 2022 Virtually Healthcare. All rights reserved</span>
+      </div>
+    </td-layout-footer>
   </td-layout-nav-list>
 </td-layout>

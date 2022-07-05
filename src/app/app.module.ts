@@ -67,6 +67,12 @@ import {CompositionComponent} from "./component/composition/composition.componen
 import {ImmunisationComponent} from "./component/immunisation/immunisation.component";
 import {TaskComponent} from "./component/task/task.component";
 import {AllergyIntoleranceComponent} from "./component/allergy-intolerance/allergy-intolerance.component";
+import {CovalentMediaModule} from "@covalent/core/media";
+import { PatientObservationComponent } from './patient/patient-obsevation/patient-obsevation.component';
+import { PatientMedicationComponent } from './patient/patient-medication/patient-medication.component';
+import { PatientMainComponent } from './patient/patient-main/patient-main.component';
+import { PatientDocumentComponent } from './patient/patient-document/patient-document.component';
+import { PatientImmunisationComponent } from './patient/patient-immunisation/patient-immunisation.component';
 
 
 @NgModule({
@@ -89,7 +95,12 @@ import {AllergyIntoleranceComponent} from "./component/allergy-intolerance/aller
     ResourceDialogComponent,
 
     LoginComponent,
-    LogoutComponent
+    LogoutComponent,
+    PatientObservationComponent,
+    PatientMedicationComponent,
+    PatientMainComponent,
+    PatientDocumentComponent,
+    PatientImmunisationComponent
   ],
   imports: [
     BrowserModule,
@@ -116,6 +127,7 @@ import {AllergyIntoleranceComponent} from "./component/allergy-intolerance/aller
     CovalentNotificationsModule,
     CovalentMessageModule,
     CovalentDialogsModule,
+    CovalentMediaModule,
 
     MatButtonModule,
     MatIconModule,

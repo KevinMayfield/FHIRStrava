@@ -1,8 +1,8 @@
 
-
 <span *ngIf="patientId!=undefined">
 
    <mat-card>
+     <h2>Summary</h2>
      <mat-card-content>
 
        <mat-tab-group>
@@ -14,16 +14,7 @@
 
 
   </mat-tab>
-  <mat-tab label="Prescriptions">
 
-    <app-medication-request [patientId]="patientId" > </app-medication-request>
-
-</mat-tab>
-         <mat-tab label="Observations">
-
-    <app-observation [patientId]="patientId" > </app-observation>
-
-</mat-tab>
          <mat-tab label="Documents">
 
     <app-document-reference [patientId]="patientId" > </app-document-reference>
@@ -52,6 +43,7 @@
        </mat-tab-group>
   </mat-card-content>
      </mat-card>
+
 </span>
 
 

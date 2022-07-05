@@ -99,7 +99,7 @@ export class PatientSearchComponent implements OnInit {
   }
 
   selectPatient(patient: fhir.Patient) {
-    console.log('patient search ' + patient.id);
+
     this.patientSelected.emit(patient);
     if (patient !== undefined) {
       this.router.navigateByUrl('patient/' + patient.id  );

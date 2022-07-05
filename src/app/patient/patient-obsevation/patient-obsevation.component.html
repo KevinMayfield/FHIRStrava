@@ -1,0 +1,8 @@
+
+<mat-card>
+  <h2>Observations</h2>
+<span *ngIf="patientId!=undefined">
+    <app-observation [patientId]="patientId" > </app-observation>
+</span>
+</mat-card>
+

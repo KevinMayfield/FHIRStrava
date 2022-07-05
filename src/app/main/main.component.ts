@@ -1,9 +1,10 @@
 import {Component, HostListener, OnInit} from '@angular/core';
-import {Router} from "@angular/router";
+import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
 
 import {FhirService} from "../services/fhir.service";
 import {FormControl} from "@angular/forms";
 import {AuthService} from "../services/auth.service";
+import {TdMediaService} from "@covalent/core/media";
 
 @Component({
   selector: 'app-main',
@@ -13,10 +14,10 @@ import {AuthService} from "../services/auth.service";
 export class MainComponent implements OnInit {
 
   constructor(
-
+    public media: TdMediaService,
     private  fhirService : FhirService,
-
-    private route : Router,
+    private route: ActivatedRoute,
+    private router : Router,
     private auth: AuthService) {
     this.onResize();
   }
@@ -35,7 +36,7 @@ export class MainComponent implements OnInit {
     {value: 365, viewValue: 'Year'}
   ];
   selected = undefined;
-
+  patient=false;
  // fromDate : any = undefined;
   toDate : any = undefined;
   @HostListener
@@ -59,13 +60,29 @@ export class MainComponent implements OnInit {
       console.log(this.auth.currentUser.username);
       this.name = this.auth.currentUser.attributes.name;
     })
+    this.router.events.subscribe((val) => {
+      // see also
+
+     // console.log(val instanceof NavigationEnd)
+      if (val instanceof NavigationEnd) {
+        if (this.router.url.startsWith('/patient')) {
+          this.patient = true;
+          console.log(this.router.url);
+        } else {
+          this.patient= false;
+        }
+
+      }
+    });
 
     // These deal with loading the FHIR server and are triggered by
 
 
   }
 
-
+  onClickR(route) {
+    this.router.navigate([ '/patient/137/'+ route ]);
+  }
   dateToChanged(value: string) {
 
   }

@@ -8,6 +8,11 @@ import {LogoutComponent} from "./logout/logout.component";
 import {AuthGuard} from "./services/auth-guard";
 import {PatientSearchComponent} from "./component/patient-search/patient-search.component";
 import {PatientSummaryComponent} from "./patient/patient-summary/patient-summary.component";
+import {PatientObservationComponent} from "./patient/patient-obsevation/patient-obsevation.component";
+import {PatientMedicationComponent} from "./patient/patient-medication/patient-medication.component";
+import {PatientMainComponent} from "./patient/patient-main/patient-main.component";
+import {PatientImmunisationComponent} from "./patient/patient-immunisation/patient-immunisation.component";
+import {PatientDocumentComponent} from "./patient/patient-document/patient-document.component";
 
 const routes: Routes = [
   {
@@ -18,7 +23,23 @@ const routes: Routes = [
       path: '', component: PatientSearchComponent,
 
     },{
-        path: 'patient/:patientid', component: PatientSummaryComponent
+        path: 'patient', component: PatientMainComponent,
+        children: [
+          {
+            path: ':patientid', component: PatientSummaryComponent,
+          },
+          {
+            path: ':patientid/observation', component: PatientObservationComponent
+          },
+          {
+            path: ':patientid/medication', component: PatientMedicationComponent
+          },
+          {
+            path: ':patientid/immunisation', component: PatientImmunisationComponent
+          },{
+            path: ':patientid/document', component: PatientDocumentComponent
+          }
+          ]
       }
     ]
   },
