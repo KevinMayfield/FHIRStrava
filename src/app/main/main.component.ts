@@ -37,6 +37,7 @@ export class MainComponent implements OnInit {
   ];
   selected = undefined;
   patient=false;
+  patientId= undefined;
  // fromDate : any = undefined;
   toDate : any = undefined;
   @HostListener
@@ -67,7 +68,12 @@ export class MainComponent implements OnInit {
       if (val instanceof NavigationEnd) {
         if (this.router.url.startsWith('/patient')) {
           this.patient = true;
-          console.log(this.router.url);
+          var split = this.router.url.split('/');
+         //amp console.log(split);
+          if (split.length > 2 && split[1] === 'patient') {
+              this.patientId = split[2]
+          }
+         // console.log(this.router.url);
         } else {
           this.patient= false;
         }
@@ -81,13 +87,10 @@ export class MainComponent implements OnInit {
   }
 
   onClickR(route) {
-    var split = route.split('/');
-    if (split.length > 1) {
-      if (split[0] === 'patient') {
-        this.router.navigate([ '/patient/'+split[1]+'/'+ route ]);
+    console.log(this.patientId);
+      if (this.patientId !== undefined) {
+        this.router.navigate([ '/patient/'+this.patientId+'/'+ route ]);
       }
-    }
-
   }
   dateToChanged(value: string) {
 

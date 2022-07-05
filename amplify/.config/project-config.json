@@ -1,12 +1,12 @@
 {
-  "projectName": "Virtually",
+  "projectName": "VirtuallyDevApp",
   "version": "3.1",
   "frontend": "javascript",
   "javascript": {
     "framework": "angular",
     "config": {
       "SourceDir": "src",
-      "DistributionDir": "dist/fhir",
+      "DistributionDir": "dist",
       "BuildCommand": "npm run-script build",
       "StartCommand": "ng serve"
     }
