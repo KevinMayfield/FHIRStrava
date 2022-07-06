@@ -27,7 +27,7 @@ export class MainComponent implements OnInit {
 
   files: File | FileList;
 
-  name: string = 'Virtually Test';
+  name: string = 'Virtually Dev App';
 
   durations  = [
     {value: 7, viewValue: 'Week'},
