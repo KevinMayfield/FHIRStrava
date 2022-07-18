@@ -77,7 +77,6 @@ export class FhirService {
   }
 
   getServerUrl(serverName : string) : string {
-    console.log(serverName);
      for (var server of environment.servers) {
        if (server.name === serverName) return server.fhirServer
      }

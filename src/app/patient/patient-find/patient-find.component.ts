@@ -1,12 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {Router} from '@angular/router';
 // @ts-ignore
 import Patient = fhir.Patient;
 import {StepState} from '@covalent/core/steps';
 import {FhirService} from "../../services/fhir.service";
-
 
 @Component({
   selector: 'app-patient-find',
@@ -15,7 +13,7 @@ import {FhirService} from "../../services/fhir.service";
 })
 export class PatientFindComponent implements OnInit {
 
-  constructor(private _formBuilder: FormBuilder) { }
+  constructor(private _formBuilder: FormBuilder,private fhir: FhirService) { }
 
   ngOnInit() {
 
@@ -59,6 +57,7 @@ export class PatientFindComponent implements OnInit {
 
     selectPatient(patient: Patient) {
         console.log('Patient change - '+patient.id);
+
 
     }
 

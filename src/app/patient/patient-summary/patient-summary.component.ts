@@ -23,7 +23,7 @@ export class PatientSummaryComponent implements OnInit {
     @ViewChild('gpchip', {static: false}) gpchip: MatChip;
 
   constructor(private router: Router,
-              private fhirSrv: FhirService,
+              private fhir: FhirService,
               private route: ActivatedRoute,
               private eprService: EprService,
               private _dialogService: TdDialogService,
@@ -35,7 +35,14 @@ export class PatientSummaryComponent implements OnInit {
 
       console.log(this.patientId);
 
-      //this.fhirSrv.
+    this.fhir.queryPatients('AWS',this.patientId);
+    this.fhir.patientsChanged.subscribe((patients) => {
+
+      }, (error) =>
+      {
+        console.log(error);
+      }
+    );
 
       this.clearDown();
 
@@ -44,9 +51,6 @@ export class PatientSummaryComponent implements OnInit {
 
 
     clearDown() {
-
-
-
     }
 
     selectEncounter(encounter: fhir.Reference) {
