@@ -25,6 +25,8 @@ export class ConditionComponent implements OnInit {
 
   @Input() clinicalStatus :string = undefined;
 
+  @Input() serverName: string;
+
   @Output() condition = new EventEmitter<fhir.Condition>();
 
   @Output() encounter = new EventEmitter<fhir.Reference>();
@@ -45,10 +47,10 @@ export class ConditionComponent implements OnInit {
   ngOnInit() {
     if (this.patientId !== undefined) {
       this.dataSource = new MatTableDataSource <any>(this.conditions);
-        this.fhir.queryConditions(this.patientId, this.clinicalStatus);
-        this.fhir.conditionsChanged.subscribe(() => {
+        this.fhir.queryConditions(this.serverName,this.patientId, this.clinicalStatus);
+        this.fhir.conditionsChanged.subscribe((conditions) => {
           this.resourcesLoaded = true;
-          this.conditions = this.fhir.getConditions();
+          this.conditions = conditions;
           this.dataSource = new MatTableDataSource(this.conditions);
           /*
             this.dataSource.filterPredicate = (data:

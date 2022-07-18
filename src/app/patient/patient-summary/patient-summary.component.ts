@@ -35,6 +35,8 @@ export class PatientSummaryComponent implements OnInit {
 
       console.log(this.patientId);
 
+      //this.fhirSrv.
+
       this.clearDown();
 
   }

@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "VirtuallyDepApp": {
+    "VirtuallyDevApp": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -67,18 +67,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "FHIRStrava:build"
+            "browserTarget": "VirtuallyDevApp:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "FHIRStrava:build:production"
+              "browserTarget": "VirtuallyDevApp:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "FHIRStrava:build"
+            "browserTarget": "VirtuallyDevApp:build"
           }
         },
         "test": {
@@ -116,18 +116,18 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "FHIRStrava:serve"
+            "devServerTarget": "VirtuallyDevApp:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "FHIRStrava:serve:production"
+              "devServerTarget": "VirtuallyDevApp:serve:production"
             }
           }
         }
       }
     }
   },
-  "defaultProject": "FHIRStrava",
+  "defaultProject": "VirtuallyDevApp",
   "cli": {
     "analytics": "bb0c3d81-f2f4-495a-a85c-015d040df47b"
   }

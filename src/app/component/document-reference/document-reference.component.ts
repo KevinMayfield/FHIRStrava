@@ -23,6 +23,8 @@ export class DocumentReferenceComponent implements OnInit {
 
   @Output() documentReference = new EventEmitter<any>();
 
+  @Input() serverName: string;
+
 
   dataSource: any;
   resourcesLoaded = false;
@@ -42,10 +44,10 @@ export class DocumentReferenceComponent implements OnInit {
     if (this.patientId !== undefined) {
       this.dataSource = new MatTableDataSource <any>(this.documents);
 
-      this.fhir.queryDocumentReferences(this.patientId);
-      this.fhir.documentReferencesChanged.subscribe(() => {
+      this.fhir.queryDocumentReferences(this.serverName, this.patientId);
+      this.fhir.documentReferencesChanged.subscribe((documents) => {
         this.resourcesLoaded = true;
-        this.documents = this.fhir.getDocumentReferences();
+        this.documents = documents;
         this.dataSource = new MatTableDataSource(this.documents);
         this.dataSource.sort = this.sort;
       });

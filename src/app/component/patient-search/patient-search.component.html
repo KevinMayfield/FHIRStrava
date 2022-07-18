@@ -6,7 +6,7 @@
       </mat-form-field>
     </form>
 
-    <app-patient [patientsObservable]="patients$"  [useObservable]="true" [showResourceLink]="false" (patient)="selectPatient($event)"></app-patient>
+    <app-patient [patientsObservable]="patients$"  [serverName]="'EMIS'" [useObservable]="true" [showResourceLink]="false" (patient)="selectPatient($event)"></app-patient>
 
   </div>
 </mat-card>

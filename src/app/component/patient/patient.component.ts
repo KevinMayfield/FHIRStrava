@@ -23,6 +23,8 @@ export class PatientComponent implements OnInit {
 
   @Input() showResourceLink = true;
 
+  @Input() serverName: string;
+
   @Output() patient = new EventEmitter<any>();
 
   dataSource: PatientDataSource;

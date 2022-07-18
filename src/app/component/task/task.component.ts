@@ -21,6 +21,8 @@ export class TaskComponent implements OnInit {
 
   @Input() useBundle = false;
 
+  @Input() serverName: string;
+
   dataSource: any;
   resourcesLoaded = false;
   @ViewChild(MatSort) sort: MatSort | undefined;
@@ -35,10 +37,10 @@ export class TaskComponent implements OnInit {
     if (this.patientId !== undefined) {
       this.dataSource = new MatTableDataSource <any>(this.tasks);
 
-      this.fhir.queryTasks(this.patientId);
-      this.fhir.tasksChanged.subscribe(() => {
+      this.fhir.queryTasks(this.serverName,this.patientId);
+      this.fhir.tasksChanged.subscribe((tasks) => {
           this.resourcesLoaded = true;
-          this.tasks = this.fhir.getTasks();
+          this.tasks = tasks;
           this.dataSource = new MatTableDataSource(this.tasks);
           this.dataSource.sort = this.sort;
         }, () =>

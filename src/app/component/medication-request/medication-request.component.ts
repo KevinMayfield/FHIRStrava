@@ -20,6 +20,8 @@ export class MedicationRequestComponent implements OnInit {
 
   @Input() showDetail = false;
 
+  @Input() serverName: string;
+
   @Output() medicationRequest = new EventEmitter<any>();
 
     @Output() context = new EventEmitter<any>();
@@ -41,9 +43,9 @@ export class MedicationRequestComponent implements OnInit {
     if (this.patientId !== undefined) {
       this.dataSource = new MatTableDataSource <any>(this.medicationRequests);
 
-      this.fhir.queryMedicationRequests(this.patientId);
-      this.fhir.medicationRequestsChanged.subscribe(() => {
-        this.medicationRequests = this.fhir.getMedicationRequests();
+      this.fhir.queryMedicationRequests(this.serverName,this.patientId);
+      this.fhir.medicationRequestsChanged.subscribe((requests) => {
+        this.medicationRequests = requests;
         this.resourcesLoaded = true;
         this.dataSource = new MatTableDataSource(this.medicationRequests);
         this.dataSource.sort = this.sort;

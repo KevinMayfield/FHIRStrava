@@ -18,6 +18,8 @@ export class ImmunisationComponent implements OnInit {
 
   @Input() patientId: string;
 
+  @Input() serverName: string;
+
   dataSource : any;
 
   @ViewChild(MatSort) sort: MatSort | undefined;
@@ -34,10 +36,10 @@ export class ImmunisationComponent implements OnInit {
     if (this.patientId !== undefined) {
       this.dataSource = new MatTableDataSource <any>(this.immunisations);
 
-      this.fhir.queryImmunizations(this.patientId);
-      this.fhir.immunizationsChanged.subscribe(() => {
+      this.fhir.queryImmunizations(this.serverName, this.patientId);
+      this.fhir.immunizationsChanged.subscribe((imms) => {
         this.resourcesLoaded = true;
-        this.immunisations = this.fhir.getImmunizations();
+        this.immunisations = imms;
         this.dataSource = new MatTableDataSource(this.immunisations);
         this.dataSource.sort = this.sort;
       });

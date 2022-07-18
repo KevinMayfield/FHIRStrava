@@ -1,6 +1,6 @@
 /// <reference path="../../../../node_modules/@types/fhir/index.d.ts" />
 
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {AfterViewInit, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 
 import {Observable, Subject, of, throwError, EMPTY} from 'rxjs';
 
@@ -25,13 +25,15 @@ import {Router} from "@angular/router";
   templateUrl: './patient-search.component.html',
   styleUrls: [ './patient-search.component.css' ]
 })
-export class PatientSearchComponent implements OnInit {
+export class PatientSearchComponent implements OnInit,AfterViewInit {
 
 
   patients$: Observable<fhir.Patient[]>;
   private searchTerms = new Subject<string>();
 
   @Output() patientSelected : EventEmitter<fhir.Patient> = new EventEmitter();
+
+  @Input() serverName: string;
 
   constructor( private fhirService: FhirService, private router: Router
 
@@ -49,6 +51,7 @@ export class PatientSearchComponent implements OnInit {
 
 
   ngOnInit(): void {
+
     this.patients$ = this.searchTerms.pipe(
       // wait 300ms after each keystroke before considering the term
       debounceTime(300),
@@ -58,7 +61,7 @@ export class PatientSearchComponent implements OnInit {
 
       // switch to new search observable each time the term changes
       switchMap((term: string) => {
-         return this.fhirService.searchPatients(term)
+         return this.fhirService.searchPatients('EMIS',term)
         }
 
       ),
@@ -125,5 +128,9 @@ export class PatientSearchComponent implements OnInit {
         return NEVER;
 
     }
+  }
+
+  ngAfterViewInit(): void {
+
   }
 }

@@ -20,6 +20,7 @@ export class ObservationComponent implements OnInit {
   @Input() showDetail = false;
 
   @Input() patientId: string;
+  @Input() serverName: string;
 
   @Output() observation = new EventEmitter<fhir.Observation>();
 
@@ -39,10 +40,10 @@ export class ObservationComponent implements OnInit {
     if (this.patientId !== undefined) {
       this.dataSource = new MatTableDataSource <any>(this.observations);
 
-      this.fhir.queryObservations(this.patientId);
-      this.fhir.observationsChanged.subscribe(() => {
+      this.fhir.queryObservations(this.serverName, this.patientId);
+      this.fhir.observationsChanged.subscribe((observations) => {
         this.resourcesLoaded = true;
-        this.observations = this.fhir.getObservations();
+        this.observations = observations;
         this.dataSource = new MatTableDataSource(this.observations);
         this.dataSource.sort = this.sort;
       });

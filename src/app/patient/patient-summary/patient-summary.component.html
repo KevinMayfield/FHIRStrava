@@ -10,19 +10,19 @@
 
                  <!-- Conditions -->
             <h2>Active Problems</h2>
-            <app-condition [patientId]="patientId" (encounter)="selectEncounter($event)" [clinicalStatus]="'active'"> </app-condition>
+            <app-condition [patientId]="patientId" [serverName]="'EMIS'" (encounter)="selectEncounter($event)" [clinicalStatus]="'active'"> </app-condition>
 
             <h2>Allergies</h2>
-             <app-allergy-intolerance [patientId]="patientId" > </app-allergy-intolerance>
+             <app-allergy-intolerance [patientId]="patientId" [serverName]="'EMIS'"> </app-allergy-intolerance>
 
             <h2>Diary Entries</h2>
-           <app-task [patientId]="patientId" > </app-task>
+           <app-task [patientId]="patientId" [serverName]="'EMIS'"> </app-task>
           </mat-tab>
 
 
           <mat-tab label="Consultations">
 
-            <app-composition [patientId]="patientId" > </app-composition>
+            <app-composition [patientId]="patientId" [serverName]="'EMIS'"> </app-composition>
 
           </mat-tab>
 

@@ -21,6 +21,8 @@ export class CompositionComponent implements OnInit {
 
   @Input() patientId: string;
 
+  @Input() serverName: string;
+
   @Output() composition = new EventEmitter<any>();
 
 
@@ -43,10 +45,10 @@ export class CompositionComponent implements OnInit {
     if (this.patientId !== undefined) {
       this.dataSource = new MatTableDataSource <any>(this.compositions);
 
-      this.fhir.queryCompositions(this.patientId);
-      this.fhir.compositionsChanged.subscribe(() => {
+      this.fhir.queryCompositions(this.serverName, this.patientId);
+      this.fhir.compositionsChanged.subscribe((composition) => {
         this.resourcesLoaded = true;
-        this.compositions= this.fhir.getCompositions();
+        this.compositions= composition;
         this.dataSource = new MatTableDataSource(this.compositions);
         this.dataSource.sort = this.sort;
       });

@@ -15,7 +15,7 @@ import {FhirService} from "../../services/fhir.service";
 })
 export class PatientFindComponent implements OnInit {
 
-  constructor(private _formBuilder: FormBuilder, private router: Router, private eprService : FhirService) { }
+  constructor(private _formBuilder: FormBuilder) { }
 
   ngOnInit() {
 

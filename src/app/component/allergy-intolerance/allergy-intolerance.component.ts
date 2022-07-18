@@ -20,6 +20,8 @@ export class AllergyIntoleranceComponent implements OnInit {
 
   @Input() patientId: string;
 
+  @Input() serverName: string;
+
   dataSource: any;
   resourcesLoaded = false;
   @ViewChild(MatSort) sort: MatSort | undefined;
@@ -35,10 +37,10 @@ export class AllergyIntoleranceComponent implements OnInit {
     if (this.patientId !== undefined) {
       this.dataSource = new MatTableDataSource <any>(this.allergies);
 
-      this.fhir.queryAllergies(this.patientId);
-      this.fhir.allergiesChanged.subscribe(() => {
+      this.fhir.queryAllergies(this.serverName,this.patientId);
+      this.fhir.allergiesChanged.subscribe((allergies) => {
           this.resourcesLoaded = true;
-          this.allergies = this.fhir.getAllergies();
+          this.allergies = allergies;
           this.dataSource = new MatTableDataSource(this.allergies);
           this.dataSource.sort = this.sort;
         }, () =>
