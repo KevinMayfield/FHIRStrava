@@ -28,6 +28,9 @@ import Composition = fhir.Composition;
 import DocumentReference = fhir.DocumentReference;
 import Immunization = fhir.Immunization;
 import AllergyIntolerance = fhir.AllergyIntolerance;
+import {FHIREvent} from "../model/eventModel";
+import Encounter = fhir.Encounter;
+import Identifier = fhir.Identifier;
 
 @Injectable({
   providedIn: 'root'
@@ -48,9 +51,11 @@ export class FhirService {
 
   medicationRequestsChanged: EventEmitter<MedicationRequest[]> = new EventEmitter();
 
-  observationsChanged: EventEmitter<Observation[]> = new EventEmitter();
+  observationsChanged: EventEmitter<FHIREvent> = new EventEmitter();
 
-  documentReferencesChanged: EventEmitter<DocumentReference[]> = new EventEmitter();
+  documentReferencesChanged: EventEmitter<FHIREvent> = new EventEmitter();
+
+  encountersChanged: EventEmitter<FHIREvent> = new EventEmitter();
 
   compositionsChanged: EventEmitter<Composition[]> = new EventEmitter();
 
@@ -193,22 +198,57 @@ export class FhirService {
   /// DocumentReferences
 
   public queryDocumentReferences(serverName: string, patientId): any {
-    var documentReferences : DocumentReference[] =[];
+    var documentReferences : FHIREvent = {
+      serverName : serverName,
+      documents : []
+    };
     const headers = this.getHeaders();
+    var url = this.getServerUrl(serverName) + '/DocumentReference?patient='+patientId;
+    if (serverName === 'AWS') url = this.getServerUrl(serverName) + '/DocumentReference?patient:Patient.identifier='+patientId;
+
     // tslint:disable-next-line:typedef
-    this.http.get(this.getServerUrl(serverName) + '/DocumentReference?patient='+patientId, { headers}).subscribe(
+    this.http.get(url, { headers}).subscribe(
       result => {
         const bundle = result as Bundle;
         if (bundle.entry !== undefined && bundle.entry.length > 0) {
 
 
           for (const entry of bundle.entry) {
-            documentReferences.push(entry.resource as DocumentReference);
+            documentReferences.documents.push(entry.resource as DocumentReference);
           }
-          this.documentReferencesChanged.emit([]);
+          this.documentReferencesChanged.emit(documentReferences);
         } else {
           console.log('DocumentRerence not found.');
-          this.documentReferencesChanged.emit([]);
+          this.documentReferencesChanged.emit(documentReferences);
+        }
+      }
+    );
+  }
+  /// Encounter
+
+  public queryEncounters(serverName: string, patientId): any {
+    var fhirEvent : FHIREvent = {
+      serverName : serverName,
+      encounters : []
+    };
+    const headers = this.getHeaders();
+    var url = this.getServerUrl(serverName) + '/Encounter?patient='+patientId;
+    if (serverName === 'AWS') url = this.getServerUrl(serverName) + '/Encounter?patient:Patient.identifier='+patientId;
+
+    // tslint:disable-next-line:typedef
+    this.http.get(url, { headers}).subscribe(
+      result => {
+        const bundle = result as Bundle;
+        if (bundle.entry !== undefined && bundle.entry.length > 0) {
+
+
+          for (const entry of bundle.entry) {
+            fhirEvent.encounters.push(entry.resource as Encounter);
+          }
+          this.encountersChanged.emit(fhirEvent);
+        } else {
+          console.log('Encounter not found.');
+          this.encountersChanged.emit(fhirEvent);
         }
       }
     );
@@ -267,17 +307,22 @@ export class FhirService {
   // Observations
 
   public queryObservations(serverName: string,patientId): any {
-    var observations : Observation[] = [];
+    var observations : FHIREvent = {
+      serverName: serverName,
+      observations : []
+    };
     const headers = this.getHeaders();
+    var url = this.getServerUrl(serverName) + '/Observation?patient='+patientId;
+    if (serverName === 'AWS') url = this.getServerUrl(serverName) + '/Observation?patient:Patient.identifier='+patientId;
     // tslint:disable-next-line:typedef
-    this.http.get(this.getServerUrl(serverName) + '/Observation?patient='+patientId , { headers}).subscribe(
+    this.http.get(url , { headers}).subscribe(
       result => {
         const bundle = result as Bundle;
         if (bundle.entry !== undefined && bundle.entry.length > 0) {
 
 
           for (const entry of bundle.entry) {
-            observations.push(entry.resource as Observation);
+            observations.observations.push(entry.resource as Observation);
           }
           this.observationsChanged.emit(observations);
         } else {
@@ -391,6 +436,13 @@ export class FhirService {
      return entry;
   }
 
+
+  getQuesionnaireResponse(serverName:string, encounter : Identifier) :Observable<Bundle> {
+    const headers = this.getHeaders();
+    var url = this.getServerUrl(serverName) + '/QuestionnaireResponse?encounter='+encounter.system + '%7C' + encounter.value;
+    // tslint:disable-next-line:typedef
+    return this.http.get(url , { headers})
+  }
 
   getServerPatient(serverName: string, patient : Patient) {
     if (patient === undefined) return;

@@ -6,6 +6,7 @@ import {MatTableDataSource} from "@angular/material/table";
 import {MatSort, Sort} from "@angular/material/sort";
 import {LinksService} from "../../services/links.service";
 import {FhirService} from "../../services/fhir.service";
+import {FHIREvent} from "../../model/eventModel";
 
 
 @Component({
@@ -41,11 +42,13 @@ export class ObservationComponent implements OnInit {
       this.dataSource = new MatTableDataSource <any>(this.observations);
 
       this.fhir.queryObservations(this.serverName, this.patientId);
-      this.fhir.observationsChanged.subscribe((observations) => {
+      this.fhir.observationsChanged.subscribe((observations : FHIREvent) => {
         this.resourcesLoaded = true;
-        this.observations = observations;
-        this.dataSource = new MatTableDataSource(this.observations);
-        this.dataSource.sort = this.sort;
+        if (observations.serverName === this.serverName) {
+          this.observations = observations.observations;
+          this.dataSource = new MatTableDataSource(this.observations);
+          this.dataSource.sort = this.sort;
+        }
       });
     }
   }

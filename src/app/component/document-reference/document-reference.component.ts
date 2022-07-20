@@ -7,6 +7,7 @@ import {FhirService} from "../../services/fhir.service";
 import {LinksService} from "../../services/links.service";
 import {MatTableDataSource} from "@angular/material/table";
 import {MatSort} from "@angular/material/sort";
+import {FHIREvent} from "../../model/eventModel";
 
 @Component({
   selector: 'app-document-reference',
@@ -45,11 +46,13 @@ export class DocumentReferenceComponent implements OnInit {
       this.dataSource = new MatTableDataSource <any>(this.documents);
 
       this.fhir.queryDocumentReferences(this.serverName, this.patientId);
-      this.fhir.documentReferencesChanged.subscribe((documents) => {
-        this.resourcesLoaded = true;
-        this.documents = documents;
-        this.dataSource = new MatTableDataSource(this.documents);
-        this.dataSource.sort = this.sort;
+      this.fhir.documentReferencesChanged.subscribe((documents : FHIREvent) => {
+        if (documents.serverName === this.serverName) {
+          this.resourcesLoaded = true;
+          this.documents = documents.documents;
+          this.dataSource = new MatTableDataSource(this.documents);
+          this.dataSource.sort = this.sort;
+        }
       });
     }
   }

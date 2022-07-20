@@ -1,0 +1,28 @@
+<div>
+  <table fxFill="100" mat-table [dataSource]="dataSource" matSort matSortActive="period.start" matSortDirection="desc"  class="mat-elevation-z8">
+
+    <!--- Note that these columns can be defined in any order.
+          The actual rendered columns are set as a property on the row definition" -->
+
+    <!-- Position Column -->
+    <ng-container matColumnDef="identifier">
+      <th mat-header-cell *matHeaderCellDef> No. </th>
+      <td mat-cell *matCellDef="let questionnaireResponse"> {{questionnaireResponse.identifier[0]}} </td>
+    </ng-container>
+
+
+    <ng-container matColumnDef="resource">
+      <th mat-header-cell *matHeaderCellDef width="5%">FHIR</th>
+      <td mat-cell *matCellDef="let questionnaireResponse">
+
+        <button mat-icon-button color="accent"  matTooltip="View FHIR resource" (click)="select(encounter)"><mat-icon>code</mat-icon></button>
+
+      </td>
+    </ng-container>
+
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+</div>

@@ -74,6 +74,8 @@ import { PatientMainComponent } from './patient/patient-main/patient-main.compon
 import { PatientDocumentComponent } from './patient/patient-document/patient-document.component';
 import { PatientImmunisationComponent } from './patient/patient-immunisation/patient-immunisation.component';
 import { PatientProblemComponent } from './patient/patient-problem/patient-problem.component';
+import {EncounterComponent} from "./component/encounter/encounter.component";
+import { QuestionnaireResponseComponent } from './component/questionnaire-response/questionnaire-response.component';
 
 
 @NgModule({
@@ -94,6 +96,7 @@ import { PatientProblemComponent } from './patient/patient-problem/patient-probl
     TaskComponent,
     AllergyIntoleranceComponent,
     ResourceDialogComponent,
+    EncounterComponent,
 
     LoginComponent,
     LogoutComponent,
@@ -102,7 +105,8 @@ import { PatientProblemComponent } from './patient/patient-problem/patient-probl
     PatientMainComponent,
     PatientDocumentComponent,
     PatientImmunisationComponent,
-    PatientProblemComponent
+    PatientProblemComponent,
+    QuestionnaireResponseComponent
   ],
   imports: [
     BrowserModule,

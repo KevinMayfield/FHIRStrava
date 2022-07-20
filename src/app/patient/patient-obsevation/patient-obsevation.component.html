@@ -1,8 +1,17 @@
-
-<mat-card>
-  <h2>Observations</h2>
 <span *ngIf="patientId!=undefined">
+<mat-card>
+  <mat-tab-group>
+    <mat-tab label="EMIS">
+  <h2>Observations</h2>
+
     <app-observation [serverName]="'EMIS'" [patientId]="patientId" > </app-observation>
-</span>
+    </mat-tab>
+    <mat-tab label="Virtually AWS">
+  <h2>Observations</h2>
+
+    <app-observation [serverName]="'AWS'" [patientId]="patientId" > </app-observation>
+    </mat-tab>
+  </mat-tab-group>
 </mat-card>
+  </span>
 

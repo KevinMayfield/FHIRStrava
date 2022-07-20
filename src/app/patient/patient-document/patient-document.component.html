@@ -1,4 +1,14 @@
+<span *ngIf="patientId!=undefined">
 <mat-card>
-  <h2>Documents</h2>
-  <app-document-reference *ngIf="patientId!=undefined" [patientId]="patientId" [serverName]="'EMIS'"> </app-document-reference>
+  <mat-tab-group>
+    <mat-tab label="EMIS">
+      <h2>Documents</h2>
+      <app-document-reference *ngIf="patientId!=undefined" [patientId]="patientId" [serverName]="'EMIS'"> </app-document-reference>
+    </mat-tab>
+    <mat-tab label="Virtually AWS">
+      <h2>Documents</h2>
+      <app-document-reference *ngIf="patientId!=undefined" [patientId]="patientId" [serverName]="'AWS'"> </app-document-reference>
+    </mat-tab>
+  </mat-tab-group>
 </mat-card>
+</span>

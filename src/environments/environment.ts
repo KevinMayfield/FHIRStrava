@@ -12,7 +12,7 @@ export const environment = {
     },
     {
       name: "AWS",
-      fhirServer : 'https://ek1wj5eye3.execute-api.eu-west-2.amazonaws.com/dev',
+      fhirServer : 'https://jtm3f8nxwe.execute-api.eu-west-2.amazonaws.com/Development/AWS-FHIR',
     }
   ]
 };
