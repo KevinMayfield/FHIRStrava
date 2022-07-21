@@ -99,11 +99,12 @@
     </ng-container>
 
 
-    <ng-container matColumnDef="asserterLink">
-      <th mat-header-cell *matHeaderCellDef width="5%"></th>
+    <ng-container matColumnDef="asserter">
+      <th mat-header-cell *matHeaderCellDef width="5%">Asserter</th>
       <td mat-cell *matCellDef="let condition">
         <span *ngIf="condition.asserter!=undefined">
           {{condition.asserter.display}}
+          <app-practitioner-role *ngIf="serverName==='AWS'" [serverName]="serverName" [practitionerRole]="condition.asserter"></app-practitioner-role>
         </span>
       </td>
     </ng-container>

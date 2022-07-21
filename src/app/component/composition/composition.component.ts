@@ -7,6 +7,7 @@ import {LinksService} from "../../services/links.service";
 import {FhirService} from "../../services/fhir.service";
 import {MatTableDataSource} from "@angular/material/table";
 import {MatSort} from "@angular/material/sort";
+import {FHIREvent} from "../../model/eventModel";
 
 @Component({
   selector: 'app-composition',
@@ -46,11 +47,13 @@ export class CompositionComponent implements OnInit {
       this.dataSource = new MatTableDataSource <any>(this.compositions);
 
       this.fhir.queryCompositions(this.serverName, this.patientId);
-      this.fhir.compositionsChanged.subscribe((composition) => {
-        this.resourcesLoaded = true;
-        this.compositions= composition;
-        this.dataSource = new MatTableDataSource(this.compositions);
-        this.dataSource.sort = this.sort;
+      this.fhir.compositionsChanged.subscribe((composition : FHIREvent) => {
+        if (this.serverName === composition.serverName) {
+          this.resourcesLoaded = true;
+          this.compositions = composition.compositions;
+          this.dataSource = new MatTableDataSource(this.compositions);
+          this.dataSource.sort = this.sort;
+        }
       });
     }
   }

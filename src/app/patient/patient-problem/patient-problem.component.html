@@ -1,6 +1,19 @@
+<span *ngIf="patientId!=undefined">
 <mat-card>
-  <h2>Problems</h2>
+  <mat-tab-group>
+    <mat-tab label="EMIS">
+   <h2>Problems</h2>
   <span *ngIf="patientId!=undefined">
     <app-condition [serverName]="'EMIS'" [patientId]="patientId" > </app-condition>
 </span>
+    </mat-tab>
+    <mat-tab label="Virtually AWS">
+ <h2>Problems</h2>
+  <span *ngIf="patientId!=undefined">
+    <app-condition [serverName]="'AWS'" [patientId]="patientId" > </app-condition>
+</span>
+    </mat-tab>
+  </mat-tab-group>
 </mat-card>
+</span>
+

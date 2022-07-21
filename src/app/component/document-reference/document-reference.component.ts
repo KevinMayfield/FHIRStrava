@@ -31,7 +31,7 @@ export class DocumentReferenceComponent implements OnInit {
   resourcesLoaded = false;
   @ViewChild(MatSort) sort: MatSort | undefined;
 
-  displayedColumns = ['open', 'date','type','title', 'typelink', 'author','authorLink', 'mime', 'status', 'resource'];
+  displayedColumns = ['open', 'date','type','title', 'typelink', 'author', 'mime', 'status', 'resource'];
 
   constructor(private router: Router,
               private _dialogService: TdDialogService,

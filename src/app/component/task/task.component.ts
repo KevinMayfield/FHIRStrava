@@ -5,6 +5,7 @@ import {MatSort} from "@angular/material/sort";
 import {MatTableDataSource} from "@angular/material/table";
 import {LinksService} from "../../services/links.service";
 import {FhirService} from "../../services/fhir.service";
+import {FHIREvent} from "../../model/eventModel";
 
 @Component({
   selector: 'app-task',
@@ -38,11 +39,13 @@ export class TaskComponent implements OnInit {
       this.dataSource = new MatTableDataSource <any>(this.tasks);
 
       this.fhir.queryTasks(this.serverName,this.patientId);
-      this.fhir.tasksChanged.subscribe((tasks) => {
-          this.resourcesLoaded = true;
-          this.tasks = tasks;
-          this.dataSource = new MatTableDataSource(this.tasks);
-          this.dataSource.sort = this.sort;
+      this.fhir.tasksChanged.subscribe((tasks : FHIREvent) => {
+         if (tasks.serverName === this.serverName) {
+           this.resourcesLoaded = true;
+           this.tasks = tasks.tasks;
+           this.dataSource = new MatTableDataSource(this.tasks);
+           this.dataSource.sort = this.sort;
+         }
         }, () =>
         {
           this.resourcesLoaded = true;

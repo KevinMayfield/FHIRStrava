@@ -1,0 +1,16 @@
+<p *ngIf="role !== undefined">
+  <span *ngIf="role.practitioner !== undefined">
+    {{role.practitioner.display}}
+    <span *ngIf="role.practitioner.identifier !== undefined">
+      [{{role.practitioner.identifier.value}}]
+    </span>
+  </span>
+
+  <span *ngIf="role.organization !== undefined">
+    <br/>
+    @{{role.organization.display}}
+    <span *ngIf="role.organization.identifier !== undefined">
+      [{{role.organization.identifier.value}}]
+    </span>
+  </span>
+</p>

@@ -8,6 +8,7 @@ import {MatTableDataSource} from "@angular/material/table";
 import {MatSort} from "@angular/material/sort";
 import Condition = fhir.Condition;
 import {MatPaginator} from "@angular/material/paginator";
+import {FHIREvent} from "../../model/eventModel";
 
 
 @Component({
@@ -37,7 +38,7 @@ export class ConditionComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  displayedColumns = ['onsetDateTime', 'code','codelink','category','categorylink', 'clinicalStatus','severity','asserterLink','contextLink', 'resource'];
+  displayedColumns = ['onsetDateTime', 'code','codelink','category','categorylink', 'clinicalStatus','severity','asserter','contextLink', 'resource'];
 
   constructor(
               public  linkService: LinksService,
@@ -48,16 +49,18 @@ export class ConditionComponent implements OnInit {
     if (this.patientId !== undefined) {
       this.dataSource = new MatTableDataSource <any>(this.conditions);
         this.fhir.queryConditions(this.serverName,this.patientId, this.clinicalStatus);
-        this.fhir.conditionsChanged.subscribe((conditions) => {
-          this.resourcesLoaded = true;
-          this.conditions = conditions;
-          this.dataSource = new MatTableDataSource(this.conditions);
-          /*
-            this.dataSource.filterPredicate = (data:
-                                                 {name: string}, filterValue: string) =>
-              data.name.trim().toLowerCase().indexOf(filterValue) !== -1;
-            this.applyFilter('dora');*/
+        this.fhir.conditionsChanged.subscribe((conditions : FHIREvent) => {
+          if (conditions.serverName === this.serverName) {
+            this.resourcesLoaded = true;
+            this.conditions = conditions.conditions;
+            this.dataSource = new MatTableDataSource(this.conditions);
+            /*
+              this.dataSource.filterPredicate = (data:
+                                                   {name: string}, filterValue: string) =>
+                data.name.trim().toLowerCase().indexOf(filterValue) !== -1;
+              this.applyFilter('dora');*/
             this.dataSource.sort = this.sort;
+          }
         }, () =>
       {
         this.resourcesLoaded = true;

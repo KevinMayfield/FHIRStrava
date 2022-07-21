@@ -1,4 +1,15 @@
+
+<span *ngIf="patientId!=undefined">
 <mat-card>
-  <h2>Immunisations</h2>
+  <mat-tab-group>
+    <mat-tab label="EMIS">
+ <h2>Immunisations</h2>
   <app-immunisation *ngIf="patientId!=undefined" [serverName]="'EMIS'" [patientId]="patientId" > </app-immunisation>
+    </mat-tab>
+    <mat-tab label="Virtually AWS">
+ <h2>Immunisations</h2>
+  <app-immunisation *ngIf="patientId!=undefined" [serverName]="'AWS'" [patientId]="patientId" > </app-immunisation>
+    </mat-tab>
+  </mat-tab-group>
 </mat-card>
+</span>

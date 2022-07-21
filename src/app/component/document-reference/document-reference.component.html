@@ -49,15 +49,7 @@
       <td mat-cell *matCellDef="let document">
         <span *ngFor="let author of document.author">
           <div>{{author.display}}</div>
-        </span>
-      </td>
-    </ng-container>
-
-    <ng-container matColumnDef="authorLink">
-      <th mat-header-cell *matHeaderCellDef width="5%"></th>
-      <td mat-cell *matCellDef="let document">
-        <span *ngIf="document.author !=undefined && document.author.length > 0">
-          {{document.author[0].display}}
+          <app-practitioner-role *ngIf="serverName==='AWS'" [serverName]="serverName" [practitionerRole]="author"></app-practitioner-role>
         </span>
       </td>
     </ng-container>

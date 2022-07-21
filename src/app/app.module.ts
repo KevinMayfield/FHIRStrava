@@ -76,6 +76,7 @@ import { PatientImmunisationComponent } from './patient/patient-immunisation/pat
 import { PatientProblemComponent } from './patient/patient-problem/patient-problem.component';
 import {EncounterComponent} from "./component/encounter/encounter.component";
 import { QuestionnaireResponseComponent } from './component/questionnaire-response/questionnaire-response.component';
+import { PractitionerRoleComponent } from './component/practitioner-role/practitioner-role.component';
 
 
 @NgModule({
@@ -106,7 +107,8 @@ import { QuestionnaireResponseComponent } from './component/questionnaire-respon
     PatientDocumentComponent,
     PatientImmunisationComponent,
     PatientProblemComponent,
-    QuestionnaireResponseComponent
+    QuestionnaireResponseComponent,
+    PractitionerRoleComponent
   ],
   imports: [
     BrowserModule,

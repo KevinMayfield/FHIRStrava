@@ -18,7 +18,18 @@
             <h2>Diary Entries</h2>
            <app-task [patientId]="patientId" [serverName]="'EMIS'"> </app-task>
           </mat-tab>
+         <mat-tab label="Virtually Summary">
 
+                 <!-- Conditions -->
+            <h2>Active Problems</h2>
+            <app-condition [patientId]="patientId" [serverName]="'AWS'" (encounter)="selectEncounter($event)" [clinicalStatus]="'active'"> </app-condition>
+
+            <h2>Allergies</h2>
+             <app-allergy-intolerance [patientId]="patientId" [serverName]="'AWS'"> </app-allergy-intolerance>
+
+          <!--  <h2>Diary Entries</h2>
+           <app-task [patientId]="patientId" [serverName]="'AWS'"> </app-task> -->
+          </mat-tab>
 
           <mat-tab label="EMIS Consultations">
 

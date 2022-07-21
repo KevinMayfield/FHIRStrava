@@ -5,6 +5,7 @@ import {LinksService} from "../../services/links.service";
 import {FhirService} from "../../services/fhir.service";
 import {MatSort} from "@angular/material/sort";
 import {MatTableDataSource} from "@angular/material/table";
+import {FHIREvent} from "../../model/eventModel";
 
 
 @Component({
@@ -37,11 +38,13 @@ export class ImmunisationComponent implements OnInit {
       this.dataSource = new MatTableDataSource <any>(this.immunisations);
 
       this.fhir.queryImmunizations(this.serverName, this.patientId);
-      this.fhir.immunizationsChanged.subscribe((imms) => {
-        this.resourcesLoaded = true;
-        this.immunisations = imms;
-        this.dataSource = new MatTableDataSource(this.immunisations);
-        this.dataSource.sort = this.sort;
+      this.fhir.immunizationsChanged.subscribe((imms : FHIREvent) => {
+        if (imms.serverName === this.serverName) {
+          this.resourcesLoaded = true;
+          this.immunisations = imms.immunizations;
+          this.dataSource = new MatTableDataSource(this.immunisations);
+          this.dataSource.sort = this.sort;
+        }
       });
     }
   }

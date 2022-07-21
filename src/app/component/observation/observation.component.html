@@ -24,11 +24,12 @@
   </ng-container>
 
   <ng-container matColumnDef="performer">
-    <th mat-header-cell *matHeaderCellDef width="5%"></th>
+    <th mat-header-cell *matHeaderCellDef width="5%">Performer</th>
     <td mat-cell *matCellDef="let observation">
         <span *ngIf="observation.performer !=undefined">
           <span *ngFor="let author of observation.performer">
-            <div>{{author.display}}</div>
+            {{author.display}}
+                 <app-practitioner-role *ngIf="serverName==='AWS'" [serverName]="serverName" [practitionerRole]="author"></app-practitioner-role>
           </span>
         </span>
     </td>
