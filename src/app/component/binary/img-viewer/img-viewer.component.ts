@@ -33,18 +33,6 @@ export class ImgViewerComponent implements OnInit {
 
    // let modalWaitRef = this.modalService.open( this.modalWait,{ windowClass: 'dark-modal' });
 
-    this.fhirService.getBinary(id).subscribe(
-      (res) => {
-        const fileURL = URL.createObjectURL(res);
-        console.log(fileURL);
-        this.imgSrc = fileURL;
-      },
-      (err) => {
-        this.showWarnDlg('Unable to load document');
-      }
-
-    );
-
   }
 
   showWarnDlg(message: string) {

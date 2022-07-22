@@ -34,12 +34,16 @@ export class BinaryComponent implements OnInit {
         this.fhirService.getResource(this.serverName, '/Binary/'+ paths[1] ).subscribe(resource => {
             // this.process(resource);
             console.log(resource);
+            this.docFound = true;
+            /*
             if (resource.presignedGetUrl !== undefined) {
               this.fhirService.getBinary(resource.presignedGetUrl).subscribe(image => {
                 const fileURL = URL.createObjectURL(image);
                 console.log(fileURL);
               });
             }
+
+             */
           },
           () => {
             const alertConfig: IAlertConfig = {message: 'Unable to locate document.'};

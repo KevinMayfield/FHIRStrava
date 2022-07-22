@@ -29,7 +29,7 @@ export class QuestionnaireResponseComponent implements OnInit {
 
   constructor(private fhir : FhirService,
               public dialog: MatDialog) { }
-  displayedColumns = ['item', 'resource'];
+  displayedColumns = [ 'item', 'resource'];
 
   ngOnInit(): void {
       this.fhir.getQuesionnaireResponse('AWS',this.encounter).subscribe( result  => {

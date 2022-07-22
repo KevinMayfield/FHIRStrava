@@ -13,21 +13,28 @@
     <ng-container matColumnDef="item">
       <th mat-header-cell *matHeaderCellDef> Notes </th>
       <td mat-cell *matCellDef="let questionnaireResponse">
+        <span *ngIf="questionnaireResponse.item !== undefined">
          <span *ngFor="let item of questionnaireResponse.item">
               <b>{{item.text}}</b>
+           <span *ngIf="item.answer !== undefined">
             <span *ngFor="let itemAnswer of item.answer">
                 {{itemAnswer.valueString}}
-                <span *ngIf="itemAnswer.valueReference !== undefined && itemAnswer.valueReference.reference !== undefined">
-                  <span *ngIf="itemAnswer.valueReference.reference.startsWith('Observation')">
-                    <app-observation [reference]="itemAnswer.valueReference.reference" [serverName]="serverName"></app-observation>
-                  </span>
-                   <span *ngIf="itemAnswer.valueReference.reference.startsWith('DocumentReference')">
-                    <app-document-reference [reference]="itemAnswer.valueReference.reference" [serverName]="serverName"></app-document-reference>
-                  </span>
-                  {{itemAnswer.valueReference.reference}}</span>
-              <br/>
-          </span>
+                   <span *ngIf="itemAnswer.valueReference !== undefined && itemAnswer.valueReference.reference !== undefined">
+
+                            <span *ngIf="itemAnswer.valueReference.reference.startsWith('Observation')">
+                              <app-observation [reference]="itemAnswer.valueReference.reference" [serverName]="serverName"></app-observation>
+                            </span>
+                             <span *ngIf="itemAnswer.valueReference.reference.startsWith('DocumentReference')">
+                              <app-document-reference [reference]="itemAnswer.valueReference.reference" [serverName]="serverName"></app-document-reference>
+                            </span>
+
+                        {{itemAnswer.valueReference.reference}}
+                   </span>
+                    <br/>
+                </span>
+           </span>
          </span>
+        </span>
       </td>
     </ng-container>
 

@@ -19,7 +19,6 @@ export class ObservationComponent implements OnInit {
 
   @Input() observations: fhir.Observation[];
 
-  headerVisible = true;
 
   @Input() reference: string;
 
@@ -46,7 +45,7 @@ export class ObservationComponent implements OnInit {
     if (this.reference !== undefined) {
 
       this.fhir.getResource(this.serverName,this.reference).subscribe(resource => {
-          this.headerVisible = false;
+
           this.observations = [];
           this.observations.push(resource as Observation);
           this.dataSource = new MatTableDataSource(this.observations);
