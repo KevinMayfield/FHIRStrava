@@ -32,6 +32,11 @@
         <span *ngIf="encounter.type !== undefined">
           <b>{{encounter.type[0].text}}</b>
         </span>
+        <span *ngFor="let participant of encounter.participant">
+          <span *ngIf="participant.individual !== undefined"><i>{{participant.individual.display}}</i>
+          <app-practitioner-role [practitionerRole]="participant.individual" [serverName]="serverName"></app-practitioner-role>
+          </span>
+      </span>
       </td>
     </ng-container>
 
@@ -82,7 +87,7 @@
       <th mat-header-cell *matHeaderCellDef width="10%"> QuestionnaireResponse </th>
       <td mat-cell *matCellDef="let encounter">
          <span *ngIf="encounter.identifier !== undefined">
-         <app-questionnaire-response [encounter]="encounter.identifier[0]"></app-questionnaire-response>
+         <app-questionnaire-response [encounter]="encounter.id" [serverName]="serverName"></app-questionnaire-response>
            </span>
       </td>
     </ng-container>

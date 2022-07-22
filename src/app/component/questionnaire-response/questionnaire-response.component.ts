@@ -16,7 +16,7 @@ import {ResourceDialogComponent} from "../../dialog/resource-dialog/resource-dia
 })
 export class QuestionnaireResponseComponent implements OnInit {
 
-  @Input() encounter: Identifier;
+  @Input() encounter: string;
   resourcesLoaded = false;
   @Input() serverName: string;
 
@@ -29,12 +29,13 @@ export class QuestionnaireResponseComponent implements OnInit {
 
   constructor(private fhir : FhirService,
               public dialog: MatDialog) { }
-  displayedColumns = [ 'identifier', 'resource'];
+  displayedColumns = ['item', 'resource'];
 
   ngOnInit(): void {
       this.fhir.getQuesionnaireResponse('AWS',this.encounter).subscribe( result  => {
         const bundle = result as Bundle;
         this.questionnaires = [];
+        console.log(bundle)
         for (const entry of bundle.entry) {
           this.questionnaires.push(entry.resource as fhir.QuestionnaireResponse);
         }

@@ -504,9 +504,16 @@ export class FhirService {
       return practitionerRole;
   }
 
-  getQuesionnaireResponse(serverName:string, encounter : Identifier) :Observable<Bundle> {
+  getQuesionnaireResponse(serverName:string, encounter : string) :Observable<Bundle> {
     const headers = this.getHeaders();
-    var url = this.getServerUrl(serverName) + '/QuestionnaireResponse?encounter='+encounter.system + '%7C' + encounter.value;
+    var url = this.getServerUrl(serverName) + '/QuestionnaireResponse?encounter='+encounter;
+    // tslint:disable-next-line:typedef
+    return this.http.get(url , { headers})
+  }
+
+  getResource(serverName:string, reference : string) :Observable<any> {
+    const headers = this.getHeaders();
+    var url = this.getServerUrl(serverName) + '/'+ reference;
     // tslint:disable-next-line:typedef
     return this.http.get(url , { headers})
   }

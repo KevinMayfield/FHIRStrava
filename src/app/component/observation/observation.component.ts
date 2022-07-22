@@ -7,6 +7,7 @@ import {MatSort, Sort} from "@angular/material/sort";
 import {LinksService} from "../../services/links.service";
 import {FhirService} from "../../services/fhir.service";
 import {FHIREvent} from "../../model/eventModel";
+import Observation = fhir.Observation;
 
 
 @Component({
@@ -17,6 +18,10 @@ import {FHIREvent} from "../../model/eventModel";
 export class ObservationComponent implements OnInit {
 
   @Input() observations: fhir.Observation[];
+
+  headerVisible = true;
+
+  @Input() reference: string;
 
   @Input() showDetail = false;
 
@@ -38,18 +43,34 @@ export class ObservationComponent implements OnInit {
               public fhir: FhirService) { }
 
   ngOnInit() {
-    if (this.patientId !== undefined) {
-      this.dataSource = new MatTableDataSource <any>(this.observations);
+    if (this.reference !== undefined) {
 
-      this.fhir.queryObservations(this.serverName, this.patientId);
-      this.fhir.observationsChanged.subscribe((observations : FHIREvent) => {
-        this.resourcesLoaded = true;
-        if (observations.serverName === this.serverName) {
-          this.observations = observations.observations;
+      this.fhir.getResource(this.serverName,this.reference).subscribe(resource => {
+          this.headerVisible = false;
+          this.observations = [];
+          this.observations.push(resource as Observation);
           this.dataSource = new MatTableDataSource(this.observations);
           this.dataSource.sort = this.sort;
-        }
-      });
+          this.resourcesLoaded = true;
+        },
+        () =>{
+          this.resourcesLoaded = true;
+      }
+      )
+    } else {
+      if (this.patientId !== undefined) {
+        this.dataSource = new MatTableDataSource<any>(this.observations);
+
+        this.fhir.queryObservations(this.serverName, this.patientId);
+        this.fhir.observationsChanged.subscribe((observations: FHIREvent) => {
+          this.resourcesLoaded = true;
+          if (observations.serverName === this.serverName) {
+            this.observations = observations.observations;
+            this.dataSource = new MatTableDataSource(this.observations);
+            this.dataSource.sort = this.sort;
+          }
+        });
+      }
     }
   }
 

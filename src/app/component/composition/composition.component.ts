@@ -114,8 +114,18 @@ export class CompositionComponent implements OnInit {
   }
 
   fix(div: string) {
-    div =div.replace('&gt;','>');
+
+    div =div.replaceAll('&amp;lt;b&amp;gt;',' <b> ');
+    div =div.replaceAll('&amp;lt;/b&amp;gt;',' </b> ');
 
   return div;
+  }
+
+  fixMarkdown(div: string) {
+
+    div =div.replaceAll('&amp;lt;b&amp;gt;',' ** ');
+    div =div.replaceAll('&amp;lt;/b&amp;gt;',' ** ');
+
+    return div;
   }
 }

@@ -38,6 +38,7 @@
            <h3>{{section.title}}</h3>
             <span *ngIf="section.text !== undefined">
              <div [innerHTML]="fix(section.text.div)"></div>
+             <!-- <td-markdown>{{fixMarkdown(section.text.div)}}</td-markdown> -->
           </span>
         </span>
       </td>

@@ -41,7 +41,7 @@ export class EncounterComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  displayedColumns = [ 'start', 'forms', 'participant', 'resource'];
+  displayedColumns = [ 'start', 'forms',  'resource'];
 
   constructor(public  linkService: LinksService,
               public dialog: MatDialog,

@@ -8,6 +8,7 @@ import {LinksService} from "../../services/links.service";
 import {MatTableDataSource} from "@angular/material/table";
 import {MatSort} from "@angular/material/sort";
 import {FHIREvent} from "../../model/eventModel";
+import DocumentReference = fhir.DocumentReference;
 
 @Component({
   selector: 'app-document-reference',
@@ -17,6 +18,8 @@ import {FHIREvent} from "../../model/eventModel";
 export class DocumentReferenceComponent implements OnInit {
 
   @Input() documents: fhir.DocumentReference[];
+
+  @Input() reference: string;
 
   @Input() documentsTotal: number;
 
@@ -42,18 +45,34 @@ export class DocumentReferenceComponent implements OnInit {
               public dialog: MatDialog) { }
 
   ngOnInit() {
-    if (this.patientId !== undefined) {
-      this.dataSource = new MatTableDataSource <any>(this.documents);
+    if (this.reference !== undefined) {
 
-      this.fhir.queryDocumentReferences(this.serverName, this.patientId);
-      this.fhir.documentReferencesChanged.subscribe((documents : FHIREvent) => {
-        if (documents.serverName === this.serverName) {
-          this.resourcesLoaded = true;
-          this.documents = documents.documents;
+      this.fhir.getResource(this.serverName,this.reference).subscribe(resource => {
+
+          this.documents = [];
+          this.documents.push(resource as DocumentReference);
           this.dataSource = new MatTableDataSource(this.documents);
           this.dataSource.sort = this.sort;
+          this.resourcesLoaded = true;
+        },
+        () =>{
+          this.resourcesLoaded = true;
         }
-      });
+      )
+    } else {
+      if (this.patientId !== undefined) {
+        this.dataSource = new MatTableDataSource<any>(this.documents);
+
+        this.fhir.queryDocumentReferences(this.serverName, this.patientId);
+        this.fhir.documentReferencesChanged.subscribe((documents: FHIREvent) => {
+          if (documents.serverName === this.serverName) {
+            this.resourcesLoaded = true;
+            this.documents = documents.documents;
+            this.dataSource = new MatTableDataSource(this.documents);
+            this.dataSource.sort = this.sort;
+          }
+        });
+      }
     }
   }
 

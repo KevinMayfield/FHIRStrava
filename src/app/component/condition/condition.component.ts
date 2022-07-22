@@ -18,7 +18,9 @@ import {FHIREvent} from "../../model/eventModel";
 })
 export class ConditionComponent implements OnInit {
 
-  @Input() conditions: fhir.Condition[];
+  conditions: fhir.Condition[];
+
+  @Input() reference: string;
 
   @Input() patientId: string;
 
@@ -27,8 +29,6 @@ export class ConditionComponent implements OnInit {
   @Input() clinicalStatus :string = undefined;
 
   @Input() serverName: string;
-
-  @Output() condition = new EventEmitter<fhir.Condition>();
 
   @Output() encounter = new EventEmitter<fhir.Reference>();
   resourcesLoaded = false;
@@ -46,28 +46,37 @@ export class ConditionComponent implements OnInit {
               public fhir: FhirService) { }
 
   ngOnInit() {
-    if (this.patientId !== undefined) {
-      this.dataSource = new MatTableDataSource <any>(this.conditions);
-        this.fhir.queryConditions(this.serverName,this.patientId, this.clinicalStatus);
-        this.fhir.conditionsChanged.subscribe((conditions : FHIREvent) => {
-          if (conditions.serverName === this.serverName) {
+    if (this.reference !== undefined) {
+      this.fhir.getResource(this.serverName,this.reference).subscribe(resource => {
+          this.conditions = [];
+          this.conditions.push(resource as Condition);
+          this.dataSource = new MatTableDataSource(this.conditions);
+          this.dataSource.sort = this.sort;
+        }
+      )
+    } else {
+      if (this.patientId !== undefined) {
+        this.dataSource = new MatTableDataSource<any>(this.conditions);
+        this.fhir.queryConditions(this.serverName, this.patientId, this.clinicalStatus);
+        this.fhir.conditionsChanged.subscribe((conditions: FHIREvent) => {
+            if (conditions.serverName === this.serverName) {
+              this.resourcesLoaded = true;
+              this.conditions = conditions.conditions;
+              this.dataSource = new MatTableDataSource(this.conditions);
+              /*
+                this.dataSource.filterPredicate = (data:
+                                                     {name: string}, filterValue: string) =>
+                  data.name.trim().toLowerCase().indexOf(filterValue) !== -1;
+                this.applyFilter('dora');*/
+              this.dataSource.sort = this.sort;
+            }
+          }, () => {
             this.resourcesLoaded = true;
-            this.conditions = conditions.conditions;
-            this.dataSource = new MatTableDataSource(this.conditions);
-            /*
-              this.dataSource.filterPredicate = (data:
-                                                   {name: string}, filterValue: string) =>
-                data.name.trim().toLowerCase().indexOf(filterValue) !== -1;
-              this.applyFilter('dora');*/
-            this.dataSource.sort = this.sort;
           }
-        }, () =>
-      {
-        this.resourcesLoaded = true;
-      }
         );
       }
     }
+  }
 
   applyFilter(filterValue: string) {
     this.dataSource.filter = filterValue.trim().toLowerCase();
