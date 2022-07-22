@@ -511,6 +511,10 @@ export class FhirService {
     return this.http.get(url , { headers})
   }
 
+  getBinary(id : string):Observable<any>  {
+    return undefined;
+
+  }
   getResource(serverName:string, reference : string) :Observable<any> {
     const headers = this.getHeaders();
     var url = this.getServerUrl(serverName) + '/'+ reference;

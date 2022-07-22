@@ -78,10 +78,8 @@ import {EncounterComponent} from "./component/encounter/encounter.component";
 import { QuestionnaireResponseComponent } from './component/questionnaire-response/questionnaire-response.component';
 import { PractitionerRoleComponent } from './component/practitioner-role/practitioner-role.component';
 import {BinaryComponent} from "./component/binary/binary.component";
-import {HtmlViewerComponent} from "./component/binary/html-viewer/html-viewer.component";
-import {PdfViewerComponent} from "./component/binary/pdf-viewer/pdf-viewer.component";
 import {ImgViewerComponent} from "./component/binary/img-viewer/img-viewer.component";
-import {ViewDocumentComponent} from "./component/binary/composition-view/view-document.component";
+
 
 
 @NgModule({
@@ -104,12 +102,8 @@ import {ViewDocumentComponent} from "./component/binary/composition-view/view-do
     ResourceDialogComponent,
     EncounterComponent,
     BinaryComponent,
-    HtmlViewerComponent,
-    PdfViewerComponent,
     ImgViewerComponent,
     CompositionComponent,
-    ViewDocumentComponent,
-
     LoginComponent,
     LogoutComponent,
     PatientObservationComponent,

@@ -30,11 +30,11 @@ export class BinaryComponent implements OnInit {
 
     this.documentReferenceId = this.route.snapshot.paramMap.get('docid');
 
-    if (this.patientEprService.documentReference !== undefined) {
-      this.process(this.patientEprService.documentReference);
+    if (this.document !== undefined) {
+     // this.process(this.patientEprService.documentReference);
     } else {
       if (this.documentReferenceId !== undefined) {
-        this.fhirService.getResource('/DocumentReference/' + this.documentReferenceId).subscribe(resource => {
+        this.fhirService.getResource('AWS','/DocumentReference/' + this.documentReferenceId).subscribe(resource => {
             this.process(resource);
           },
           () => {
@@ -55,15 +55,6 @@ export class BinaryComponent implements OnInit {
     this.document = <fhir.DocumentReference> resource;
     this.processDocument();
 
-    if ((this.patientEprService.patient === undefined) ||
-      (this.document.subject !== undefined
-      && ('Patient/' + this.patientEprService.patient.id) !== this.document.subject.reference
-        && (this.document.subject.reference.indexOf('demographics.spineservices.nhs.uk')==0)
-      )) {
-      this.fhirService.getResource(this.document.subject.reference).subscribe( patient => {
-        this.patientEprService.set(<fhir.Patient> patient);
-      });
-    }
   }
 
   processDocument() {
