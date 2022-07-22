@@ -1,6 +1,6 @@
-<span *ngIf="docType=='img'">
-  <app-img-viewer [binaryId]="binaryId"></app-img-viewer>
+<span *ngIf="docFound">
+  <app-img-viewer></app-img-viewer>
 </span>
-
-
-
+<span *ngIf="!docFound">
+  Image missing
+</span>

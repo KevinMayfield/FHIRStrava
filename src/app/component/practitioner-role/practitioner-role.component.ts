@@ -21,9 +21,16 @@ export class PractitionerRoleComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.practitionerRole !== undefined) {
-      this.fhir.getPractitionerRole(this.serverName,this.practitionerRole).subscribe(bundle => {
-        this.role = this.fhir.extractPractitionerRole(bundle);
-      })
+
+      this.role = this.fhir.getRole(this.practitionerRole.reference);
+      if (this.role === undefined) {
+        this.fhir.getPractitionerRole(this.serverName, this.practitionerRole).subscribe(bundle => {
+          this.fhir.putRole(this.practitionerRole.reference,bundle);
+          this.role = this.fhir.extractPractitionerRole(bundle);
+        })
+      } else {
+        console.log('Cache used');
+      }
     }
   }
 

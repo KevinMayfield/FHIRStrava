@@ -34,6 +34,8 @@ import Identifier = fhir.Identifier;
 import Reference = fhir.Reference;
 import Practitioner = fhir.Practitioner;
 import Organization = fhir.Organization;
+import Resource = fhir.Resource;
+import PractitionerRole = fhir.PractitionerRole;
 
 @Injectable({
   providedIn: 'root'
@@ -41,6 +43,8 @@ import Organization = fhir.Organization;
 export class FhirService {
 
   private patient : Patient;
+
+  private roles = new Map<string, Bundle>();
 
   private apiKey = 'K5wfy9doLB3LzeNGK8T201A26rqMXQ4m7hDHHZyj';
 
@@ -82,6 +86,13 @@ export class FhirService {
     this.loaded.subscribe(sucess => {
 
     });
+  }
+
+  getRole(role :string) :Bundle {
+    return this.roles.get(role);
+  }
+  putRole(role :string, practitionerRole : Bundle)  {
+    return this.roles.set(role,practitionerRole);
   }
 
   getServerUrl(serverName : string) : string {
@@ -511,10 +522,12 @@ export class FhirService {
     return this.http.get(url , { headers})
   }
 
-  getBinary(id : string):Observable<any>  {
-    return undefined;
-
+  getBinary(url : string):Observable<any>  {
+    const headers = this.getHeaders();
+    // tslint:disable-next-line:typedef
+    return this.http.get(url, {'headers':headers, responseType: 'blob'});
   }
+
   getResource(serverName:string, reference : string) :Observable<any> {
     const headers = this.getHeaders();
     var url = this.getServerUrl(serverName) + '/'+ reference;

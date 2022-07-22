@@ -35,7 +35,6 @@ export class QuestionnaireResponseComponent implements OnInit {
       this.fhir.getQuesionnaireResponse('AWS',this.encounter).subscribe( result  => {
         const bundle = result as Bundle;
         this.questionnaires = [];
-        console.log(bundle)
         for (const entry of bundle.entry) {
           this.questionnaires.push(entry.resource as fhir.QuestionnaireResponse);
         }
