@@ -38,10 +38,13 @@ export class AuthService {
 
     Hub.listen('auth',({ payload: { event, data } }) => {
       console.log(event);
-      const { channel, payload } = data;
-      if (channel === 'auth') {
-        this._authState.next(payload.event);
+      if (data != undefined) {
+        const { channel, payload } = data;
+        if (channel === 'auth') {
+          this._authState.next(payload.event);
+        }
       }
+
       switch (event) {
         case "signIn":
 

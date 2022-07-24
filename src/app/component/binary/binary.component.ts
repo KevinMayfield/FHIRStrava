@@ -18,6 +18,7 @@ export class BinaryComponent implements OnInit {
 
   public docFound: boolean =false;
 
+  binary : fhir.Binary;
 
   constructor(
               private fhirService: FhirService,
@@ -30,10 +31,11 @@ export class BinaryComponent implements OnInit {
     if (this.serverName === 'AWS') {
       if (this.document !== undefined && this.document.content !== undefined && this.document.content[0].attachment !== undefined) {
         var paths = this.document.content[0].attachment.url.split('Binary/');
-        console.log(paths[1]);
-        this.fhirService.getResource(this.serverName, '/Binary/'+ paths[1] ).subscribe(resource => {
+
+        this.fhirService.getResource(this.serverName, 'Binary/'+ paths[1] ).subscribe(resource => {
             // this.process(resource);
             console.log(resource);
+            this.binary = resource;
             this.docFound = true;
             /*
             if (resource.presignedGetUrl !== undefined) {

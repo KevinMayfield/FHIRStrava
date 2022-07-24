@@ -256,8 +256,8 @@ export class FhirService {
       encounters : []
     };
     const headers = this.getHeaders();
-    var url = this.getServerUrl(serverName) + '/Encounter?patient='+patientId;
-    if (serverName === 'AWS') url = this.getServerUrl(serverName) + '/Encounter?patient:Patient.identifier='+patientId;
+    var url = this.getServerUrl(serverName) + '/Encounter?patient='+patientId ;
+    if (serverName === 'AWS') url = this.getServerUrl(serverName) + '/Encounter?patient:Patient.identifier='+patientId + '&_sort=-date';
 
     // tslint:disable-next-line:typedef
     this.http.get(url, { headers}).subscribe(

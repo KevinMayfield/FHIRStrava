@@ -79,6 +79,7 @@ import { QuestionnaireResponseComponent } from './component/questionnaire-respon
 import { PractitionerRoleComponent } from './component/practitioner-role/practitioner-role.component';
 import {BinaryComponent} from "./component/binary/binary.component";
 import {ImgViewerComponent} from "./component/binary/img-viewer/img-viewer.component";
+import {ImageViewerModule} from "ngx-image-viewer";
 
 
 
@@ -166,7 +167,8 @@ import {ImgViewerComponent} from "./component/binary/img-viewer/img-viewer.compo
     MatDialogModule,
     MatChipsModule,
     MatTabsModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    ImageViewerModule.forRoot()
 
   ],
   providers: [

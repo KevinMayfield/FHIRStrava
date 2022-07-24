@@ -29,7 +29,7 @@ export class PractitionerRoleComponent implements OnInit {
           this.role = this.fhir.extractPractitionerRole(bundle);
         })
       } else {
-        console.log('Cache used');
+       // console.log('Cache used');
       }
     }
   }

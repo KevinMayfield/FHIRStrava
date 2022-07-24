@@ -3,7 +3,12 @@
 <mat-card>
   <mat-card-title>Image Viewer</mat-card-title>
   <mat-card-content>
-    <!--
-<ngx-imageviewer [src]="imgSrc" ></ngx-imageviewer> -->
+    <span *ngIf="base64 !==undefined">
+    <img [src]="'data:image/jpg;base64,' + base64">
+      </span>
+  <!--  <ngx-image-viewer [src]="images"
+                      [config]="{customBtns:[{name: 'link', icon: 'fa fa-paperclip'}]}"
+                      (customEvent)="handleEvent($event)">
+    </ngx-image-viewer> -->
   </mat-card-content>
 </mat-card>
