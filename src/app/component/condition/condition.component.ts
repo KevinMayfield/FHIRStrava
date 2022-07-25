@@ -6,7 +6,7 @@ import {FhirService} from "../../services/fhir.service";
 import {LinksService} from "../../services/links.service";
 import {MatTableDataSource} from "@angular/material/table";
 import {MatSort} from "@angular/material/sort";
-import Condition = fhir.Condition;
+import Condition = fhir4.Condition;
 import {MatPaginator} from "@angular/material/paginator";
 import {FHIREvent} from "../../model/eventModel";
 
@@ -18,7 +18,7 @@ import {FHIREvent} from "../../model/eventModel";
 })
 export class ConditionComponent implements OnInit {
 
-  conditions: fhir.Condition[];
+  conditions: fhir4.Condition[];
 
   @Input() reference: string;
 
@@ -30,7 +30,7 @@ export class ConditionComponent implements OnInit {
 
   @Input() serverName: string;
 
-  @Output() encounter = new EventEmitter<fhir.Reference>();
+  @Output() encounter = new EventEmitter<fhir4.Reference>();
   resourcesLoaded = false;
 
   dataSource : any;
@@ -99,7 +99,7 @@ export class ConditionComponent implements OnInit {
     }
 
 
-  getCodeTip(codeableConcept : fhir.CodeableConcept) {
+  getCodeTip(codeableConcept : fhir4.CodeableConcept) {
     for (var code of codeableConcept.coding) {
       if (this.linkService.isSNOMED(code.system)) {
         return "SNOMED "+code.code
@@ -114,7 +114,7 @@ export class ConditionComponent implements OnInit {
     return this.linkService.isSNOMED(system);
   }
 
-  getSNOMEDLink(codeableConcept: fhir.CodeableConcept) {
+  getSNOMEDLink(codeableConcept: fhir4.CodeableConcept) {
     for (var code of codeableConcept.coding) {
       if (this.linkService.isSNOMED(code.system)) {
         window.open(this.linkService.getSNOMEDLink(code), '_blank');
@@ -123,9 +123,9 @@ export class ConditionComponent implements OnInit {
   }
 
 
-  showEncounter(condition: fhir.Condition) {
+  showEncounter(condition: fhir4.Condition) {
 
-    this.encounter.emit(condition.context);
+    this.encounter.emit(condition.encounter);
 
   }
 

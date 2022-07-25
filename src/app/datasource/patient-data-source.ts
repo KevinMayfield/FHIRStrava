@@ -4,8 +4,8 @@ import {BehaviorSubject, Observable} from "rxjs";
 
 export class PatientDataSource extends DataSource<any> {
   constructor(
-              public patients: fhir.Patient[],
-              public patientObservable : Observable<fhir.Patient[]>,
+              public patients: fhir4.Patient[],
+              public patientObservable : Observable<fhir4.Patient[]>,
               public useObservable: boolean = false
   ) {
     super();
@@ -13,10 +13,10 @@ export class PatientDataSource extends DataSource<any> {
   }
 
   private dataStore: {
-    patients: fhir.Patient[]
+    patients: fhir4.Patient[]
   };
 
-  connect(): Observable<fhir.Patient[]> {
+  connect(): Observable<fhir4.Patient[]> {
 
     //
  //   console.log('calling data service');
@@ -26,13 +26,13 @@ export class PatientDataSource extends DataSource<any> {
     }
 
 
-    let _patients : BehaviorSubject<fhir.Patient[]> =<BehaviorSubject<fhir.Patient[]>>new BehaviorSubject([]);;
+    let _patients : BehaviorSubject<fhir4.Patient[]> =<BehaviorSubject<fhir4.Patient[]>>new BehaviorSubject([]);
 
     this.dataStore = { patients: [] };
 
     if (this.patients != []) {
       for (let patient of this.patients) {
-        this.dataStore.patients.push(<fhir.Patient> patient);
+        this.dataStore.patients.push(<fhir4.Patient> patient);
       }
       _patients.next(Object.assign({}, this.dataStore).patients);
     }

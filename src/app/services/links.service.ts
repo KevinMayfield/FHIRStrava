@@ -26,11 +26,11 @@ export class LinksService {
     }
   }
 
-  getDMDLink(code: fhir.Coding) {
+  getDMDLink(code: fhir4.Coding) {
     return 'http://dmd.medicines.org.uk/DesktopDefault.aspx?VMP='+code.code+'&toc=nofloat';
   }
 
-  getSNOMEDLink(code: fhir.Coding): string {
+  getSNOMEDLink(code: fhir4.Coding): string {
 
     if (this.isSNOMED(code.system)) {
 //&server=https://termbrowser.nhs.uk/sct-browser-api/snomed&langRefset=999000681000001101,999001251000000103

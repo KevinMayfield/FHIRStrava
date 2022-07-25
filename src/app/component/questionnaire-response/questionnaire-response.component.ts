@@ -1,10 +1,10 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
-import Identifier = fhir.Identifier;
+import Identifier = fhir4.Identifier;
 import {MatPaginator} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
 import {FhirService} from "../../services/fhir.service";
-import Bundle = fhir.Bundle;
-import QuestionnaireResponse = fhir.QuestionnaireResponse;
+import Bundle = fhir4.Bundle;
+import QuestionnaireResponse = fhir4.QuestionnaireResponse;
 import {MatTableDataSource} from "@angular/material/table";
 import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material/dialog";
 import {ResourceDialogComponent} from "../../dialog/resource-dialog/resource-dialog.component";
@@ -36,7 +36,7 @@ export class QuestionnaireResponseComponent implements OnInit {
         const bundle = result as Bundle;
         this.questionnaires = [];
         for (const entry of bundle.entry) {
-          this.questionnaires.push(entry.resource as fhir.QuestionnaireResponse);
+          this.questionnaires.push(entry.resource as fhir4.QuestionnaireResponse);
         }
         this.dataSource = new MatTableDataSource(this.questionnaires);
         this.dataSource.sort = this.sort;

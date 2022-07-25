@@ -15,7 +15,7 @@ import {FHIREvent} from "../../model/eventModel";
 })
 export class AllergyIntoleranceComponent implements OnInit {
 
-  @Input() allergies: fhir.AllergyIntolerance[];
+  @Input() allergies: fhir4.AllergyIntolerance[];
 
   @Output() allergy = new EventEmitter<any>();
 
@@ -57,7 +57,7 @@ export class AllergyIntoleranceComponent implements OnInit {
     return this.linksService.getCodeSystem(system);
   }
 
-  getSNOMEDLink(code: fhir.Coding) {
+  getSNOMEDLink(code: fhir4.Coding) {
     if (this.linksService.isSNOMED(code.system)) {
       window.open(this.linksService.getSNOMEDLink(code), '_blank');
     }

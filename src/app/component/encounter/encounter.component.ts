@@ -4,7 +4,7 @@ import {LinksService} from "../../services/links.service";
 import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material/dialog";
 import {FhirService} from "../../services/fhir.service";
 import {MatTableDataSource} from "@angular/material/table";
-import Encounter = fhir.Encounter;
+import Encounter = fhir4.Encounter;
 import {FHIREvent} from "../../model/eventModel";
 import {MatPaginator} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
@@ -18,16 +18,16 @@ import {ResourceDialogComponent} from "../../dialog/resource-dialog/resource-dia
 })
 export class EncounterComponent implements OnInit {
 
-  @Input() encounters: fhir.Encounter[];
+  @Input() encounters: fhir4.Encounter[];
 
-  locations: fhir.Location[];
+  locations: fhir4.Location[];
 
   @Input() showDetail = false;
 
-  @Input() patient: fhir.Patient;
+  @Input() patient: fhir4.Patient;
 
 
-  selectedEncounter: fhir.Encounter;
+  selectedEncounter: fhir4.Encounter;
 
   @Input() patientId: string;
 
@@ -84,7 +84,7 @@ export class EncounterComponent implements OnInit {
   }
 
 
-  getCodeTip(codeableConcept : fhir.CodeableConcept) {
+  getCodeTip(codeableConcept : fhir4.CodeableConcept) {
     for (var code of codeableConcept.coding) {
       if (this.linkService.isSNOMED(code.system)) {
         return "SNOMED "+code.code
@@ -99,7 +99,7 @@ export class EncounterComponent implements OnInit {
     return this.linkService.isSNOMED(system);
   }
 
-  getSNOMEDLink(codeableConcept: fhir.CodeableConcept) {
+  getSNOMEDLink(codeableConcept: fhir4.CodeableConcept) {
     for (var code of codeableConcept.coding) {
       if (this.linkService.isSNOMED(code.system)) {
         window.open(this.linkService.getSNOMEDLink(code), '_blank');

@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
-import Reference = fhir.Reference;
+import Reference = fhir4.Reference;
 import {FhirService} from "../../services/fhir.service";
-import PractitionerRole = fhir.PractitionerRole;
+import PractitionerRole = fhir4.PractitionerRole;
 
 @Component({
   selector: 'app-practitioner-role',

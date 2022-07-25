@@ -32,7 +32,7 @@
     "@covalent/http": "^3.2.4",
     "@covalent/markdown": "^3.2.4",
     "@swimlane/ngx-charts": "^16.0.0",
-    "@types/fhir": "^3.0.2",
+    "@types/fhir": "^0.0.35",
     "aws-amplify": "^3.4.3",
     "csv-reader": "^1.0.7",
     "moment": "^2.29.1",

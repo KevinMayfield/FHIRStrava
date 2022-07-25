@@ -28,10 +28,10 @@ import {Router} from "@angular/router";
 export class PatientSearchComponent implements OnInit,AfterViewInit {
 
 
-  patients$: Observable<fhir.Patient[]>;
+  patients$: Observable<fhir4.Patient[]>;
   private searchTerms = new Subject<string>();
 
-  @Output() patientSelected : EventEmitter<fhir.Patient> = new EventEmitter();
+  @Output() patientSelected : EventEmitter<fhir4.Patient> = new EventEmitter();
 
   @Input() serverName: string;
 
@@ -67,7 +67,7 @@ export class PatientSearchComponent implements OnInit,AfterViewInit {
       ),
 
       map(bundle => {
-        var pat$: fhir.Patient[] = [];
+        var pat$: fhir4.Patient[] = [];
         var i;
         if (bundle !== undefined && bundle.hasOwnProperty("entry")) {
           // @ts-ignore
@@ -78,7 +78,8 @@ export class PatientSearchComponent implements OnInit,AfterViewInit {
         }
         return pat$;}
         )
-    ),  catchError((err, caught) => {
+    ),
+      catchError((err, caught) => {
       console.log(err);
       return EMPTY;
     });
@@ -101,7 +102,7 @@ export class PatientSearchComponent implements OnInit,AfterViewInit {
     };
   }
 
-  selectPatient(patient: fhir.Patient) {
+  selectPatient(patient: fhir4.Patient) {
 
     this.patientSelected.emit(patient);
     if (patient !== undefined) {

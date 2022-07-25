@@ -24,7 +24,7 @@ export class EprService {
 
 
 
-  patient: fhir.Patient = undefined;
+  patient: fhir4.Patient = undefined;
 
   resource: any = undefined;
 
@@ -40,29 +40,29 @@ export class EprService {
 
   VirtuallyConnectStatusEmitter: EventEmitter<string> = new EventEmitter();
 
-  flagEmitter: EventEmitter<fhir.Flag> = new EventEmitter();
+  flagEmitter: EventEmitter<fhir4.Flag> = new EventEmitter();
 
-  patientAllergies: fhir.AllergyIntolerance[] = [];
+  patientAllergies: fhir4.AllergyIntolerance[] = [];
 
-  patientFlags: fhir.Flag[] = [];
+  patientFlags: fhir4.Flag[] = [];
 
   constructor(
     private fhirService: FhirService
   ) { }
 
-  documentReference: fhir.DocumentReference;
+  documentReference: fhir4.DocumentReference;
 
   private title: string;
 
   private titleChangeEvent: EventEmitter<string> = new EventEmitter<string>();
 
-  private patientChangeEvent: EventEmitter<fhir.Patient> = new EventEmitter();
+  private patientChangeEvent: EventEmitter<fhir4.Patient> = new EventEmitter();
 
   private resourceChangeEvent: EventEmitter<any> = new EventEmitter();
 
   private sectionChangeEvent: EventEmitter<string> = new EventEmitter();
 
-  set(patient: fhir.Patient) {
+  set(patient: fhir4.Patient) {
 
     this.patient = patient;
 
@@ -94,7 +94,7 @@ export class EprService {
      return this.flagEmitter;
   }
 
-  addFlag(flag: fhir.Flag) {
+  addFlag(flag: fhir4.Flag) {
     this.patientFlags.push(flag);
     this.flagEmitter.emit(flag);
   }
@@ -129,7 +129,7 @@ export class EprService {
     this.resourceChangeEvent.emit(resource);
   }
 
-  setDocumentReference(document: fhir.DocumentReference) {
+  setDocumentReference(document: fhir4.DocumentReference) {
     this.documentReference = document;
   }
   getDocumentReference() {

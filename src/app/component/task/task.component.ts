@@ -14,7 +14,7 @@ import {FHIREvent} from "../../model/eventModel";
 })
 export class TaskComponent implements OnInit {
 
-  @Input() tasks: fhir.Task[];
+  @Input() tasks: fhir4.Task[];
 
   @Output() task = new EventEmitter<any>();
 

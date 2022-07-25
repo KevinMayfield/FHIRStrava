@@ -33,8 +33,10 @@
           <b>{{encounter.type[0].text}}</b>
         </span>
         <span *ngFor="let participant of encounter.participant">
-          <span *ngIf="participant.individual !== undefined"><i>{{participant.individual.display}}</i>
-          <app-practitioner-role [practitionerRole]="participant.individual" [serverName]="serverName"></app-practitioner-role>
+          <span *ngIf="participant.individual !== undefined">
+            Participant
+            <i *ngIf="participant.individual.display != undefined">{{participant.individual.display}}</i>
+            <app-practitioner-role [practitionerRole]="participant.individual" [serverName]="serverName"></app-practitioner-role>
           </span>
       </span>
       </td>

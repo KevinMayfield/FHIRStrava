@@ -53,7 +53,7 @@ export class PatientSummaryComponent implements OnInit {
     clearDown() {
     }
 
-    selectEncounter(encounter: fhir.Reference) {
+    selectEncounter(encounter: fhir4.Reference) {
 
         const str = encounter.reference.split('/');
         console.log(this.route.root);
@@ -61,7 +61,7 @@ export class PatientSummaryComponent implements OnInit {
 
     }
 
-    selectCarePlan(carePlan: fhir.Reference) {
+    selectCarePlan(carePlan: fhir4.Reference) {
 
         this.router.navigate(['..', 'careplan', carePlan.id] , { relativeTo : this.route});
 

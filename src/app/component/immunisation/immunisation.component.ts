@@ -15,7 +15,7 @@ import {FHIREvent} from "../../model/eventModel";
 })
 export class ImmunisationComponent implements OnInit {
 
-  @Input() immunisations: fhir.Immunization[];
+  @Input() immunisations: fhir4.Immunization[];
 
   @Input() patientId: string;
 
@@ -63,7 +63,7 @@ export class ImmunisationComponent implements OnInit {
   }
 
 
-  getCodeTip(codeableConcept : fhir.CodeableConcept) {
+  getCodeTip(codeableConcept : fhir4.CodeableConcept) {
     for (var code of codeableConcept.coding) {
       if (this.linkService.isSNOMED(code.system)) {
         return "SNOMED "+code.code
@@ -76,7 +76,7 @@ export class ImmunisationComponent implements OnInit {
     return this.linkService.isSNOMED(system);
   }
 
-  getSNOMEDLink(codeableConcept: fhir.CodeableConcept) {
+  getSNOMEDLink(codeableConcept: fhir4.CodeableConcept) {
     for (var code of codeableConcept.coding) {
       if (this.linkService.isSNOMED(code.system)) {
         window.open(this.linkService.getSNOMEDLink(code), '_blank');

@@ -16,7 +16,7 @@ import {FHIREvent} from "../../model/eventModel";
 })
 export class CompositionComponent implements OnInit {
 
-  @Input() compositions: fhir.Composition[];
+  @Input() compositions: fhir4.Composition[];
 
   @Input() compositionsTotal: number;
 
@@ -58,7 +58,7 @@ export class CompositionComponent implements OnInit {
     }
   }
 
-  getCodeTip(codeableConcept : fhir.CodeableConcept) {
+  getCodeTip(codeableConcept : fhir4.CodeableConcept) {
     for (var code of codeableConcept.coding) {
       if (this.linkService.isSNOMED(code.system)) {
         return "SNOMED "+code.code
@@ -71,7 +71,7 @@ export class CompositionComponent implements OnInit {
     return this.linkService.isSNOMED(system);
   }
 
-  getSNOMEDLink(codeableConcept: fhir.CodeableConcept) {
+  getSNOMEDLink(codeableConcept: fhir4.CodeableConcept) {
     for (var code of codeableConcept.coding) {
       if (this.linkService.isSNOMED(code.system)) {
         window.open(this.linkService.getSNOMEDLink(code), '_blank');
@@ -79,7 +79,7 @@ export class CompositionComponent implements OnInit {
     }
   }
 
-  selectDocument(document: fhir.Composition) {
+  selectDocument(document: fhir4.Composition) {
 
     this.composition.emit(document);
 

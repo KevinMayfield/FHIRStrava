@@ -15,9 +15,9 @@ import {FhirService} from "../../services/fhir.service";
 })
 export class PatientComponent implements OnInit {
 
-  @Input() patients: fhir.Patient[];
+  @Input() patients: fhir4.Patient[];
 
-  @Input() patientsObservable: Observable<fhir.Patient[]>;
+  @Input() patientsObservable: Observable<fhir4.Patient[]>;
 
   @Input() useObservable = false;
 
@@ -29,9 +29,9 @@ export class PatientComponent implements OnInit {
 
   dataSource: PatientDataSource;
 
-  practitioners: fhir.Practitioner[];
+  practitioners: fhir4.Practitioner[];
 
-  organisations: fhir.Organization[];
+  organisations: fhir4.Organization[];
 
   displayedColumns = ['patient', 'dob', 'gender', 'identifier', 'contact',  'practice', 'resource'];
 
@@ -53,7 +53,7 @@ export class PatientComponent implements OnInit {
     }
   }
 
-  getFirstAddress(patient: fhir.Patient): String {
+  getFirstAddress(patient: fhir4.Patient): String {
     if (patient === undefined) { return ''; }
     if (patient.address === undefined || patient.address.length === 0) {
       return '';
@@ -61,7 +61,7 @@ export class PatientComponent implements OnInit {
     return patient.address[0].line.join(', ') + ', ' + patient.address[0].city + ', ' + patient.address[0].postalCode;
 
   }
-  getLastName(patient: fhir.Patient): String {
+  getLastName(patient: fhir4.Patient): String {
     if (patient === undefined) { return ''; }
     if (patient.name === undefined || patient.name.length === 0) {
       return '';
@@ -72,7 +72,7 @@ export class PatientComponent implements OnInit {
    return name;
 
   }
-  getFirstName(patient: fhir.Patient): String {
+  getFirstName(patient: fhir4.Patient): String {
     if (patient === undefined) { return ''; }
     if (patient.name === undefined || patient.name.length === 0) {
       return '';
@@ -90,7 +90,7 @@ export class PatientComponent implements OnInit {
 
   }
 
-  getFirstTelecom(patient: fhir.Patient): String {
+  getFirstTelecom(patient: fhir4.Patient): String {
     if (patient === undefined) {
       return '';
     }
@@ -100,7 +100,7 @@ export class PatientComponent implements OnInit {
 
   }
 
-  getIdentifier(identifier: fhir.Identifier): String {
+  getIdentifier(identifier: fhir4.Identifier): String {
 
     let name: String = identifier.system;
     if (identifier.system.indexOf('nhs-number') !== -1) {
@@ -119,7 +119,7 @@ export class PatientComponent implements OnInit {
     return name;
   }
 
-  getNHSIdentifier(patient: fhir.Patient): String {
+  getNHSIdentifier(patient: fhir4.Patient): String {
     if (patient === undefined) { return ''; }
     if (patient.identifier === undefined || patient.identifier.length === 0) { return ''; }
     // Move to address
@@ -136,7 +136,7 @@ export class PatientComponent implements OnInit {
 
 
 
-  selectPatient(patient: fhir.Patient) {
+  selectPatient(patient: fhir4.Patient) {
     this.patient.emit(patient);
   }
   select(resource) {

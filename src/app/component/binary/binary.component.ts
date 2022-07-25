@@ -12,13 +12,13 @@ import {FhirService} from "../../services/fhir.service";
 export class BinaryComponent implements OnInit {
 
   @Input()
-  private document: fhir.DocumentReference;
+  private document: fhir4.DocumentReference;
 
   @Input() serverName: string;
 
   public docFound: boolean =false;
 
-  binary : fhir.Binary;
+  binary : fhir4.Binary;
 
   constructor(
               private fhirService: FhirService,
@@ -63,7 +63,7 @@ export class BinaryComponent implements OnInit {
   }
 
   process(resource: any) {
-    this.document = <fhir.DocumentReference> resource;
+    this.document = <fhir4.DocumentReference> resource;
 
 
   }

@@ -8,7 +8,7 @@ import {LinksService} from "../../services/links.service";
 import {MatTableDataSource} from "@angular/material/table";
 import {MatSort} from "@angular/material/sort";
 import {FHIREvent} from "../../model/eventModel";
-import DocumentReference = fhir.DocumentReference;
+import DocumentReference = fhir4.DocumentReference;
 
 @Component({
   selector: 'app-document-reference',
@@ -17,7 +17,7 @@ import DocumentReference = fhir.DocumentReference;
 })
 export class DocumentReferenceComponent implements OnInit {
 
-  @Input() documents: fhir.DocumentReference[];
+  @Input() documents: fhir4.DocumentReference[];
 
   @Input() reference: string;
 
@@ -76,7 +76,7 @@ export class DocumentReferenceComponent implements OnInit {
     }
   }
 
-  getCodeTip(codeableConcept : fhir.CodeableConcept) {
+  getCodeTip(codeableConcept : fhir4.CodeableConcept) {
     for (var code of codeableConcept.coding) {
       if (this.linkService.isSNOMED(code.system)) {
         return "SNOMED "+code.code
@@ -89,7 +89,7 @@ export class DocumentReferenceComponent implements OnInit {
     return this.linkService.isSNOMED(system);
   }
 
-  getSNOMEDLink(codeableConcept: fhir.CodeableConcept) {
+  getSNOMEDLink(codeableConcept: fhir4.CodeableConcept) {
     for (var code of codeableConcept.coding) {
       if (this.linkService.isSNOMED(code.system)) {
         window.open(this.linkService.getSNOMEDLink(code), '_blank');
@@ -97,7 +97,7 @@ export class DocumentReferenceComponent implements OnInit {
     }
   }
 
-  selectDocument(document: fhir.DocumentReference) {
+  selectDocument(document: fhir4.DocumentReference) {
 
     this.documentReference.emit(document);
 

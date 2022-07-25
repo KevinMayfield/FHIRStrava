@@ -1,18 +1,18 @@
 import {EventEmitter, Injectable} from '@angular/core';
 
 // @ts-ignore
-import Patient = fhir.Patient;
+import Patient = fhir4.Patient;
 // @ts-ignore
 import Bundle = fhir4.Bundle;
 // @ts-ignore
-import Observation = fhir.Observation;
+import Observation = fhir4.Observation;
 // @ts-ignore
-import BundleEntry = fhir.BundleEntry;
+import BundleEntry = fhir4.BundleEntry;
 import * as uuid from 'uuid';
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 // @ts-ignore
-import Flag = fhir.Flag;
-import Task = fhir.Task;
+import Flag = fhir4.Flag;
+import Task = fhir4.Task;
 // @ts-ignore
 import DiagnosticReport = fhir.DiagnosticReport;
 // @ts-ignore
@@ -23,19 +23,19 @@ import {Observable} from "rxjs";
 import {environment} from "../../environments/environment";
 // @ts-ignore
 import Condition = fhir4.Condition;
-import MedicationRequest = fhir.MedicationRequest;
-import Composition = fhir.Composition;
-import DocumentReference = fhir.DocumentReference;
-import Immunization = fhir.Immunization;
-import AllergyIntolerance = fhir.AllergyIntolerance;
+import MedicationRequest = fhir4.MedicationRequest;
+import Composition = fhir4.Composition;
+import DocumentReference = fhir4.DocumentReference;
+import Immunization = fhir4.Immunization;
+import AllergyIntolerance = fhir4.AllergyIntolerance;
 import {FHIREvent} from "../model/eventModel";
-import Encounter = fhir.Encounter;
-import Identifier = fhir.Identifier;
-import Reference = fhir.Reference;
-import Practitioner = fhir.Practitioner;
-import Organization = fhir.Organization;
-import Resource = fhir.Resource;
-import PractitionerRole = fhir.PractitionerRole;
+import Encounter = fhir4.Encounter;
+import Identifier = fhir4.Identifier;
+import Reference = fhir4.Reference;
+import Practitioner = fhir4.Practitioner;
+import Organization = fhir4.Organization;
+import Resource = fhir4.Resource;
+import PractitionerRole = fhir4.PractitionerRole;
 
 @Injectable({
   providedIn: 'root'
@@ -88,8 +88,8 @@ export class FhirService {
     });
   }
 
-  getRole(role :string) :Bundle {
-    return this.roles.get(role);
+  getRole(role :string) :fhir4.PractitionerRole {
+    return this.extractPractitionerRole(this.roles.get(role));
   }
   putRole(role :string, practitionerRole : Bundle)  {
     return this.roles.set(role,practitionerRole);
@@ -382,7 +382,7 @@ export class FhirService {
         const bundle = result as Bundle;
         if (bundle.entry !== undefined && bundle.entry.length > 0) {
           for (const entry of bundle.entry) {
-            tasks.tasks.push(entry.resource as fhir.Task);
+            tasks.tasks.push(entry.resource as fhir4.Task);
           }
           this.tasksChanged.emit(tasks);
         } else {
@@ -405,7 +405,7 @@ export class FhirService {
 
           patients = [];
           for (const entry of bundle.entry) {
-            patients.push(entry.resource as fhir.Patient);
+            patients.push(entry.resource as fhir4.Patient);
           }
           this.patientsChanged.emit(patients);
         } else {
@@ -422,7 +422,7 @@ export class FhirService {
       this.patientChange.emit(this.patient);
       return;
     }
-    var patient = {
+    var patient : fhir4.Patient= {
       resourceType: 'Patient',
       identifier: [{
         system: "https://auth.mayfield-is.co.uk/Id/UserName",
@@ -470,7 +470,7 @@ export class FhirService {
      return entry;
   }
 
-  getPractitionerRole(serverName: string, reference : Reference) :Observable<Bundle> {
+  getPractitionerRole(serverName: string, reference : fhir4.Reference) :Observable<any> {
 
       var ids = reference.reference.split('/');
       const headers = this.getHeaders();
@@ -479,7 +479,8 @@ export class FhirService {
   }
 
   extractPractitionerRole(bundle : Bundle) {
-    var practitionerRole: fhir.PractitionerRole = {
+    var practitionerRole: fhir4.PractitionerRole = {
+      "resourceType" : "PractitionerRole"
     };
     // Find PractitionerRole
     for (const entry of bundle.entry) {
@@ -515,7 +516,7 @@ export class FhirService {
       return practitionerRole;
   }
 
-  getQuesionnaireResponse(serverName:string, encounter : string) :Observable<Bundle> {
+  getQuesionnaireResponse(serverName:string, encounter : string) :Observable<any> {
     const headers = this.getHeaders();
     var url = this.getServerUrl(serverName) + '/QuestionnaireResponse?encounter='+encounter;
     // tslint:disable-next-line:typedef
@@ -535,7 +536,7 @@ export class FhirService {
     return this.http.get(url , { headers})
   }
 
-  getServerPatient(serverName: string, patient : Patient) {
+  getServerPatient(serverName: string, patient : fhir4.Patient) {
     if (patient === undefined) return;
 
     let headers = this.getHeaders();
@@ -553,7 +554,7 @@ export class FhirService {
           headers = headers.append('Prefer','return=representation');
           this.http.post(this.getServerUrl(serverName) +"/Patient", patient,{ 'headers' : headers}).subscribe(result => {
             console.log(result);
-            this.patient = result;
+            this.patient = result as fhir4.Patient;
             this.patientChange.emit(this.patient);
           });
         }
@@ -561,14 +562,14 @@ export class FhirService {
     )
 
   }
-  searchPatients(serverName: string, term: string): Observable<fhir.Bundle> {
+  searchPatients(serverName: string, term: string): Observable<any> {
     const url = this.getServerUrl(serverName);
     let headers = this.getHeaders();
     if (!isNaN(parseInt(term))) {
-      return this.http.get<fhir.Bundle>(url + `/Patient?identifier=${term}`, {'headers': headers});
+      return this.http.get<fhir4.Bundle>(url + `/Patient?identifier=${term}`, {'headers': headers});
     } else {
 
-      return this.http.get<fhir.Bundle>(url + `/Patient?name=${term}`, {'headers': headers});
+      return this.http.get<fhir4.Bundle>(url + `/Patient?name=${term}`, {'headers': headers});
 
     }
 

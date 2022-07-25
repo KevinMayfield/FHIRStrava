@@ -7,7 +7,7 @@ import {MatSort, Sort} from "@angular/material/sort";
 import {LinksService} from "../../services/links.service";
 import {FhirService} from "../../services/fhir.service";
 import {FHIREvent} from "../../model/eventModel";
-import Observation = fhir.Observation;
+import Observation = fhir4.Observation;
 
 
 @Component({
@@ -17,7 +17,7 @@ import Observation = fhir.Observation;
 })
 export class ObservationComponent implements OnInit {
 
-  @Input() observations: fhir.Observation[];
+  @Input() observations: fhir4.Observation[];
 
 
   @Input() reference: string;
@@ -27,7 +27,7 @@ export class ObservationComponent implements OnInit {
   @Input() patientId: string;
   @Input() serverName: string;
 
-  @Output() observation = new EventEmitter<fhir.Observation>();
+  @Output() observation = new EventEmitter<fhir4.Observation>();
 
   dataSource : any;
   @ViewChild(MatSort) sort: MatSort | undefined;
@@ -75,7 +75,7 @@ export class ObservationComponent implements OnInit {
 
 
 
-  getValue(observation: fhir.Observation): string {
+  getValue(observation: fhir4.Observation): string {
     // console.log("getValue called" + observation.valueQuantity.value);
     if (observation === undefined) {
         return '';
@@ -138,7 +138,7 @@ export class ObservationComponent implements OnInit {
 
 
 
-  getCodeTip(codeableConcept : fhir.CodeableConcept) {
+  getCodeTip(codeableConcept : fhir4.CodeableConcept) {
     for (var code of codeableConcept.coding) {
       if (this.linkService.isSNOMED(code.system)) {
         return "SNOMED "+code.code
@@ -151,7 +151,7 @@ export class ObservationComponent implements OnInit {
     return this.linkService.isSNOMED(system);
   }
 
-  getSNOMEDLink(codeableConcept: fhir.CodeableConcept) {
+  getSNOMEDLink(codeableConcept: fhir4.CodeableConcept) {
     for (var code of codeableConcept.coding) {
       if (this.linkService.isSNOMED(code.system)) {
         window.open(this.linkService.getSNOMEDLink(code), '_blank');

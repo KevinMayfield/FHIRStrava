@@ -15,7 +15,7 @@ import {FHIREvent} from "../../model/eventModel";
 })
 export class MedicationRequestComponent implements OnInit {
 
-  @Input() medicationRequests: fhir.MedicationRequest[];
+  @Input() medicationRequests: fhir4.MedicationRequest[];
 
   @Input() patientId: string;
 
@@ -68,7 +68,7 @@ export class MedicationRequestComponent implements OnInit {
   isSNOMED(system: string): boolean {
     return this.linkService.isSNOMED(system);
   }
-  getCodeTip(codeableConcept : fhir.CodeableConcept) {
+  getCodeTip(codeableConcept : fhir4.CodeableConcept) {
     for (var code of codeableConcept.coding) {
       if (this.linkService.isSNOMED(code.system)) {
         return "SNOMED "+code.code
@@ -78,14 +78,14 @@ export class MedicationRequestComponent implements OnInit {
   }
 
 
-  getDMDLink(codeableConcept: fhir.CodeableConcept) {
+  getDMDLink(codeableConcept: fhir4.CodeableConcept) {
     for (var code of codeableConcept.coding) {
       if (this.linkService.isSNOMED(code.system)) {
         window.open(this.linkService.getDMDLink(code),  '_blank');
       }
     }
   }
-  getSNOMEDLink(codeableConcept: fhir.CodeableConcept) {
+  getSNOMEDLink(codeableConcept: fhir4.CodeableConcept) {
     for (var code of codeableConcept.coding) {
       if (this.linkService.isSNOMED(code.system)) {
         window.open(this.linkService.getSNOMEDLink(code), '_blank');
@@ -150,9 +150,9 @@ export class MedicationRequestComponent implements OnInit {
     }
   }
 */
-  viewEncounter(request: fhir.MedicationRequest) {
-    if (request.context !== undefined) {
-      this.context.emit(request.context);
+  viewEncounter(request: fhir4.MedicationRequest) {
+    if (request.encounter !== undefined) {
+      this.context.emit(request.encounter);
     }
   }
   select(resource) {
